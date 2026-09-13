@@ -40,11 +40,13 @@ class ThreadComment extends Model {
 
     protected $with = ['author'];
 
-    protected $casts = [
-        'creation_date' => Datetime::class,
-        'edit_date' => Datetime::class,
-        'content' => Markdown::class
-    ];
+    protected function casts(): array {
+        return [
+            'creation_date' => Datetime::class,
+            'edit_date' => Datetime::class,
+            'content' => Markdown::class
+        ];
+    }
 
     protected $dispatchesEvents = [
         'created' => ThreadCommentCreated::class

@@ -103,4 +103,16 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | The app only caches scalars, so classes are never unserialized from
+    | cache payloads, closing the object-injection vector.
+    |
+    */
+
+    'serializable_classes' => false,
+
 ];

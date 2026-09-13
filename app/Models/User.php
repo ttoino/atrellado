@@ -50,9 +50,11 @@ class User extends Authenticatable implements MustVerifyEmail {
         'remember_token'
     ];
 
-    protected $casts = [
-        'is_admin' => 'boolean',
-    ];
+    protected function casts(): array {
+        return [
+            'is_admin' => 'boolean',
+        ];
+    }
 
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
