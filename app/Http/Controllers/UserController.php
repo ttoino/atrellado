@@ -110,7 +110,7 @@ class UserController extends Controller {
             Files::convertToWebp($data['profile_picture'], 512, 1);
 
             // TODO: change this to use accessor
-            $path = Storage::putFileAs("public/users/", $data['profile_picture'], "$user->id.webp");
+            $path = Storage::putFileAs("users/", $data['profile_picture'], "$user->id.webp");
 
             if ($path === false) {
                 // TODO: handle file upload err

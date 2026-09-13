@@ -20,7 +20,20 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function register() {
-        //
+        // workers-php: `r2` filesystem driver over the FILES bucket
+        // binding. Registered lazily — WorkersPHP classes only exist
+        // inside the worker.
+        \Illuminate\Support\Facades\Storage::extend('r2', function ($app, $config) {
+            $adapter = new \App\Support\WorkersR2Adapter(
+                new \WorkersPHP\R2Bucket($config['binding'] ?? 'FILES')
+            );
+
+            return new \Illuminate\Filesystem\FilesystemAdapter(
+                new \League\Flysystem\Filesystem($adapter, $config),
+                $adapter,
+                $config
+            );
+        });
     }
 
     /**
@@ -29,6 +42,25 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
+        // workers-php: the bridge stages multipart uploads outside Zend's
+        // rfc1867 registry, so is_uploaded_file() fails for them. Re-mark
+        // as test files so UploadedFile::isValid() accepts them.
+        if (class_exists(\WorkersPHP\Env::class)) {
+            $request = $this->app['request'];
+            $files = [];
+            foreach ($request->files->all() as $key => $file) {
+                // Laravel wraps lazily on ->file() access; the bag itself
+                // holds Symfony instances.
+                $files[$key] = $file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile
+                    ? new \Illuminate\Http\UploadedFile(
+                        $file->getPathname(), $file->getClientOriginalName(),
+                        $file->getClientMimeType(), (int) $file->getError(), true,
+                    )
+                    : $file;
+            }
+            $request->files->replace($files);
+        }
+
         Paginator::useBootstrapFive();
         Route::pattern('id', '[0-9]+');
         RateLimiter::for('api', function (Request $request) {

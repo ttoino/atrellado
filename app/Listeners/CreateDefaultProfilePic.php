@@ -70,7 +70,7 @@ class CreateDefaultProfilePic {
 
     public function handle(UserEvent $event) {
         Storage::put(
-            "public/users/default_{$event->user->id}.svg",
+            "users/default_{$event->user->id}.svg",
                 view('other.pfp', [
                     'background' => static::generateColor($event->user->id),
                     'text' => $event->user->name[0]

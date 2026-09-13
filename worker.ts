@@ -1,5 +1,7 @@
 // Worker entrypoint. The D1 binding backs Laravel's custom `d1`
-// database driver; APP_ENV surfaces to PHP as `$env->APP_ENV`.
+// database driver; FILES backs the `r2` filesystem disk and serves
+// uploaded files under /storage. APP_ENV surfaces to PHP as
+// `$env->APP_ENV`.
 
 import {createPhpHandler} from "workers-php";
 
@@ -10,7 +12,11 @@ export default {
 		displayErrors: false,
 		bindings: {
 			DB:      "d1",
+			FILES:   "r2",
 			APP_ENV: "var",
 		},
+		staticRoutes: [
+			{pathPrefix: "/storage/", from: "FILES", stripPrefix: true},
+		],
 	}),
 };

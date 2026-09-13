@@ -29,7 +29,9 @@ Laravel migrations (the business triggers are Eloquent observers);
 artisan cannot reach D1 outside the worker, so migrations run in-place:
 `build/migrate.sh` curls a key-gated route that calls `artisan migrate`
 against the D1 binding. Full-text search uses LIKE fallbacks instead of
-tsvector/ts_rank.
+tsvector/ts_rank. Uploaded files (profile pictures) live in an R2 bucket
+(`FILES` binding): `FILESYSTEM_DRIVER=r2` via `app/Support/WorkersR2Adapter.php`,
+served back under `/storage/` by a `staticRoutes` entry in `worker.ts`.
 
 ```bash
 pnpm install

@@ -42,6 +42,14 @@ return [
             'visibility' => 'public',
         ],
 
+        // workers-php: R2 bucket, served under /storage by staticRoutes.
+        'r2' => [
+            'driver' => 'r2',
+            'binding' => env('FILES_BINDING', 'FILES'),
+            'url' => '/storage',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
