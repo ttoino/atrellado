@@ -13,17 +13,33 @@
 // Home
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\StaticController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TaskCommentController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskGroupController;
+use App\Http\Controllers\ThreadCommentController;
+use App\Http\Controllers\ThreadController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OAuthController;
+use App\Http\Controllers\Auth\PasswordRecoveryController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Enums\ProviderType;
 
-Route::get('', 'HomeController@show')->name('home');
+Route::get('', [HomeController::class, 'show'])->name('home');
 
 // Static
-Route::get('{name}', 'StaticController@show')
+Route::get('{name}', [StaticController::class, 'show'])
     ->whereIn('name', StaticController::STATIC_PAGES)->name('static');
 
 // User
-Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->controller('UserController')->group(function () {
+Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->controller(UserController::class)->group(function () {
     Route::prefix('/{user}')->where(['user', '[0-9]+'])->group(function () {
         Route::get('', 'show')->name('profile');
 
@@ -39,10 +55,10 @@ Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->control
     });
 });
 
-Route::get('/notifications', 'UserController@showNotifications')->middleware(['auth', 'verified'])->name('notifications');
+Route::get('/notifications', [UserController::class, 'showNotifications'])->middleware(['auth', 'verified'])->name('notifications');
 
 // Project 
-Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->controller('ProjectController')->group(function () {
+Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->controller(ProjectController::class)->group(function () {
     Route::get('', 'index')->name('.list');
 
     Route::prefix('/new')->group(function () {
@@ -73,13 +89,13 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
         
         Route::post('/delete', 'destroy')->name('.delete');
 
-        Route::prefix('/task')->name('.task')->controller('TaskController')->group(function () {
+        Route::prefix('/task')->name('.task')->controller(TaskController::class)->group(function () {
             Route::prefix('/{task}')->where(['task', '[0-9]+'])->scopeBindings()->group(function () {
                 Route::get('', 'show')->name('.info');
             });
         });
 
-        Route::prefix('/thread')->name('.thread')->controller('ThreadController')->group(function () {
+        Route::prefix('/thread')->name('.thread')->controller(ThreadController::class)->group(function () {
             Route::prefix('/{thread}')->where(['thread', '[0-9]+'])->scopeBindings()->group(function () {
                 Route::get('', 'show')->name('');
             });
@@ -88,7 +104,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 });
 
 // Admin
-Route::prefix('/admin')->middleware(['auth', 'isAdmin', 'verified'])->name('admin')->controller('AdminController')->group(function () {
+Route::prefix('/admin')->middleware(['auth', 'isAdmin', 'verified'])->name('admin')->controller(AdminController::class)->group(function () {
     Route::redirect('', '/admin/users')->name('');
     
     Route::get('/users', 'listUsers')->name('.users');
@@ -107,29 +123,29 @@ Route::prefix('/admin')->middleware(['auth', 'isAdmin', 'verified'])->name('admi
 });
 
 // Authentication
-Route::name('')->middleware('guest')->namespace('Auth')->group(function () {
-    Route::controller('LoginController')->group(function () {
+Route::name('')->middleware('guest')->group(function () {
+    Route::controller(LoginController::class)->group(function () {
         Route::get('/login', 'showLoginForm')->name('login');
         Route::post('/login', 'login');
         Route::get('/logout', 'logout')->withoutMiddleware('guest')->middleware('auth')->name('logout');
     });
-    Route::controller('RegisterController')->group(function () {
+    Route::controller(RegisterController::class)->group(function () {
         Route::get('/register', 'showRegistrationForm')->name('register');
         Route::post('/register', 'register');
     });
-    Route::controller('PasswordRecoveryController')->name('password')->group(function () {
+    Route::controller(PasswordRecoveryController::class)->name('password')->group(function () {
         Route::get('/recover-password', 'showPasswordRecoveryForm')->name('.request');
         Route::post('/recover-password', 'sendPasswordRecoveryLink')->name('.request-action');
         Route::get('/reset-password/{token}', 'showPasswordResetForm')->name('.reset');
         Route::post('/reset-password', 'resetPassword')->name('.reset-action');
     });
 
-    Route::controller('OAuthController')->prefix('/oauth/{provider}')->whereIn('provider', ProviderType::values())->name('oauth')->group(function () {
+    Route::controller(OAuthController::class)->prefix('/oauth/{provider}')->whereIn('provider', ProviderType::values())->name('oauth')->group(function () {
         Route::get('/redirect', 'redirectOAuth')->name('.redirect');
         Route::get('/callback', 'handleOAuthCallback')->name('.callback');
     });
 
-    Route::controller('EmailVerificationController')->prefix('/email')->withoutMiddleware('guest')->middleware('auth')->name('verification')->group(function () {
+    Route::controller(EmailVerificationController::class)->prefix('/email')->withoutMiddleware('guest')->middleware('auth')->name('verification')->group(function () {
         Route::get('/verify', 'showEmailVerificationNotice')->name('.notice');
         Route::get('/verify/{id}/{hash}', 'verifyEmail')->middleware('signed')->name('.verify');
         Route::post('/verification-notice', 'sendNewVerificationEmail')->middleware('throttle:6,1')->name('.send');
@@ -138,7 +154,7 @@ Route::name('')->middleware('guest')->namespace('Auth')->group(function () {
 
 Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
-    Route::prefix('/project')->name('.project')->middleware('verified')->controller('ProjectController')->group(function () {
+    Route::prefix('/project')->name('.project')->middleware('verified')->controller(ProjectController::class)->group(function () {
 
         Route::post('', 'store')->name('.new');
 
@@ -177,7 +193,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/user')->name('.user')->middleware('verified')->controller('UserController')->group(function () {
+    Route::prefix('/user')->name('.user')->middleware('verified')->controller(UserController::class)->group(function () {
         
         Route::post('', 'store')->name('.new');      
 
@@ -194,7 +210,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/task')->name('.task')->middleware('verified')->controller('TaskController')->group(function () {
+    Route::prefix('/task')->name('.task')->middleware('verified')->controller(TaskController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
 
@@ -211,7 +227,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/task-comment')->name('.task-comment')->middleware('verified')->controller('TaskCommentController')->group(function () {
+    Route::prefix('/task-comment')->name('.task-comment')->middleware('verified')->controller(TaskCommentController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
@@ -224,7 +240,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/task-group')->name('.task-group')->middleware('verified')->controller('TaskGroupController')->group(function () {
+    Route::prefix('/task-group')->name('.task-group')->middleware('verified')->controller(TaskGroupController::class)->group(function () {
         
         Route::post('/new', 'store')->name('.new');
         
@@ -238,7 +254,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/thread')->name('.thread')->middleware('verified')->controller('ThreadController')->group(function () {
+    Route::prefix('/thread')->name('.thread')->middleware('verified')->controller(ThreadController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         
@@ -250,7 +266,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/thread-comment')->name('.thread-comment')->middleware('verified')->controller('ThreadCommentController')->group(function () {
+    Route::prefix('/thread-comment')->name('.thread-comment')->middleware('verified')->controller(ThreadCommentController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
@@ -263,7 +279,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/tag')->name('.tag')->middleware('verified')->controller('TagController')->group(function () {
+    Route::prefix('/tag')->name('.tag')->middleware('verified')->controller(TagController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         
@@ -275,7 +291,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 
-    Route::prefix('/notifications')->name('.notification')->middleware('verified')->controller('NotificationController')->group(function () {
+    Route::prefix('/notifications')->name('.notification')->middleware('verified')->controller(NotificationController::class)->group(function () {
         Route::prefix('/{notification}')->group(function () {
 
             Route::get('', 'show')->name('');
