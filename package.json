@@ -5,7 +5,7 @@
         "dev:assets": "vite --host",
         "build:assets": "vite build",
         "build": "bash build/build.sh",
-        "dev": "npm run build --silent && wrangler dev",
+        "dev": "npm run build --silent && wrangler dev --port 8799",
         "deploy": "npm run build --silent && wrangler deploy",
         "migrate:local": "bash build/migrate.sh --local",
         "migrate:remote": "bash build/migrate.sh --remote"

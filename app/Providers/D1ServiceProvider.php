@@ -12,7 +12,11 @@ class D1ServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app['db']->extend('d1', function (array $config) {
+        // The name is set so Connection::getName() works — Migrator::runMethod
+        // promotes it to the default connection while a migration runs.
+        $this->app['db']->extend('d1', function (array $config, string $name) {
+            $config['name'] = $name;
+
             return new SQLiteConnection(
                 new D1PDO($config['binding'] ?? 'DB'),
                 $config['database'] ?? ':memory:',

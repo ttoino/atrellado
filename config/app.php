@@ -121,6 +121,9 @@ return [
 
     'key' => env('APP_KEY'),
 
+    // Shared secret for the workers-php in-worker migrate endpoint.
+    'workers_migrate_key' => env('WORKERS_MIGRATE_KEY'),
+
     'cipher' => 'AES-256-CBC',
 
 ];

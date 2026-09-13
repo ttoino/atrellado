@@ -301,3 +301,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         });
     });
 });
+
+// workers-php: in-place artisan migrations against the D1 binding
+// (outside the throttled API group; the controller enforces the key).
+Route::post('/_workers/migrate', \App\Http\Controllers\WorkersMigrateController::class);

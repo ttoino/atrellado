@@ -26,14 +26,15 @@ This repo deploys as a Cloudflare Worker via
 wasm, with Cloudflare D1 as the database (custom `d1` Laravel driver,
 see `app/Providers/D1ServiceProvider.php`). The schema is driver-agnostic
 Laravel migrations (the business triggers are Eloquent observers);
-`build/migrate.sh` dumps them to SQL via `artisan schema:dump` for
-`wrangler d1 execute`. Full-text search uses LIKE fallbacks instead of
+artisan cannot reach D1 outside the worker, so migrations run in-place:
+`build/migrate.sh` curls a key-gated route that calls `artisan migrate`
+against the D1 binding. Full-text search uses LIKE fallbacks instead of
 tsvector/ts_rank.
 
 ```bash
 pnpm install
-npm run migrate:local   # apply the migration dump to local D1
 npm run dev             # build assets + vendor + bundle, wrangler dev
+npm run migrate:local   # artisan migrate inside wrangler dev (port 8799)
 # npm run migrate:remote && npm run deploy
 ```
 

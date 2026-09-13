@@ -34,6 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
             '^localhost(:\d+)?$',
         ]);
 
+        // workers-php: the migrate endpoint authenticates with its own
+        // shared key instead of a session CSRF token.
+        $middleware->validateCsrfTokens(except: ['/_workers/migrate']);
+
         // The old web group ran AuthenticateSession; the framework default
         // does not.
         $middleware->web(append: [
