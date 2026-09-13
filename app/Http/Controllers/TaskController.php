@@ -47,12 +47,12 @@ class TaskController extends Controller {
         try {
             foreach ($data['tags'] ?? [] as $tagId) {
                 $tag = Tag::findOrFail($tagId);
-                $task->tags()->save($tag);
+                $task->attachTag($tag);
             }
 
             foreach ($data['assignees'] ?? [] as $assigneeId) {
                 $assignee = User::findOrFail($assigneeId);
-                $task->assignees()->save($assignee);
+                $task->attachAssignee($assignee);
             }
         } catch (Exception $e) {
             $task->delete();
@@ -165,12 +165,12 @@ class TaskController extends Controller {
         $task->assignees()->detach();
         foreach ($data['tags'] ?? [] as $tagId) {
             $tag = Tag::findOrFail($tagId);
-            $task->tags()->save($tag);
+            $task->attachTag($tag);
         }
 
         foreach ($data['assignees'] ?? [] as $assigneeId) {
             $assignee = User::findOrFail($assigneeId);
-            $task->assignees()->save($assignee);
+            $task->attachAssignee($assignee);
         }
 
         $task->push();

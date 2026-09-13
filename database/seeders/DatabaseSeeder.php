@@ -5,26 +5,18 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+// Schema, indexes and the old business triggers are owned by
+// database/migrations + model observers now. populate.sql remains the
+// course fixture (PostgreSQL-only, e.g. x'..'::COLOR casts); the factory
+// mode is driver-agnostic.
 class DatabaseSeeder extends Seeder {
+
     /**
-     * Run the database seeds.
+     * Seed the application's database.
      *
      * @return void
      */
     public function run() {
-        $path = 'resources/sql';
-
-        $this->command->info('Creating schema!');
-        DB::unprepared(file_get_contents("$path/schema.sql"));
-
-        $this->command->info('Adding indexes!');
-        DB::unprepared(file_get_contents("$path/indexes.sql"));
-
-        $this->command->info('Adding triggers!');
-        DB::unprepared(file_get_contents("$path/triggers.sql"));
-
-        $this->command->info('Populating database!');
-
         if (env('DB_LARGE_DATA')) {
             $this->call([
                 UserSeeder::class,
@@ -37,7 +29,7 @@ class DatabaseSeeder extends Seeder {
                 ThreadCommentSeeder::class,
             ]);
         } else {
-            DB::unprepared(file_get_contents("$path/populate.sql"));
+            DB::unprepared(file_get_contents('resources/sql/populate.sql'));
         }
 
         $this->command->info('Database seeded!');

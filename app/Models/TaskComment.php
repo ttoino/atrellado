@@ -14,6 +14,11 @@ use Spatie\LaravelMarkdown\MarkdownRenderer;
 class TaskComment extends Model {
     use HasFactory;
 
+    // Author-membership validation ported from the PL/pgSQL triggers.
+    protected static function booted(): void {
+        static::observe(\App\Observers\TaskCommentObserver::class);
+    }
+
     const CREATED_AT = 'creation_date';
     const UPDATED_AT = 'edit_date';
 

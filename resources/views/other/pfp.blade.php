@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+{!! '<' . '?xml version="1.0" encoding="utf-8"?' . '>' !!}
 <svg version="1.1" width="128" height="128" xmlns="http://www.w3.org/2000/svg">
 
     <rect width="100%" height="100%" fill="{{ $background }}" />
