@@ -3,7 +3,7 @@
         <div class="p-2 rounded-lg bg-yellow-100">
             <div class="flex items-center justify-between flex-wrap">
                 <div class="w-0 flex-1 items-center hidden md:inline">
-                    <p class="ml-3 text-black cookie-consent__message">
+                    <p class="ms-3 text-black cookie-consent__message">
                         {!! trans('cookie-consent::texts.message') !!}
                     </p>
                 </div>

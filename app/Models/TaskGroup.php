@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TaskGroup extends Model {
-    
+
     use HasFactory;
-    
+
     public $timestamps = false;
+
+    // Sibling-position bookkeeping ported from the PL/pgSQL triggers.
+    protected static function booted(): void {
+        static::observe(\App\Observers\TaskGroupObserver::class);
+    }
 
     /**
      * The attributes that are mass assignable.

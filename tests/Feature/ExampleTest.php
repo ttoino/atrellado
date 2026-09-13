@@ -7,6 +7,9 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    // Exercises the migrations on every run (sqlite :memory: in CI).
+    use RefreshDatabase;
+
     /**
      * A basic test example.
      *

@@ -13,6 +13,11 @@ use Spatie\LaravelMarkdown\MarkdownRenderer;
 class Project extends Model {
     use HasFactory;
 
+    // Coordinator-membership bookkeeping ported from the PL/pgSQL triggers.
+    protected static function booted(): void {
+        static::observe(\App\Observers\ProjectObserver::class);
+    }
+
     const CREATED_AT = 'creation_date';
     const UPDATED_AT = 'edit_date';
 

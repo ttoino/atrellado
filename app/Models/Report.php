@@ -25,9 +25,11 @@ class Report extends Model {
      */
     protected $hidden = [];
 
-    protected $casts = [
-        'creation_date' => Datetime::class
-    ];
+    protected function casts(): array {
+        return [
+            'creation_date' => Datetime::class
+        ];
+    }
 
     public function project() {
         return $this->belongsTo(Project::class, 'project_id');

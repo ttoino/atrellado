@@ -169,7 +169,7 @@ return [
     */
 
     # use this to force HTTPS on production servers
-    'secure' => strcmp(env('APP_ENV'), 'production') === 0 ? true : env('SESSION_SECURE_COOKIE'),
+    'secure' => env('APP_ENV') === 'production' ? true : env('SESSION_SECURE_COOKIE'),
 
     /*
     |--------------------------------------------------------------------------
@@ -198,5 +198,18 @@ return [
     */
 
     'same_site' => 'lax',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Serialization
+    |--------------------------------------------------------------------------
+    |
+    | The app only stores scalars in the session, so JSON serialization is
+    | safe and prevents object-injection via session payloads. Switching
+    | formats invalidates existing sessions (users log in again).
+    |
+    */
+
+    'serialization' => 'json',
 
 ];

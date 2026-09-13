@@ -8,21 +8,22 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.0",
+        "php": "^8.3",
         "ext-gd": "*",
-        "fideloper/proxy": "^4.4",
-        "laravel/framework": "^9.0",
+        "laravel/framework": "^13.0",
         "laravel/socialite": "^5.5",
         "laravel/ui": "^4.0",
-        "nesbot/carbon": "^2.63",
+        "nesbot/carbon": "^3.0",
         "spatie/laravel-cookie-consent": "^3.2",
         "spatie/laravel-markdown": "^2.2",
         "symfony/polyfill-iconv": "^1.27"
     },
     "require-dev": {
-        "spatie/laravel-ignition": "^1.0",
         "fakerphp/faker": "^1.20",
-        "nunomaduro/collision": "^6.1"
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^12.0",
+        "spatie/laravel-ignition": "^2.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -46,8 +47,6 @@
             "Tests\\": "tests/"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

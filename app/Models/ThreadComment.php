@@ -14,6 +14,11 @@ use Spatie\LaravelMarkdown\MarkdownRenderer;
 class ThreadComment extends Model {
     use HasFactory;
 
+    // Author-membership validation ported from the PL/pgSQL triggers.
+    protected static function booted(): void {
+        static::observe(\App\Observers\ThreadCommentObserver::class);
+    }
+
     const CREATED_AT = 'creation_date';
     const UPDATED_AT = 'edit_date';
 
@@ -35,11 +40,13 @@ class ThreadComment extends Model {
 
     protected $with = ['author'];
 
-    protected $casts = [
-        'creation_date' => Datetime::class,
-        'edit_date' => Datetime::class,
-        'content' => Markdown::class
-    ];
+    protected function casts(): array {
+        return [
+            'creation_date' => Datetime::class,
+            'edit_date' => Datetime::class,
+            'content' => Markdown::class
+        ];
+    }
 
     protected $dispatchesEvents = [
         'created' => ThreadCommentCreated::class

@@ -27,8 +27,6 @@ class AuthServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        $this->registerPolicies();
-
         Gate::define('admin-action', function (User $user) {
             if (!$user->is_admin)
                 return Response::deny('Only an admin can perform this action');
