@@ -2,7 +2,6 @@
 -- Populate
 --------------------------------------------------------------------------------------------------------------------------------
 
-SET search_path TO lbaw2265;
 
 INSERT INTO user_profile(
   name, email, password, blocked, is_admin
@@ -344,43 +343,43 @@ INSERT INTO tag(
 VALUES 
   (
     'molestie in, tempus', 'Cras dictum ultricies ligula. Nullam enim.', 
-    x'f4b8b7' :: COLOR, 3
+    16038071, 3
   ), 
   (
     'tellus eu augue', 'dui lectus rutrum urna, nec luctus', 
-    x'8ed863' :: COLOR, 2
+    9361507, 2
   ), 
   (
     'varius et, euismod', 'risus. Duis a mi fringilla mi', 
-    x'8fd1e0' :: COLOR, 3
+    9425376, 3
   ), 
   (
     'magna. Duis dignissim', 'id ante dictum cursus. Nunc mauris', 
-    x'3282ad' :: COLOR, 1
+    3310253, 1
   ), 
   (
     'iaculis quis, pede.', 'facilisi. Sed neque. Sed eget lacus.', 
-    x'75dd77' :: COLOR, 1
+    7724407, 1
   ), 
   (
     'dictum magna. Ut', 'Fusce aliquet magna a neque. Nullam', 
-    x'35ea5d' :: COLOR, 2
+    3533405, 2
   ), 
   (
     'augue ac ipsum.', 'molestie in, tempus eu, ligula. Aenean', 
-    x'009179' :: COLOR, 2
+    37241, 2
   ), 
   (
     'parturient montes, nascetur', 'Morbi accumsan laoreet ipsum. Curabitur consequat,', 
-    x'14369b' :: COLOR, 3
+    1324699, 3
   ), 
   (
     'eu enim. Etiam', 'ut, nulla. Cras eu tellus eu', 
-    x'4dc429' :: COLOR, 2
+    5096489, 2
   ), 
   (
     'lacus pede sagittis', 'Curae Phasellus ornare. Fusce mollis. Duis', 
-    x'b5eeff' :: COLOR, 1
+    11923199, 1
   );
 
 INSERT INTO task_tag 

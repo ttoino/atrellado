@@ -27,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->trustProxies(at: '*');
 
+        // workers-php: wrangler dev serves localhost; the default trusts
+        // only subdomains of the app URL.
+        $middleware->trustHosts(fn () => [
+            '^(.+\.)?'.preg_quote(parse_url(config('app.url'), PHP_URL_HOST)).'$',
+            '^localhost(:\d+)?$',
+        ]);
+
         // The old web group ran AuthenticateSession; the framework default
         // does not.
         $middleware->web(append: [

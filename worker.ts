@@ -8,7 +8,6 @@ export default {
 		docroot: "public",
 		entrypoint: "index.php",
 		displayErrors: false,
-		errorReporting: "E_ALL & ~E_DEPRECATED & ~E_NOTICE",
 		bindings: {
 			DB:      "d1",
 			APP_ENV: "var",

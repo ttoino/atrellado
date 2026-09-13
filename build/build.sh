@@ -28,6 +28,19 @@ docker run --rm \
 docker run --rm -v "$PWD:/app" -w /app composer:2 \
 	chown -R "$(id -u):$(id -g)" vendor composer.lock
 
+# 2b. Framework caches (config + routes): fewer PHP files parsed per
+# request lowers the isolate memory high-water — the app brushes the
+# 128 MiB isolate limit otherwise. The repo is mounted at the runtime
+# appRoot so baked absolute paths match the worker's filesystem.
+docker run --rm \
+	-v "$PWD:/persist/app" \
+	-w /persist/app \
+	composer:2 sh -c 'php artisan config:cache && php artisan route:cache && php artisan view:cache'
+
+# The container writes root-owned files; hand them back to the user.
+docker run --rm -v "$PWD:/persist/app" -w /persist/app composer:2 \
+	chown -R "$(id -u):$(id -g)" bootstrap/cache storage/compiled-views
+
 # 3. Bundle the app (docroot is the web root; vendor ships in the tarball).
 npx workers-php build ./ --out ./dist --docroot public --entrypoint index.php
 
