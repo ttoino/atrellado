@@ -13,6 +13,7 @@ export default {
 		bindings: {
 			DB:      "d1",
 			FILES:   "r2",
+			EMAIL:   "send_email",
 			APP_ENV: "var",
 		},
 		staticRoutes: [

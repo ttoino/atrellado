@@ -15,6 +15,12 @@
 			"bucket_name": "atrellado-files"
 		}
 	],
+	"send_email": [
+		{
+			"name": "EMAIL",
+			"allowed_sender_addresses": ["noreply@atrellado.toino.pt"]
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",

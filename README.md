@@ -32,6 +32,9 @@ against the D1 binding. Full-text search uses LIKE fallbacks instead of
 tsvector/ts_rank. Uploaded files (profile pictures) live in an R2 bucket
 (`FILES` binding): `FILESYSTEM_DRIVER=r2` via `app/Support/WorkersR2Adapter.php`,
 served back under `/storage/` by a `staticRoutes` entry in `worker.ts`.
+Mail goes out through a `send_email` binding (`EMAIL`) via
+`app/Support/Mailer/WorkersEmailTransport.php`; the sender domain
+`atrellado.toino.pt` is onboarded to Cloudflare Email Sending.
 
 ```bash
 pnpm install

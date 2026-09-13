@@ -62,6 +62,11 @@ return [
             'path' => '/usr/sbin/sendmail -bs',
         ],
 
+        // workers-php: sends through the Worker's send_email binding.
+        'workers-email' => [
+            'transport' => 'workers-email',
+        ],
+
         'log' => [
             'transport' => 'log',
             'channel' => env('MAIL_LOG_CHANNEL'),
