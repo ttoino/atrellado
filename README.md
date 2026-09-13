@@ -38,6 +38,23 @@ Mail goes out through a `send_email` binding (`EMAIL`) via
 is Workers KV (`CACHE` binding, `app/Support/WorkersKvStore.php`) so
 rate limits hold across isolates.
 
+## Memory: the 128 MiB isolate wall
+
+Workers isolates cap at 128 MiB. `php-web.wasm` declares its linear
+memory at exactly 128 MiB and accounting is touch-based: a cold PHP
+boot plus one Laravel 13 request touches ~110–125 MB, so roughly one
+heavy request (login with bcrypt, registration) fits per isolate.
+Symptoms are 503s on fresh isolates; warm isolates serve fine.
+
+Mitigations in place: `build/build.sh` bakes Laravel's config/route/view
+caches at the runtime mount path (`/persist/app`) so light reads skip
+most PHP parsing. Bcrypt stays at framework defaults. Vendor trimming
+(`tests/`, `docs/`) was evaluated and rejected — unmounted files are
+read lazily, so trimming shrinks the tarball but not per-request memory.
+
+Measure locally with `grep VmRSS /proc/<workerd-pid>/status` across
+requests; in production use the dashboard memory chart per version.
+
 ```bash
 pnpm install
 npm run dev             # build assets + vendor + bundle, wrangler dev
