@@ -39,6 +39,17 @@ class AppServiceProvider extends ServiceProvider {
             )
         );
 
+        // workers-php: `kv` cache store over the CACHE KV binding; used
+        // by the throttle middleware so rate limits hold across isolates.
+        \Illuminate\Support\Facades\Cache::extend('kv', fn ($app, $config) =>
+            \Illuminate\Support\Facades\Cache::repository(
+                new \App\Support\WorkersKvStore(
+                    $config['binding'] ?? 'CACHE',
+                    config('cache.prefix') . ':'
+                )
+            )
+        );
+
         \Illuminate\Support\Facades\Storage::extend('r2', function ($app, $config) {
             $adapter = new \App\Support\WorkersR2Adapter(
                 new \WorkersPHP\R2Bucket($config['binding'] ?? 'FILES')

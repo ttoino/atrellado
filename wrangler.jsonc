@@ -15,6 +15,12 @@
 			"bucket_name": "atrellado-files"
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "CACHE",
+			"id": "eb0e3247a091442fb2271e3612421c60"
+		}
+	],
 	"send_email": [
 		{
 			"name": "EMAIL",

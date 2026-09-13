@@ -34,7 +34,9 @@ tsvector/ts_rank. Uploaded files (profile pictures) live in an R2 bucket
 served back under `/storage/` by a `staticRoutes` entry in `worker.ts`.
 Mail goes out through a `send_email` binding (`EMAIL`) via
 `app/Support/Mailer/WorkersEmailTransport.php`; the sender domain
-`atrellado.toino.pt` is onboarded to Cloudflare Email Sending.
+`atrellado.toino.pt` is onboarded to Cloudflare Email Sending. The cache
+is Workers KV (`CACHE` binding, `app/Support/WorkersKvStore.php`) so
+rate limits hold across isolates.
 
 ```bash
 pnpm install

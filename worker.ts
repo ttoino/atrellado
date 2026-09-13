@@ -13,6 +13,7 @@ export default {
 		bindings: {
 			DB:      "d1",
 			FILES:   "r2",
+			CACHE:   "kv",
 			EMAIL:   "send_email",
 			APP_ENV: "var",
 		},

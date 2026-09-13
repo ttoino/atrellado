@@ -33,6 +33,12 @@ return [
 
     'stores' => [
 
+        // workers-php: Workers KV, shared across isolates (throttle).
+        'kv' => [
+            'driver' => 'kv',
+            'binding' => env('CACHE_BINDING', 'CACHE'),
+        ],
+
         'apc' => [
             'driver' => 'apc',
         ],
