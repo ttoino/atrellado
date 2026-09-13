@@ -10,10 +10,10 @@
     "require": {
         "php": "^8.2",
         "ext-gd": "*",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^12.0",
         "laravel/socialite": "^5.5",
         "laravel/ui": "^4.0",
-        "nesbot/carbon": "^2.63",
+        "nesbot/carbon": "^3.0",
         "spatie/laravel-cookie-consent": "^3.2",
         "spatie/laravel-markdown": "^2.2",
         "symfony/polyfill-iconv": "^1.27"
@@ -22,7 +22,7 @@
         "spatie/laravel-ignition": "^2.0",
         "fakerphp/faker": "^1.20",
         "nunomaduro/collision": "^8.1",
-        "phpunit/phpunit": "^10.0"
+        "phpunit/phpunit": "^11.0"
     },
     "config": {
         "optimize-autoloader": true,
