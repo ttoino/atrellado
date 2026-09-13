@@ -1,0 +1,25 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "atrellado",
+	"account_id": "e024e5a1e487a3d3a07815b431986107",
+	"main": "worker.ts",
+	"compatibility_date": "2026-09-13",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "atrellado-db",
+			"database_id": "7192fb5e-aaa0-4926-8aea-639a3bf4656b"
+		}
+	],
+	"vars": {
+		"APP_ENV": "production"
+	},
+	"rules": [
+		{ "type": "Text", "globs": ["**/*.php"], "fallthrough": true }
+	]
+}

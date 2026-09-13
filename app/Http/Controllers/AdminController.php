@@ -103,8 +103,7 @@ class AdminController extends Controller {
         $projects = Project::with('reports');
 
         if (!empty($search))
-            $projects = $projects->whereRaw('(fts_search @@ plainto_tsquery(\'english\', ?) OR project.name = ?)', [$search, $search])
-                ->orderByRaw('ts_rank(fts_search, plainto_tsquery(\'english\', ?)) DESC', [$search]); 
+            $projects = $projects->where('project.name', 'LIKE', "%{$search}%"); // workers-php: LIKE fallback, no tsvector on D1
         
         return $projects->cursorPaginate(10);
     }

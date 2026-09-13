@@ -14,3 +14,9 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .vscode
+
+# workers-php build outputs
+/dist/
+/.wrangler/
+/public/build/
+/storage/compiled-views/

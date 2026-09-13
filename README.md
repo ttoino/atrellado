@@ -18,3 +18,25 @@ This repository (and all others with the name format `feup-*`) are for archival 
 If you don't understand some part of the code or anything else in this repo, feel free to ask (although I may not understand it myself anymore).
 
 Keep in mind that this repo is public. If you copy any code and use it in your school projects you may be flagged for plagiarism by automated tools.
+
+## Cloudflare Workers deployment
+
+This repo deploys as a Cloudflare Worker via
+[workers-php](https://github.com/ttoino/php-wasm-worker): PHP 8.5 in
+wasm, with Cloudflare D1 as the database (custom `d1` Laravel driver,
+see `app/Providers/D1ServiceProvider.php`). The schema is driver-agnostic
+Laravel migrations (the business triggers are Eloquent observers);
+`build/migrate.sh` dumps them to SQL via `artisan schema:dump` for
+`wrangler d1 execute`. Full-text search uses LIKE fallbacks instead of
+tsvector/ts_rank.
+
+```bash
+pnpm install
+npm run migrate:local   # apply the migration dump to local D1
+npm run dev             # build assets + vendor + bundle, wrangler dev
+# npm run migrate:remote && npm run deploy
+```
+
+Until workers-php is published to npm it is referenced as a sibling
+checkout (`file:../php-wasm-worker/packages/workers-php`); clone
+php-wasm-worker next to this repo.

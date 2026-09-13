@@ -35,6 +35,16 @@ return [
 
     'connections' => [
 
+        // workers-php: PDO handle over the Worker's D1 binding, with
+        // SQLite grammar; see App\Providers\D1ServiceProvider.
+        'd1' => [
+            'driver' => 'd1',
+            'binding' => env('DB_D1_BINDING', 'DB'),
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DATABASE_URL'),
