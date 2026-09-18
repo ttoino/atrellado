@@ -44,7 +44,7 @@ A Laravel 13 app deployed to Cloudflare Workers via [workers-php](https://github
 
 ### Memory
 
-PHP runs in a fixed 128 MiB wasm memory arena that cannot shrink. A Laravel boot plus one heavy request touches ~110–125 MB, so a fresh isolate serves roughly one heavy request before hitting the wall; subsequent requests on a warmed isolate are fine. Mitigations: config/route/view caches baked into `/persist/app` at build time, cookie-based session/cache drivers, and avoiding per-request `Artisan::call`. Measure locally by watching the `workerd` process RSS during `wrangler dev`.
+PHP runs in a fixed 128 MiB wasm memory arena that cannot shrink: freed chunks are reused, but the touched high-water mark is monotonic within an isolate. Mitigations in place: config/route/view caches baked into `/persist/app`, cookie session/cache drivers, vendor trimmed of unused packages, uploads capped at 4000×4000 px with bitmaps freed immediately (`Files::convertToWebp`), markdown code highlighting disabled (Shiki shells out to node, which cannot spawn on wasm), and `maxRequestsPerInstance: 50` in `worker.ts` to recycle the instance before fragmentation reaches the cap. Measure locally by watching the RSS of the request-serving `workerd` process during `wrangler dev` (identify it as the pid that grows after a request).
 
 ## Code Style
 
