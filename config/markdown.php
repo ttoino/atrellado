@@ -7,7 +7,9 @@ return [
          *
          * More info: https://spatie.be/docs/laravel-markdown/v1/installation-setup
          */
-        'enabled' => true,
+        // Shiki shells out to node, which cannot spawn inside the wasm
+        // runtime — highlighting must stay off.
+        'enabled' => false,
 
         /*
          * The name of or path to a Shiki theme
