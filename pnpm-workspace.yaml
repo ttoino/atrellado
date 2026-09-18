@@ -3,4 +3,3 @@ allowBuilds:
   workerd: true
   sharp: true
   '@parcel/watcher': true
-  '@parcel/watcher': set this to true or false

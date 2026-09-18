@@ -22,7 +22,7 @@ Keep in mind that this repo is public. If you copy any code and use it in your s
 ## Cloudflare Workers deployment
 
 This repo deploys as a Cloudflare Worker via
-[workers-php](https://github.com/ttoino/php-wasm-worker): PHP 8.5 in
+[workers-php](https://github.com/ttoino/workers-php): PHP 8.5 in
 wasm, with Cloudflare D1 as the database (custom `d1` Laravel driver,
 see `app/Providers/D1ServiceProvider.php`). The schema is driver-agnostic
 Laravel migrations (the business triggers are Eloquent observers);
@@ -63,5 +63,5 @@ npm run migrate:local   # artisan migrate inside wrangler dev (port 8799)
 ```
 
 Until workers-php is published to npm it is referenced as a sibling
-checkout (`file:../php-wasm-worker/packages/workers-php`); clone
-php-wasm-worker next to this repo.
+checkout (`file:../workers-php/packages/workers-php`); clone
+workers-php next to this repo.

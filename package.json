@@ -24,6 +24,6 @@
         "bootstrap": "^5.3.8",
         "bootstrap-icons": "^1.13.1",
         "sortablejs": "^1.15.7",
-        "workers-php": "file:../php-wasm-worker/packages/workers-php"
+        "workers-php": "file:../workers-php/packages/workers-php"
     }
 }
