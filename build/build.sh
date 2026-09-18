@@ -22,7 +22,7 @@ docker run --rm \
 	-v "$COMPOSER_CACHE_DIR:/tmp/composer-cache" \
 	"${CA_ARGS[@]}" \
 	-w /app composer:2 \
-	composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+	composer install --no-dev --classmap-authoritative --no-interaction --ignore-platform-reqs
 
 # The container writes root-owned files; hand them back to the user.
 docker run --rm -v "$PWD:/app" -w /app composer:2 \
@@ -40,6 +40,12 @@ docker run --rm \
 # The container writes root-owned files; hand them back to the user.
 docker run --rm -v "$PWD:/persist/app" -w /persist/app composer:2 \
 	chown -R "$(id -u):$(id -g)" bootstrap/cache storage/compiled-views
+
+# 2c. Strip non-runtime files from vendor; the tarball lives in MEMFS
+# inside the isolate's 128 MiB arena, so smaller is directly cheaper.
+# composer install does not re-extract packages, so this stays pruned
+# across builds.
+find vendor -type d \( -iname tests -o -iname test -o -iname docs -o -iname doc \) -prune -exec rm -rf {} + 2>/dev/null || true
 
 # 3. Bundle the app (docroot is the web root; vendor ships in the tarball).
 npx workers-php build ./ --out ./dist --docroot public --entrypoint index.php
