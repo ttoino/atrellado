@@ -10,6 +10,9 @@ export default {
 		docroot: "public",
 		entrypoint: "index.php",
 		displayErrors: false,
+		// The wasm heap high-water is monotonic within an isolate; recycle
+		// the PHP instance before fragmentation can reach the 128 MiB cap.
+		maxRequestsPerInstance: 50,
 		bindings: {
 			DB:      "d1",
 			FILES:   "r2",
