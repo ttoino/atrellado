@@ -1,20 +1,25 @@
-# FEUP-LBAW-PROJ
+<div align="center">
+	<img src="./public/apple-touch-icon.png" alt="Atrellado logo" width="96">
+	<h1>Atrellado</h1>
+</div>
 
-Group project for the LBAW course unit at FEUP.
+A project-management web app — boards, tasks, and team collaboration.
 
-[Old readme](README.old.md)\
-[Final website](https://atrellado.toino.pt/)
+**Live site: [atrellado.toino.pt](https://atrellado.toino.pt/)**
 
-## Unit info
+## What is Atrellado?
 
-* **Name**: Laboratório de Bases de Dados e Aplicações Web (Database and Web Applications Laboratory)
-* **Date**: Year 3, Semester 1, 2022/23
-* [**More info**](https://sigarra.up.pt/feup/ucurr_geral.ficha_uc_view?pv_ocorrencia_id=501685)
+Atrellado lets teams organize work into projects with kanban boards,
+task groups, and tags, with discussion threads, notifications, and
+member management built in.
 
-## Disclaimer
+## Features
 
-This repository (and all others with the name format `feup-*`) are for archival and educational purposes only.
+- **Projects & boards** — kanban-style boards with task groups and tasks
+- **Tags** — organize and filter work across a project
+- **Collaboration** — project members, discussion threads, and task comments
+- **Notifications** — stay on top of activity and mentions
 
-If you don't understand some part of the code or anything else in this repo, feel free to ask (although I may not understand it myself anymore).
+## Development
 
-Keep in mind that this repo is public. If you copy any code and use it in your school projects you may be flagged for plagiarism by automated tools.
+Technical details, local setup, and architecture notes are in [`AGENTS.md`](./AGENTS.md).
