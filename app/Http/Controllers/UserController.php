@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rule;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -134,6 +135,9 @@ class UserController extends Controller {
             'profile_picture' => [
                 File::image()
                     ->max(5 * 1024)
+                    // Compressed size says nothing about the decoded
+                    // bitmap; cap dimensions so GD decodes stay bounded.
+                    ->dimensions(Rule::dimensions()->maxWidth(4000)->maxHeight(4000))
             ],
             'is_blocked' => 'boolean',
             'is_admin' => 'boolean'
