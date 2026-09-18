@@ -42,6 +42,13 @@ class Files {
         $resized = imagecreatetruecolor($dest_width, $dest_height);
         imagecopyresized($resized, $image, 0, 0, $offset_x, $offset_y, $dest_width, $dest_height, $src_width, $src_height);
 
-        return imagewebp($resized, $file->path());
+        // Free the full-resolution bitmap as soon as it is resampled; the
+        // wasm heap never returns pages, so the high-water mark matters.
+        imagedestroy($image);
+
+        $ok = imagewebp($resized, $file->path());
+        imagedestroy($resized);
+
+        return $ok;
     }
 }
