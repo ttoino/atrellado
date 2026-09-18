@@ -7,7 +7,6 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Laravel\Ui\Presets\React;
 
 class ThreadController extends Controller {
     /**

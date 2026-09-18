@@ -14,9 +14,7 @@
         "laravel/socialite": "^5.5",
         "laravel/ui": "^4.0",
         "nesbot/carbon": "^3.0",
-        "spatie/laravel-cookie-consent": "^3.2",
-        "spatie/laravel-markdown": "^2.2",
-        "symfony/polyfill-iconv": "^1.27"
+        "spatie/laravel-markdown": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.20",
