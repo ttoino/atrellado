@@ -23,7 +23,7 @@ class TaskCommentController extends Controller
 
         $this->authorize('viewAny', [TaskComment::class, $task]);
 
-        $comments = TaskComment::cursorPaginate(10);
+        $comments = $task->comments()->cursorPaginate(10);
 
         return response()->json($comments);
     }
