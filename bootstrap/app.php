@@ -27,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->trustProxies(at: '*');
 
+        // Local container dev arrives with a localhost Host; production
+        // keeps the default (the app URL host and its subdomains).
+        $middleware->trustHosts(at: ['127.0.0.1', 'localhost'], subdomains: false);
+
         // The old web group ran AuthenticateSession; the framework default
         // does not.
         $middleware->web(append: [

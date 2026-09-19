@@ -12,7 +12,8 @@ export class AtrelladoContainer extends Container<Env> {
 	envVars = {
 		APP_KEY: workerEnv.APP_KEY,
 		APP_ENV: "production",
-		APP_DEBUG: "false",
+		// Overridable via .dev.vars for local debugging.
+		APP_DEBUG: (workerEnv as unknown as { APP_DEBUG?: string }).APP_DEBUG ?? "false",
 		APP_URL: "https://atrellado.toino.pt",
 		DB_CONNECTION: "d1",
 		DB_D1_ENDPOINT: "http://d1.app",
