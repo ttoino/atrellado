@@ -6,10 +6,13 @@ use App\Casts\Datetime;
 use App\Casts\NotificationJson;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 
 // Since we wanted to customize the behavior of Notifications, we needed to copy the whole model from the Laravel source code in order to perform modifications
 class Notification extends Model
 {
+    use Prunable;
+
     public $timestamps = false;
 
     /**
@@ -30,6 +33,11 @@ class Notification extends Model
         'read_date' => Datetime::class,
         'json' => NotificationJson::class,
     ];
+
+    public function prunable(): Builder
+    {
+        return static::where('creation_date', '<=', now()->subDays(90));
+    }
 
     /**
      * Mark the notification as read.
