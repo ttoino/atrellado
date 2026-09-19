@@ -2,12 +2,12 @@
 
 namespace App\Listeners;
 
-use App\Events\ThreadCommentEvent;
+use App\Events\ThreadCommentCreated;
 use App\Notifications\ThreadCommented;
 
 class SendThreadCommented
 {
-    public function handle(ThreadCommentEvent $event)
+    public function handle(ThreadCommentCreated $event)
     {
         $event->comment->thread->author->notify(new ThreadCommented($event->comment));
     }

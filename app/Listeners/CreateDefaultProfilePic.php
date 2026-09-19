@@ -2,7 +2,8 @@
 
 namespace App\Listeners;
 
-use App\Events\UserEvent;
+use App\Events\UserCreated;
+use App\Events\UserUpdated;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -78,7 +79,7 @@ class CreateDefaultProfilePic
         return sprintf('#%02x%02x%02x', $r_srgb * 255, $g_srgb * 255, $b_srgb * 255);
     }
 
-    public function handle(UserEvent $event)
+    public function handle(UserCreated|UserUpdated $event)
     {
         Storage::put(
             "public/users/default_{$event->user->id}.svg",

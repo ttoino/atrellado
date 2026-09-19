@@ -6,8 +6,7 @@ use App\Providers\EventServiceProvider;
 use App\Providers\TelescopeServiceProvider;
 
 return [
-    AppServiceProvider::class,
-    AuthServiceProvider::class,
-    EventServiceProvider::class,
-    TelescopeServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+    App\Providers\AuthServiceProvider::class,
+    App\Providers\TelescopeServiceProvider::class,
 ];
