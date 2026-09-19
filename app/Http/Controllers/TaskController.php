@@ -105,7 +105,7 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse|Response
      */
     public function show(Request $request, Project $project, Task $task)
     {
@@ -195,7 +195,7 @@ class TaskController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(Request $request, Task $task)
     {

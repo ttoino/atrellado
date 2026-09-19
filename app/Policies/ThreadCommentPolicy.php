@@ -24,7 +24,7 @@ class ThreadCommentPolicy
             return $this->deny('Your user account has been blocked');
         }
 
-        if ($user->us_admin) {
+        if ($user->is_admin) {
             return $this->allow();
         }
 
@@ -134,7 +134,7 @@ class ThreadCommentPolicy
      */
     public function restore(User $user, ThreadComment $threadComment)
     {
-        //
+        return false;
     }
 
     /**
@@ -144,6 +144,6 @@ class ThreadCommentPolicy
      */
     public function forceDelete(User $user, ThreadComment $threadComment)
     {
-        //
+        return false;
     }
 }

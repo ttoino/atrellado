@@ -8,6 +8,7 @@ use App\Events\TaskCommentCreated;
 use App\Observers\TaskCommentObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaskComment extends Model
 {
@@ -26,7 +27,7 @@ class TaskComment extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'content',
@@ -35,7 +36,7 @@ class TaskComment extends Model
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [];
 
@@ -54,6 +55,7 @@ class TaskComment extends Model
         'created' => TaskCommentCreated::class,
     ];
 
+    /** @return BelongsTo<Task, $this> */
     public function task()
     {
         return $this->belongsTo(
@@ -62,6 +64,7 @@ class TaskComment extends Model
         );
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);

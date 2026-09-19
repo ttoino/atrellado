@@ -7,21 +7,22 @@ use App\Http\Requests\UpdateTaskCommentRequest;
 use App\Http\Resources\TaskCommentResource;
 use App\Models\Task;
 use App\Models\TaskComment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TaskCommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return AnonymousResourceCollection
      */
     public function index(Request $request)
     {
         $taskId = $request->query('task_id');
 
-        $task = Task::findOrFail($taskId);
+        $task = Task::findOrFail((int) $taskId);
 
         $this->authorize('viewAny', [TaskComment::class, $task]);
 
@@ -33,11 +34,11 @@ class TaskCommentController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function store(StoreTaskCommentRequest $request)
     {
-        $task = Task::findOrFail($request->input('task_id'));
+        $task = Task::findOrFail((int) $request->input('task_id'));
 
         $this->authorize('edit', $task->project);
         $this->authorize('create', [TaskComment::class, $task]);
@@ -64,7 +65,7 @@ class TaskCommentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function show(Request $request, TaskComment $taskComment)
     {
@@ -76,7 +77,7 @@ class TaskCommentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function update(UpdateTaskCommentRequest $request, TaskComment $taskComment)
     {
@@ -107,7 +108,7 @@ class TaskCommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(TaskComment $taskComment)
     {

@@ -20,7 +20,7 @@ class TaskPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -122,7 +122,7 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task)
     {
-        //
+        return false;
     }
 
     /**
@@ -132,7 +132,7 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task)
     {
-        //
+        return false;
     }
 
     /**

@@ -6,8 +6,9 @@ use App\Http\Requests\StoreTaskGroupRequest;
 use App\Http\Requests\UpdateTaskGroupRequest;
 use App\Models\Project;
 use App\Models\TaskGroup;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class TaskGroupController extends Controller
 {
@@ -22,7 +23,7 @@ class TaskGroupController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return JsonResponse|RedirectResponse
      */
     public function store(StoreTaskGroupRequest $request)
     {

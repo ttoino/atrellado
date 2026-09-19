@@ -9,6 +9,10 @@ use App\Events\ProjectDeleted;
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Project extends Model
 {
@@ -27,7 +31,7 @@ class Project extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -47,11 +51,13 @@ class Project extends Model
         'deleting' => ProjectDeleted::class,
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function coordinator()
     {
         return $this->belongsTo(User::class, 'coordinator_id');
     }
 
+    /** @return BelongsToMany<User, $this> */
     public function users()
     {
         return $this->belongsToMany(
@@ -62,6 +68,7 @@ class Project extends Model
         )->withPivot('is_favorite');
     }
 
+    /** @return HasMany<TaskGroup, $this> */
     public function taskGroups()
     {
         return $this->hasMany(
@@ -70,6 +77,7 @@ class Project extends Model
         )->orderBy('position');
     }
 
+    /** @return HasManyThrough<Task, TaskGroup, $this> */
     public function tasks()
     {
         return $this->hasManyThrough(
@@ -80,6 +88,7 @@ class Project extends Model
         );
     }
 
+    /** @return HasMany<Tag, $this> */
     public function tags()
     {
         return $this->hasMany(
@@ -88,6 +97,7 @@ class Project extends Model
         );
     }
 
+    /** @return HasMany<Thread, $this> */
     public function threads()
     {
         return $this->hasMany(
@@ -96,6 +106,7 @@ class Project extends Model
         )->orderBy('creation_date', 'desc');
     }
 
+    /** @return HasMany<Report, $this> */
     public function reports()
     {
         return $this->hasMany(Report::class, 'project_id');

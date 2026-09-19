@@ -18,7 +18,7 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -57,7 +57,7 @@ class UserPolicy
      */
     public function create(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -199,7 +199,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model)
     {
-        //
+        return false;
     }
 
     /**
@@ -209,6 +209,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model)
     {
-        //
+        return false;
     }
 }

@@ -8,15 +8,14 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Report;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     /**
-     * Shows the user profile of the user identified by the argument id.
-     *
-     * @param  int  $id  the id of the user to show
+     * Shows the user profile of the given user.
      */
     public function show(Request $request, User $user)
     {
@@ -43,7 +42,7 @@ class UserController extends Controller
      * Register a new user.
      * This endpoint is API only.
      *
-     * @return User The user registered.
+     * @return JsonResponse The registered user, serialized.
      */
     public function store(StoreUserRequest $request)
     {

@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        if (env('FORCE_HTTPS', false)) {
+        if (config('app.force_https')) {
             error_log('configuring https');
             $app_url = config('app.url');
             URL::forceRootUrl($app_url);

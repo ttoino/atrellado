@@ -8,6 +8,8 @@ use App\Events\ThreadCreated;
 use App\Observers\ThreadObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Thread extends Model
 {
@@ -26,7 +28,7 @@ class Thread extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'title',
@@ -36,7 +38,7 @@ class Thread extends Model
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [];
 
@@ -52,6 +54,7 @@ class Thread extends Model
         'created' => ThreadCreated::class,
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project()
     {
         return $this->belongsTo(
@@ -60,6 +63,7 @@ class Thread extends Model
         );
     }
 
+    /** @return HasMany<ThreadComment, $this> */
     public function comments()
     {
         return $this->hasMany(
@@ -68,6 +72,7 @@ class Thread extends Model
         );
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);

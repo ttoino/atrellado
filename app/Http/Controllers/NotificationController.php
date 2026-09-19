@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class NotificationController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
     public function index()
     {
@@ -20,8 +18,6 @@ class NotificationController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @return Response
      */
     public function store(Request $request)
     {
@@ -31,7 +27,7 @@ class NotificationController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function show(Notification $notification)
     {
@@ -43,8 +39,6 @@ class NotificationController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @return Response
      */
     public function edit(Notification $notification)
     {
@@ -53,8 +47,6 @@ class NotificationController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @return Response
      */
     public function update(Request $request, Notification $notification)
     {
@@ -63,8 +55,6 @@ class NotificationController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @return Response
      */
     public function destroy(Notification $notification)
     {

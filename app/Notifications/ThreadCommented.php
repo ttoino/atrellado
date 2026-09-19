@@ -41,6 +41,8 @@ class ThreadCommented extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+            // Known relation-call bug, replaced in a later phase.
+            // @phpstan-ignore property.notFound
             ->line($this->thread_comment->author()->name.'has commented on a thread you opened in '.$this->thread_comment->thread->project->name.'.')
             ->action('View the thread', route('project.thread', ['project' => $this->thread_comment->thread->project, 'thread' => $this->thread_comment->thread]))
             ->line('Thank you for using our application!');

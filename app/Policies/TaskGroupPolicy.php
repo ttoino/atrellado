@@ -19,7 +19,7 @@ class TaskGroupPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -117,7 +117,7 @@ class TaskGroupPolicy
      */
     public function restore(User $user, TaskGroup $taskGroup)
     {
-        //
+        return false;
     }
 
     /**
@@ -127,6 +127,6 @@ class TaskGroupPolicy
      */
     public function forceDelete(User $user, TaskGroup $taskGroup)
     {
-        //
+        return false;
     }
 }

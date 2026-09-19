@@ -2,6 +2,7 @@
 
 namespace App\Concerns;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
 
 // Replaces the old trigger-maintained fts_search tsvector column with
@@ -13,7 +14,10 @@ trait SearchableText
     {
         $table = $this->getTable();
 
-        if ($query->getConnection()->getDriverName() !== 'pgsql') {
+        /** @var Connection $connection */
+        $connection = $query->getConnection();
+
+        if ($connection->getDriverName() !== 'pgsql') {
             return $query->where(function (Builder $query) use ($table, $term) {
                 $query->whereLike("{$table}.name", "%{$term}%")
                     ->orWhereLike("{$table}.description", "%{$term}%");

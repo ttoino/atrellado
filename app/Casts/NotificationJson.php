@@ -38,7 +38,7 @@ class NotificationJson implements CastsAttributes
     {
         return json_encode(array_map(function ($val) {
             if ($val instanceof Model) {
-                return 'model:'.get_class($val).':'.$val->id;
+                return 'model:'.get_class($val).':'.$val->getKey();
             }
 
             return $val;

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProviderType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OAuthUser extends Model
 {
@@ -19,6 +20,7 @@ class OAuthUser extends Model
         'user_id',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user()
     {
         return $this->belongsTo(

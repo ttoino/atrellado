@@ -6,6 +6,8 @@ use App\Casts\Datetime;
 use App\Observers\TaskGroupObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaskGroup extends Model
 {
@@ -22,7 +24,7 @@ class TaskGroup extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -33,7 +35,7 @@ class TaskGroup extends Model
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [];
 
@@ -41,11 +43,13 @@ class TaskGroup extends Model
         'creation_date' => Datetime::class,
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
+    /** @return HasMany<Task, $this> */
     public function tasks()
     {
         return $this->hasMany(

@@ -12,6 +12,7 @@ use App\Notifications\ProjectArchived;
 use App\Notifications\ProjectInvite;
 use App\Notifications\ProjectRemoved;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
 
 class ProjectController extends Controller
@@ -258,10 +259,14 @@ class ProjectController extends Controller
 
         $member = $project->users()->get()->first(fn (User $user) => $user->id === $request->user()->id);
 
-        $member->pivot->is_favorite = ! $member->pivot->is_favorite;
-        $member->pivot->save();
+        // Pivot columns are runtime-magic on the related model; fetch the
+        // loaded pivot relation directly to keep static analysis happy.
+        $pivot = $member->getRelation('pivot');
 
-        return response()->json(['isFavorite' => $member->pivot->is_favorite]);
+        $pivot->is_favorite = ! $pivot->is_favorite;
+        $pivot->save();
+
+        return response()->json(['isFavorite' => $pivot->is_favorite]);
     }
 
     public function archive(Request $request, Project $project)

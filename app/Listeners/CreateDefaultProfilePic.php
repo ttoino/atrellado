@@ -16,11 +16,6 @@ class CreateDefaultProfilePic
         return $component <= 0.03928 ? $component / 12.92 : (($component + 0.055) / 1.055) ** 2.4;
     }
 
-    private static function spacelessToSRGB(float $component)
-    {
-        return $component * 12.92 <= 0.03928 ? $component * 12.92 : (($component ** (1 / 2.4)) * 1.055) - 0.055;
-    }
-
     private static function hsvToSRGB(float $h, float $s, float $v)
     {
         $sector = $h / 60;
@@ -59,20 +54,20 @@ class CreateDefaultProfilePic
         $h = ((float) mt_rand()) / $RAND_MAX * 360;
 
         $contrast = -1;
-        while ($contrast < static::TARGET_CONTRAST) {
+        do {
             $s = ((float) mt_rand()) / $RAND_MAX * .4 + .6;
             $v = ((float) mt_rand()) / $RAND_MAX * .4 + .6;
 
-            [$r_srgb, $g_srgb, $b_srgb] = static::hsvToSRGB($h, $s, $v);
+            [$r_srgb, $g_srgb, $b_srgb] = self::hsvToSRGB($h, $s, $v);
 
-            $r = static::srgbToSpaceless($r_srgb);
-            $g = static::srgbToSpaceless($g_srgb);
-            $b = static::srgbToSpaceless($b_srgb);
+            $r = self::srgbToSpaceless($r_srgb);
+            $g = self::srgbToSpaceless($g_srgb);
+            $b = self::srgbToSpaceless($b_srgb);
 
             $y = 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
 
             $contrast = 1.05 / ($y + 0.05);
-        }
+        } while ($contrast < static::TARGET_CONTRAST);
 
         Log::debug('COLOR: ', [$h, $s, $v, $r_srgb, $g_srgb, $b_srgb]);
 
@@ -84,7 +79,7 @@ class CreateDefaultProfilePic
         Storage::put(
             "public/users/default_{$event->user->id}.svg",
             view('other.pfp', [
-                'background' => static::generateColor($event->user->id),
+                'background' => self::generateColor($event->user->id),
                 'text' => $event->user->name[0],
             ])->render());
     }

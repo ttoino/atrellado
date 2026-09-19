@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Tag extends Model
 {
@@ -15,7 +17,7 @@ class Tag extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'title',
@@ -26,12 +28,13 @@ class Tag extends Model
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [];
 
     protected $appends = ['rgb_color'];
 
+    /** @return BelongsTo<Project, $this> */
     public function project()
     {
         return $this->belongsTo(
@@ -40,6 +43,7 @@ class Tag extends Model
         );
     }
 
+    /** @return BelongsToMany<Task, $this> */
     public function tasks()
     {
         return $this->belongsToMany(
@@ -50,6 +54,7 @@ class Tag extends Model
         );
     }
 
+    /** @return Attribute<string, int> */
     protected function color(): Attribute
     {
         return Attribute::make(fn ($color) => sprintf('#%06x', $color));

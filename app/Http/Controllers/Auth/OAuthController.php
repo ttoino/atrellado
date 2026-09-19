@@ -18,6 +18,7 @@ class OAuthController extends Controller
 
     public function handleOAuthCallback($provider)
     {
+        /** @var \Laravel\Socialite\Two\User $oAuthUser */
         $oAuthUser = Socialite::driver($provider)->user();
 
         $user = User::firstWhere('email', $oAuthUser->getEmail());
@@ -42,6 +43,8 @@ class OAuthController extends Controller
             $userOAuthSignIn = OAuthUser::create([
                 'provider_type' => $provider,
                 'provider_token' => $oAuthUser->token,
+                // Socialite exposes refresh_token only through its magic __get.
+                // @phpstan-ignore property.notFound
                 'provider_refresh_token' => $oAuthUser->refresh_token,
                 'user_id' => $user->id,
             ]);

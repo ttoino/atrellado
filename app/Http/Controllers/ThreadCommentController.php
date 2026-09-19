@@ -7,22 +7,23 @@ use App\Http\Requests\UpdateThreadCommentRequest;
 use App\Http\Resources\ThreadCommentResource;
 use App\Models\Thread;
 use App\Models\ThreadComment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ThreadCommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return AnonymousResourceCollection
      */
     public function index(Request $request)
     {
 
         $threadId = $request->query('thread_id');
 
-        $thread = Thread::findOrFail($threadId);
+        $thread = Thread::findOrFail((int) $threadId);
 
         $this->authorize('viewAny', [ThreadComment::class, $thread]);
 
@@ -34,11 +35,11 @@ class ThreadCommentController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function store(StoreThreadCommentRequest $request)
     {
-        $thread = Thread::findOrFail($request->input('thread_id'));
+        $thread = Thread::findOrFail((int) $request->input('thread_id'));
 
         $this->authorize('edit', $thread->project);
         $this->authorize('create', [ThreadComment::class, $thread]);
@@ -67,7 +68,7 @@ class ThreadCommentController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function show(Request $request, ThreadComment $threadComment)
     {
@@ -79,7 +80,7 @@ class ThreadCommentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function update(UpdateThreadCommentRequest $request, ThreadComment $threadComment)
     {
@@ -112,7 +113,7 @@ class ThreadCommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(ThreadComment $threadComment)
     {

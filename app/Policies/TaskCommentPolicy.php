@@ -38,7 +38,6 @@ class TaskCommentPolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  TaskComment  $TaskComment
      * @return Response|bool
      */
     public function view(User $user, TaskComment $taskComment)
@@ -85,7 +84,6 @@ class TaskCommentPolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @param  TaskComment  $TaskComment
      * @return Response|bool
      */
     public function update(User $user, TaskComment $taskComment)
@@ -109,7 +107,6 @@ class TaskCommentPolicy
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  TaskComment  $TaskComment
      * @return Response|bool
      */
     public function delete(User $user, TaskComment $taskComment)
@@ -135,9 +132,9 @@ class TaskCommentPolicy
      *
      * @return Response|bool
      */
-    public function restore(User $user, TaskComment $TaskComment)
+    public function restore(User $user, TaskComment $taskComment)
     {
-        //
+        return false;
     }
 
     /**
@@ -145,8 +142,8 @@ class TaskCommentPolicy
      *
      * @return Response|bool
      */
-    public function forceDelete(User $user, TaskComment $TaskComment)
+    public function forceDelete(User $user, TaskComment $taskComment)
     {
-        //
+        return false;
     }
 }

@@ -8,6 +8,10 @@ use App\Concerns\SearchableText;
 use App\Observers\TaskObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Validation\ValidationException;
 
@@ -28,7 +32,7 @@ class Task extends Model
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -49,6 +53,7 @@ class Task extends Model
 
     protected $with = ['tags', 'creator', 'assignees'];
 
+    /** @return HasOneThrough<Project, TaskGroup, $this> */
     public function project()
     {
         return $this->hasOneThrough(
@@ -61,6 +66,7 @@ class Task extends Model
         );
     }
 
+    /** @return BelongsTo<TaskGroup, $this> */
     public function taskGroup()
     {
         return $this->belongsTo(
@@ -69,11 +75,13 @@ class Task extends Model
         );
     }
 
+    /** @return BelongsTo<User, $this> */
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id')->withDefault(User::DELETED_USER);
     }
 
+    /** @return HasMany<TaskComment, $this> */
     public function comments()
     {
         return $this->hasMany(
@@ -82,6 +90,7 @@ class Task extends Model
         );
     }
 
+    /** @return BelongsToMany<Tag, $this> */
     public function tags()
     {
         return $this->belongsToMany(
@@ -92,6 +101,7 @@ class Task extends Model
         );
     }
 
+    /** @return BelongsToMany<User, $this> */
     public function assignees()
     {
         return $this->belongsToMany(

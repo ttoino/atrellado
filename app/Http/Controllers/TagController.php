@@ -6,15 +6,16 @@ use App\Http\Requests\StoreTagRequest;
 use App\Http\Requests\UpdateTagRequest;
 use App\Models\Project;
 use App\Models\Tag;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class TagController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return JsonResponse|RedirectResponse
      */
     public function store(StoreTagRequest $request)
     {
@@ -48,7 +49,7 @@ class TagController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function show(Request $request, Project $project, Tag $tag)
     {
@@ -61,7 +62,7 @@ class TagController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function update(UpdateTagRequest $request, Tag $tag)
     {
@@ -94,7 +95,7 @@ class TagController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(Request $request, Tag $tag)
     {

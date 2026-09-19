@@ -19,7 +19,7 @@ class ThreadPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -143,7 +143,7 @@ class ThreadPolicy
      */
     public function restore(User $user, Thread $thread)
     {
-        //
+        return false;
     }
 
     /**
@@ -153,6 +153,6 @@ class ThreadPolicy
      */
     public function forceDelete(User $user, Thread $thread)
     {
-        //
+        return false;
     }
 }

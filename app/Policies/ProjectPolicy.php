@@ -138,7 +138,7 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project)
     {
-        //
+        return false;
     }
 
     public function toggleFavorite(User $user, Project $project)
@@ -389,6 +389,6 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project)
     {
-        //
+        return false;
     }
 }

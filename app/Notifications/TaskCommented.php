@@ -41,7 +41,10 @@ class TaskCommented extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+            // Known relation-call bug, replaced in a later phase.
+            // @phpstan-ignore property.notFound
             ->line($this->comment->author()->name."has left a comment on a task you're assigned to - ".$this->comment->task->name.'.')
+            // @phpstan-ignore property.notFound
             ->action('View the task', route('project.task.info', ['project' => $this->comment->task()->project, 'task' => $this->comment->task]))
             ->line('Thank you for using our application!');
     }

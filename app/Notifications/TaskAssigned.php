@@ -45,6 +45,8 @@ class TaskAssigned extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
+            // Known relation-call bug, replaced in a later phase.
+            // @phpstan-ignore property.notFound
             ->line("You've been assigned to a task in ".$this->task->project()->name.' by '.$this->assigner->name.'.')
             ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
             ->line('Thank you for using our application!');

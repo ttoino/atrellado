@@ -7,6 +7,8 @@ use App\Http\Requests\UpdateThreadRequest;
 use App\Http\Resources\ThreadResource;
 use App\Models\Project;
 use App\Models\Thread;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -14,8 +16,6 @@ class ThreadController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return Response
      */
     public function index()
     {
@@ -37,7 +37,7 @@ class ThreadController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return JsonResponse|RedirectResponse
      */
     public function store(StoreThreadRequest $request)
     {
@@ -71,7 +71,7 @@ class ThreadController extends Controller
     /**
      * Display the specified resource.
      *
-     * @return Response
+     * @return JsonResponse|Response
      */
     public function show(Request $request, Project $project, Thread $thread)
     {
@@ -88,7 +88,7 @@ class ThreadController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function update(UpdateThreadRequest $request, Thread $thread)
     {
@@ -122,7 +122,7 @@ class ThreadController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(Request $request, Thread $thread)
     {

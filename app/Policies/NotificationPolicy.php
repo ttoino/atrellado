@@ -18,7 +18,7 @@ class NotificationPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -46,7 +46,7 @@ class NotificationPolicy
      */
     public function create(User $user)
     {
-        //
+        return false;
     }
 
     /**
@@ -56,7 +56,7 @@ class NotificationPolicy
      */
     public function update(User $user, Notification $notification)
     {
-        //
+        return false;
     }
 
     /**
@@ -66,7 +66,7 @@ class NotificationPolicy
      */
     public function delete(User $user, Notification $notification)
     {
-        //
+        return false;
     }
 
     /**
@@ -76,7 +76,7 @@ class NotificationPolicy
      */
     public function restore(User $user, Notification $notification)
     {
-        //
+        return false;
     }
 
     /**
@@ -86,7 +86,7 @@ class NotificationPolicy
      */
     public function forceDelete(User $user, Notification $notification)
     {
-        //
+        return false;
     }
 
     public function markRead(User $user, Notification $notification)

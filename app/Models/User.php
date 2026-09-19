@@ -9,6 +9,8 @@ use App\Listeners\CreateDefaultProfilePic;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var list<string>
      */
     protected $fillable = [
         'name',
@@ -44,7 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * The attributes that should be hidden for arrays.
      *
-     * @var array
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -65,6 +67,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'deleted' => UserDeleted::class,
     ];
 
+    /** @return BelongsToMany<Project, $this> */
     public function projects()
     {
         return $this->belongsToMany(
@@ -75,16 +78,19 @@ class User extends Authenticatable implements MustVerifyEmail
         )->withPivot('is_favorite')->orderByPivot('is_favorite', 'desc');
     }
 
+    /** @return HasMany<Report, $this> */
     public function reports()
     {
         return $this->hasMany(Report::class, 'user_profile_id');
     }
 
+    /** @return HasMany<OAuthUser, $this> */
     public function oAuthProfiles()
     {
         return $this->hasMany(OAuthUser::class, 'user_id');
     }
 
+    /** @return HasMany<Notification, $this> */
     public function notifications()
     {
         return $this->hasMany(Notification::class, 'notifiable_id')->orderByDesc('creation_date');
