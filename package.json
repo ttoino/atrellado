@@ -33,5 +33,6 @@
         "laravel-echo": "^2.5.0",
         "pusher-js": "^8.6.0",
         "sortablejs": "^1.15.7"
-    }
+    },
+    "packageManager": "pnpm@12.4.1"
 }
