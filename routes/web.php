@@ -30,6 +30,7 @@ use App\Http\Controllers\TaskGroupController;
 use App\Http\Controllers\ThreadCommentController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
+use App\Models\Project;
 use Illuminate\Support\Facades\Route;
 
 Route::get('', [HomeController::class, 'show'])->name('home');
@@ -40,7 +41,7 @@ Route::get('{name}', [StaticController::class, 'show'])
 
 // User
 Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->controller(UserController::class)->group(function () {
-    Route::prefix('/{user}')->where(['user', '[0-9]+'])->group(function () {
+    Route::prefix('/{user}')->where(['user' => '[0-9]+'])->group(function () {
         Route::get('', 'show')->name('profile');
 
         Route::prefix('/edit')->group(function () {
@@ -66,7 +67,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
         Route::post('', 'store')->name('.new-action');
     });
 
-    Route::prefix('/{project}')->where(['project', '[0-9]+'])->middleware('withOtherProjects')->group(function () {
+    Route::prefix('/{project}')->where(['project' => '[0-9]+'])->middleware('withOtherProjects')->group(function () {
 
         // Report project
         Route::prefix('/report')->group(function () {
@@ -74,7 +75,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
             Route::post('', 'report')->name('.report-action');
         });
 
-        Route::redirect('', '/project/{project}/board')->name('');
+        Route::any('', fn (Project $project) => redirect()->route('project.board', $project))->name('');
 
         Route::get('/info', 'showProjectInfo')->name('.info');
         Route::get('/members', 'getProjectMembers')->name('.members');
@@ -90,13 +91,13 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
         Route::post('/delete', 'destroy')->name('.delete');
 
         Route::prefix('/task')->name('.task')->controller(TaskController::class)->group(function () {
-            Route::prefix('/{task}')->where(['task', '[0-9]+'])->scopeBindings()->group(function () {
+            Route::prefix('/{task}')->where(['task' => '[0-9]+'])->scopeBindings()->group(function () {
                 Route::get('', 'show')->name('.info');
             });
         });
 
         Route::prefix('/thread')->name('.thread')->controller(ThreadController::class)->group(function () {
-            Route::prefix('/{thread}')->where(['thread', '[0-9]+'])->scopeBindings()->group(function () {
+            Route::prefix('/{thread}')->where(['thread' => '[0-9]+'])->scopeBindings()->group(function () {
                 Route::get('', 'show')->name('');
             });
         });
@@ -158,7 +159,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('', 'store')->name('.new');
 
-        Route::prefix('/{project}')->where(['project', '[0-9]+'])->group(function () {
+        Route::prefix('/{project}')->where(['project' => '[0-9]+'])->group(function () {
             Route::delete('', 'destroy')->name('.delete');
             Route::get('', 'show')->name('');
 
@@ -197,7 +198,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('', 'store')->name('.new');
 
-        Route::prefix('/{user}')->where(['user', '[0-9]+'])->group(function () {
+        Route::prefix('/{user}')->where(['user' => '[0-9]+'])->group(function () {
             Route::delete('', 'destroy')->name('.delete');
 
             Route::put('', 'update')->name('.update');
@@ -214,7 +215,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
 
-        Route::prefix('/{task}')->where(['task', '[0-9]+'])->group(function () {
+        Route::prefix('/{task}')->where(['task' => '[0-9]+'])->group(function () {
 
             // this needs to be a separate function since this won't be wrapped in a project route group
             Route::get('', 'show')->name('');
@@ -232,7 +233,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
 
-        Route::prefix('/{taskComment}')->where(['taskComment', '[0-9]+'])->group(function () {
+        Route::prefix('/{taskComment}')->where(['taskComment' => '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
             Route::put('', 'update')->name('.update');
@@ -244,7 +245,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
 
-        Route::prefix('/{taskGroup}')->where(['taskGroup', '[0-9]+'])->group(function () {
+        Route::prefix('/{taskGroup}')->where(['taskGroup' => '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
             Route::put('', 'update')->name('.update');
@@ -258,7 +259,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
 
-        Route::prefix('/{thread}')->where(['thread', '[0-9]+'])->group(function () {
+        Route::prefix('/{thread}')->where(['thread' => '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
             Route::put('', 'update')->name('.update');
@@ -271,7 +272,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
 
-        Route::prefix('/{threadComment}')->where(['threadComment', '[0-9]+'])->group(function () {
+        Route::prefix('/{threadComment}')->where(['threadComment' => '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
             Route::put('', 'update')->name('.update');
@@ -283,7 +284,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
 
-        Route::prefix('/{tag}')->where(['tag', '[0-9]+'])->group(function () {
+        Route::prefix('/{tag}')->where(['tag' => '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
             Route::put('', 'update')->name('.update');
