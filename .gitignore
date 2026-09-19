@@ -1,12 +1,17 @@
 /node_modules
 /public/hot
 /public/storage
+/public/build
 /public/css/app.css
 /public/js/app.js
 /public/fonts/vendor/**
 /storage/*.key
+/storage/compiled-views
 /vendor
+/.wrangler
+/dist
 .env.*
+!.env.example
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json
