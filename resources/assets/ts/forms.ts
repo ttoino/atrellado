@@ -1,4 +1,5 @@
 import { APIError, apiFetch } from "./api";
+import { renderToast } from "./toast";
 
 export const ajaxForm = <K, P>(
     fn: (param: P) => ReturnType<typeof apiFetch<K>>,
@@ -30,7 +31,11 @@ export const ajaxForm = <K, P>(
             if (response.ok) {
                 form.reset();
                 ok(await response.json());
-            } else notOk(await response.json());
+            } else {
+                const error = await response.json();
+                if (error?.message) renderToast({ text: error.message });
+                notOk(error);
+            }
         } catch {
             notOk();
         }
