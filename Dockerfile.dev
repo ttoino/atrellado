@@ -4,7 +4,9 @@ ARG HOST_UID=1000
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip curl \
-        libgd-dev libpq-dev libsqlite3-dev libzip-dev libicu-dev \
+        libgd-dev libwebp-dev libjpeg-dev libfreetype6-dev \
+        libpq-dev libsqlite3-dev libzip-dev libicu-dev \
+    && docker-php-ext-configure gd --with-webp --with-jpeg --with-freetype \
     && docker-php-ext-install gd pdo_pgsql pdo_sqlite zip intl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 

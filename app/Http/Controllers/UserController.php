@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Files;
 use App\Http\Requests\StoreReportRequest;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -10,7 +9,7 @@ use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Image;
 
 class UserController extends Controller
 {
@@ -89,14 +88,11 @@ class UserController extends Controller
         }
 
         if (isset($data['profile_picture'])) {
-            Files::convertToWebp($data['profile_picture'], 512, 1);
-
-            // TODO: change this to use accessor
-            $path = Storage::putFileAs('public/users/', $data['profile_picture'], "$user->id.webp");
-
-            if ($path === false) {
-                // TODO: handle file upload err
-            }
+            Image::fromUpload($data['profile_picture'])
+                ->orient()
+                ->cover(512, 512)
+                ->toWebp()
+                ->storePubliclyAs('public/users', "$user->id.webp");
         }
 
         // Privilege fields belong to admins alone; block/unblock also have
