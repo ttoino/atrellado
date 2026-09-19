@@ -373,7 +373,7 @@ class ProjectPolicy
 
         $projectInvite = Notification::where('type', 'App\Notifications\ProjectInvite')->where('notifiable_id', $user->id);
 
-        $invitedToProject = $projectInvite->get()->reduce(fn (bool $carry, Notification $notification) => $carry || $notification->json['project']?->id === $project->id, false);
+        $invitedToProject = $projectInvite->get()->reduce(fn (bool $carry, Notification $notification) => $carry || $notification->data['project_id'] === $project->id, false);
 
         if ($invitedToProject) {
             return $this->allow();

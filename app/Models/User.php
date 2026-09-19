@@ -90,12 +90,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(OAuthUser::class, 'user_id');
     }
 
-    /** @return HasMany<Notification, $this> */
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class, 'notifiable_id')->orderByDesc('creation_date');
-    }
-
     protected function profilePic(): Attribute
     {
         return Attribute::make(get: function ($_, $attributes) {

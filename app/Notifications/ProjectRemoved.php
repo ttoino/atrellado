@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Project;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ProjectRemoved extends Notification
 {
@@ -29,7 +30,7 @@ class ProjectRemoved extends Notification
     {
         return [
             // 'mail',
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -55,7 +56,9 @@ class ProjectRemoved extends Notification
     public function toArray($notifiable)
     {
         return [
-            'project' => $this->project,
+            'project_id' => $this->project->id,
+            'project_name' => $this->project->name,
+            'url' => route('project', ['project' => $this->project]),
         ];
     }
 }

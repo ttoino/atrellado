@@ -5,6 +5,7 @@ namespace App\Notifications;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TaskAssigned extends Notification
 {
@@ -32,7 +33,7 @@ class TaskAssigned extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -45,9 +46,7 @@ class TaskAssigned extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            // Known relation-call bug, replaced in a later phase.
-            // @phpstan-ignore property.notFound
-            ->line("You've been assigned to a task in ".$this->task->project()->name.' by '.$this->assigner->name.'.')
+            ->line("You've been assigned to a task in ".$this->task->project->name.' by '.$this->assigner->name.'.')
             ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
             ->line('Thank you for using our application!');
     }
@@ -60,9 +59,14 @@ class TaskAssigned extends Notification
      */
     public function toArray($notifiable)
     {
+        $project = $this->task->project;
+
         return [
-            'task' => $this->task,
-            'assigner' => $this->assigner,
+            'task_id' => $this->task->id,
+            'task_name' => $this->task->name,
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'url' => route('project.task.info', ['project' => $project, 'task' => $this->task]),
         ];
     }
 }

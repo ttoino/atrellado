@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Project;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ProjectDeleted extends Notification
 {
@@ -28,7 +29,7 @@ class ProjectDeleted extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 

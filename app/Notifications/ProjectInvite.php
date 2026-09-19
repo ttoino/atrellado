@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Project;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ProjectInvite extends Notification
 {
@@ -32,7 +33,7 @@ class ProjectInvite extends Notification
     {
         return [
             'mail',
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -59,8 +60,9 @@ class ProjectInvite extends Notification
     public function toArray($notifiable)
     {
         return [
+            'project_id' => $this->project->id,
+            'project_name' => $this->project->name,
             'url' => $this->url,
-            'project' => $this->project,
         ];
     }
 }

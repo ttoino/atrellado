@@ -12,6 +12,7 @@ use App\Models\Task;
 use App\Models\TaskComment;
 use App\Models\TaskGroup;
 use App\Models\User;
+use App\Notifications\TaskAssigned;
 use App\Notifications\TaskCompleted;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -60,6 +61,7 @@ class TaskController extends Controller
             foreach ($data['assignees'] ?? [] as $assigneeId) {
                 $assignee = User::findOrFail($assigneeId);
                 $task->attachAssignee($assignee);
+                $assignee->notify(new TaskAssigned($task, $request->user()));
             }
         } catch (Exception $e) {
             $task->delete();
@@ -159,6 +161,10 @@ class TaskController extends Controller
             $task->name = $data['name'];
         }
 
+        // Captured before the detach/attach cycle so only genuinely new
+        // assignees get notified.
+        $previousAssigneeIds = $task->assignees->pluck('id')->all();
+
         $task->tags()->detach();
         $task->assignees()->detach();
         foreach ($data['tags'] ?? [] as $tagId) {
@@ -169,6 +175,9 @@ class TaskController extends Controller
         foreach ($data['assignees'] ?? [] as $assigneeId) {
             $assignee = User::findOrFail($assigneeId);
             $task->attachAssignee($assignee);
+            if (! in_array($assignee->id, $previousAssigneeIds, true)) {
+                $assignee->notify(new TaskAssigned($task, $request->user()));
+            }
         }
 
         $task->push();

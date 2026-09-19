@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\ThreadComment;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ThreadCommented extends Notification
 {
@@ -28,7 +29,7 @@ class ThreadCommented extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -41,9 +42,7 @@ class ThreadCommented extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            // Known relation-call bug, replaced in a later phase.
-            // @phpstan-ignore property.notFound
-            ->line($this->thread_comment->author()->name.'has commented on a thread you opened in '.$this->thread_comment->thread->project->name.'.')
+            ->line($this->thread_comment->author->name.'has commented on a thread you opened in '.$this->thread_comment->thread->project->name.'.')
             ->action('View the thread', route('project.thread', ['project' => $this->thread_comment->thread->project, 'thread' => $this->thread_comment->thread]))
             ->line('Thank you for using our application!');
     }
@@ -56,8 +55,17 @@ class ThreadCommented extends Notification
      */
     public function toArray($notifiable)
     {
+        $thread = $this->thread_comment->thread;
+        $project = $thread->project;
+
         return [
-            'thread_comment' => $this->thread_comment,
+            'comment_id' => $this->thread_comment->id,
+            'thread_id' => $thread->id,
+            'thread_title' => $thread->title,
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'author_name' => $this->thread_comment->author->name,
+            'url' => route('project.thread', ['project' => $project, 'thread' => $thread]),
         ];
     }
 }

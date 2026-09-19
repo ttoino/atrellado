@@ -3,105 +3,34 @@
 namespace App\Models;
 
 use App\Casts\Datetime;
-use App\Casts\NotificationJson;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Notifications\DatabaseNotification;
 
-// Since we wanted to customize the behavior of Notifications, we needed to copy the whole model from the Laravel source code in order to perform modifications
-class Notification extends Model
+class Notification extends DatabaseNotification
 {
     use Prunable;
 
-    public $timestamps = false;
+    protected function casts(): array
+    {
+        return [
+            'data' => 'array',
+            'read_at' => Datetime::class,
+            'created_at' => Datetime::class,
+        ];
+    }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
-    protected $fillable = [
-        'json',
-        'type',
-        'notifiable_id',
-        'read_date',
-        'creation_date',
-    ];
-
-    protected $casts = [
-        'creation_date' => Datetime::class,
-        'read_date' => Datetime::class,
-        'json' => NotificationJson::class,
-    ];
+    // The parent fills a Carbon, which the class-cast cache then returns
+    // verbatim, bypassing the Datetime cast on serialization of this instance.
+    public function markAsRead()
+    {
+        if (is_null($this->read_at)) {
+            $this->forceFill(['read_at' => $this->freshTimestamp()->toISOString()])->save();
+        }
+    }
 
     public function prunable(): Builder
     {
-        return static::where('creation_date', '<=', now()->subDays(90));
+        return static::where('created_at', '<=', now()->subDays(90));
     }
-
-    /**
-     * Mark the notification as read.
-     *
-     * @return void
-     */
-    public function markAsRead()
-    {
-        if (is_null($this->read_date)) {
-            $this->forceFill(['read_date' => $this->freshTimestamp()])->save();
-        }
-    }
-
-    /**
-     * Mark the notification as unread.
-     *
-     * @return void
-     */
-    public function markAsUnread()
-    {
-        if (! is_null($this->read_date)) {
-            $this->forceFill(['read_date' => null])->save();
-        }
-    }
-
-    /**
-     * Determine if a notification has been read.
-     *
-     * @return bool
-     */
-    public function read()
-    {
-        return $this->read_date !== null;
-    }
-
-    /**
-     * Determine if a notification has not been read.
-     *
-     * @return bool
-     */
-    public function unread()
-    {
-        return $this->read_date === null;
-    }
-
-    /**
-     * Scope a query to only include read notifications.
-     *
-     * @return Builder
-     */
-    public function scopeRead(Builder $query)
-    {
-        return $query->whereNotNull('read_date');
-    }
-
-    /**
-     * Scope a query to only include unread notifications.
-     *
-     * @return Builder
-     */
-    public function scopeUnread(Builder $query)
-    {
-        return $query->whereNull('read_date');
-    }
-
-    protected $table = 'notification';
 }

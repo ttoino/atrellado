@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Task;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TaskCompleted extends Notification
 {
@@ -28,7 +29,7 @@ class TaskCompleted extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -54,8 +55,14 @@ class TaskCompleted extends Notification
      */
     public function toArray($notifiable)
     {
+        $project = $this->task->project;
+
         return [
-            'task' => $this->task,
+            'task_id' => $this->task->id,
+            'task_name' => $this->task->name,
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'url' => route('project.task.info', ['project' => $project, 'task' => $this->task]),
         ];
     }
 }

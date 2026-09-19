@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\TaskComment;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class TaskCommented extends Notification
 {
@@ -28,7 +29,7 @@ class TaskCommented extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -41,11 +42,8 @@ class TaskCommented extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            // Known relation-call bug, replaced in a later phase.
-            // @phpstan-ignore property.notFound
-            ->line($this->comment->author()->name."has left a comment on a task you're assigned to - ".$this->comment->task->name.'.')
-            // @phpstan-ignore property.notFound
-            ->action('View the task', route('project.task.info', ['project' => $this->comment->task()->project, 'task' => $this->comment->task]))
+            ->line($this->comment->author->name."has left a comment on a task you're assigned to - ".$this->comment->task->name.'.')
+            ->action('View the task', route('project.task.info', ['project' => $this->comment->task->project, 'task' => $this->comment->task]))
             ->line('Thank you for using our application!');
     }
 
@@ -57,8 +55,17 @@ class TaskCommented extends Notification
      */
     public function toArray($notifiable)
     {
+        $task = $this->comment->task;
+        $project = $task->project;
+
         return [
-            'comment' => $this->comment,
+            'comment_id' => $this->comment->id,
+            'task_id' => $task->id,
+            'task_name' => $task->name,
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'author_name' => $this->comment->author->name,
+            'url' => route('project.task.info', ['project' => $project, 'task' => $task]),
         ];
     }
 }

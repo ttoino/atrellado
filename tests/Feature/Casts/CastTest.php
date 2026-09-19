@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Notification;
-use App\Models\Project;
 use App\Models\TaskComment;
 use Illuminate\Validation\ValidationException;
 
@@ -33,25 +31,6 @@ it('keeps raw markdown next to the rendered html', function () {
     expect($cast)->toBeArray()
         ->and($cast['raw'])->toBe('**bold** text')
         ->and($cast['formatted'])->toContain('<strong>bold</strong>');
-});
-
-it('round-trips models through notification json as model:class:id', function () {
-    $coordinator = makeUser();
-    $project = makeProject($coordinator);
-
-    $notification = new Notification;
-    $notification->type = 'Test';
-    $notification->notifiable_id = $coordinator->id;
-    $notification->json = ['project' => $project, 'note' => 'plain'];
-    $notification->save();
-
-    $stored = $notification->fresh();
-    expect($stored->getRawOriginal('json'))->toContain('model:'.addslashes(Project::class).':'.$project->id);
-
-    $cast = $stored->json;
-    expect($cast['project'])->toBeInstanceOf(Project::class)
-        ->and($cast['project']->id)->toBe($project->id)
-        ->and($cast['note'])->toBe('plain');
 });
 
 it('validates comment and thread authors are project members', function () {

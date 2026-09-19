@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Thread;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ThreadNew extends Notification
 {
@@ -28,7 +29,7 @@ class ThreadNew extends Notification
     public function via($notifiable)
     {
         return [
-            CustomDatabaseChannel::class,
+            'database',
         ];
     }
 
@@ -54,8 +55,15 @@ class ThreadNew extends Notification
      */
     public function toArray($notifiable)
     {
+        $project = $this->thread->project;
+
         return [
-            'thread' => $this->thread,
+            'thread_id' => $this->thread->id,
+            'thread_title' => $this->thread->title,
+            'project_id' => $project->id,
+            'project_name' => $project->name,
+            'author_name' => $this->thread->author->name,
+            'url' => route('project.thread', ['project' => $project, 'thread' => $this->thread]),
         ];
     }
 }
