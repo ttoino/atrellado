@@ -154,152 +154,65 @@ Route::name('')->middleware('guest')->group(function () {
     });
 });
 
-Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
+Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle'])->group(function () {
 
-    Route::prefix('/project')->name('.project')->middleware('verified')->controller(ProjectController::class)->group(function () {
+    Route::apiResource('project', ProjectController::class)->only(['store', 'show', 'update', 'destroy']);
 
-        Route::post('', 'store')->name('.new');
+    Route::prefix('/project/{project}')->whereNumber('project')->controller(ProjectController::class)->group(function () {
+        Route::put('/archive', 'archive')->name('project.archive');
+        Route::delete('/archive', 'unarchive')->name('project.unarchive');
 
-        Route::prefix('/{project}')->where(['project' => '[0-9]+'])->group(function () {
-            Route::delete('', 'destroy')->name('.delete');
-            Route::get('', 'show')->name('');
+        Route::post('/leave', 'leaveProject')->name('project.leave');
 
-            Route::put('', 'update')->name('.update');
+        Route::get('/members', 'getProjectMembers')->name('project.members');
+        Route::delete('/members/{user}', 'removeUser')->name('project.members.remove');
 
-            Route::prefix('/archive')->group(function () {
-                Route::put('', 'archive')->name('.archive');
-                Route::delete('', 'unarchive')->name('.unarchive');
-            });
+        Route::get('/tags', 'getProjectTags')->name('project.tags');
 
-            Route::post('/leave', 'leaveProject')->name('.leave');
+        Route::post('/favorite/toggle', 'toggleFavorite')->name('project.favorite.toggle');
 
-            Route::prefix('/members')->name('.members')->group(function () {
-                Route::get('', 'getProjectMembers')->name('');
-                Route::delete('/{user}', 'removeUser')->name('.remove');
-                // Route::post('', 'addProjectMember')->name('.add');
-            });
+        Route::post('/invite', 'inviteUser')->name('project.invite-user');
 
-            Route::prefix('tags')->name('.tags')->group(function () {
-                Route::get('', 'getProjectTags');
-            });
-
-            Route::prefix('/favorite')->name('.favorite')->group(function () {
-                Route::post('/toggle', 'toggleFavorite')->name('.toggle');
-            });
-
-            Route::post('/invite', 'inviteUser')->name('.invite-user');
-
-            Route::prefix('/coordinator')->name('.coordinator')->group(function () {
-                Route::put('', 'setCoordinator');
-            });
-        });
+        Route::put('/coordinator', 'setCoordinator')->name('project.coordinator');
     });
 
-    Route::prefix('/user')->name('.user')->middleware('verified')->controller(UserController::class)->group(function () {
+    Route::apiResource('user', UserController::class)->only(['store', 'show', 'update', 'destroy']);
 
-        Route::post('', 'store')->name('.new');
-
-        Route::prefix('/{user}')->where(['user' => '[0-9]+'])->group(function () {
-            Route::delete('', 'destroy')->name('.delete');
-
-            Route::put('', 'update')->name('.update');
-
-            Route::post('/block', 'block')->name('.block');
-
-            Route::post('/unblock', 'unblock')->name('.unblock');
-
-            Route::get('', 'show')->name('');
-        });
+    Route::prefix('/user/{user}')->whereNumber('user')->controller(UserController::class)->group(function () {
+        Route::post('/block', 'block')->name('user.block');
+        Route::post('/unblock', 'unblock')->name('user.unblock');
     });
 
-    Route::prefix('/task')->name('.task')->middleware('verified')->controller(TaskController::class)->group(function () {
+    Route::apiResource('task', TaskController::class)->only(['store', 'show', 'update', 'destroy']);
 
-        Route::post('/new', 'store')->name('.new');
-
-        Route::prefix('/{task}')->where(['task' => '[0-9]+'])->group(function () {
-
-            // this needs to be a separate function since this won't be wrapped in a project route group
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('update');
-            Route::delete('', 'destroy')->name('.delete');
-
-            Route::put('/complete', 'complete')->name('.complete');
-            Route::delete('/complete', 'incomplete')->name('.incomplete');
-            Route::post('/reposition', 'update')->name('.reposition');
-        });
+    Route::prefix('/task/{task}')->whereNumber('task')->controller(TaskController::class)->group(function () {
+        Route::put('/complete', 'complete')->name('task.complete');
+        Route::delete('/complete', 'incomplete')->name('task.incomplete');
+        Route::post('/reposition', 'update')->name('task.reposition');
     });
 
-    Route::prefix('/task-comment')->name('.task-comment')->middleware('verified')->controller(TaskCommentController::class)->group(function () {
+    Route::apiResource('task-comment', TaskCommentController::class)
+        ->only(['index', 'store', 'show', 'update', 'destroy'])
+        ->parameters(['task-comment' => 'taskComment']);
 
-        Route::post('/new', 'store')->name('.new');
-        Route::get('', 'index')->name('list');
+    Route::apiResource('task-group', TaskGroupController::class)
+        ->only(['store', 'show', 'update', 'destroy'])
+        ->parameters(['task-group' => 'taskGroup']);
 
-        Route::prefix('/{taskComment}')->where(['taskComment' => '[0-9]+'])->group(function () {
-
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('.update');
-            Route::delete('', 'destroy')->name('.delete');
-        });
+    Route::prefix('/task-group/{taskGroup}')->whereNumber('taskGroup')->group(function () {
+        Route::post('/reposition', [TaskGroupController::class, 'update'])->name('task-group.reposition');
     });
 
-    Route::prefix('/task-group')->name('.task-group')->middleware('verified')->controller(TaskGroupController::class)->group(function () {
+    Route::apiResource('thread', ThreadController::class)->only(['store', 'show', 'update', 'destroy']);
 
-        Route::post('/new', 'store')->name('.new');
+    Route::apiResource('thread-comment', ThreadCommentController::class)
+        ->only(['index', 'store', 'show', 'update', 'destroy'])
+        ->parameters(['thread-comment' => 'threadComment']);
 
-        Route::prefix('/{taskGroup}')->where(['taskGroup' => '[0-9]+'])->group(function () {
+    Route::apiResource('tag', TagController::class)->only(['store', 'show', 'update', 'destroy']);
 
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('.update');
-            Route::delete('', 'destroy')->name('.delete');
-
-            Route::post('/reposition', 'update')->name('.reposition');
-        });
-    });
-
-    Route::prefix('/thread')->name('.thread')->middleware('verified')->controller(ThreadController::class)->group(function () {
-
-        Route::post('/new', 'store')->name('.new');
-
-        Route::prefix('/{thread}')->where(['thread' => '[0-9]+'])->group(function () {
-
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('.update');
-            Route::delete('', 'destroy')->name('.delete');
-        });
-    });
-
-    Route::prefix('/thread-comment')->name('.thread-comment')->middleware('verified')->controller(ThreadCommentController::class)->group(function () {
-
-        Route::post('/new', 'store')->name('.new');
-        Route::get('', 'index')->name('list');
-
-        Route::prefix('/{threadComment}')->where(['threadComment' => '[0-9]+'])->group(function () {
-
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('.update');
-            Route::delete('', 'destroy')->name('.delete');
-        });
-    });
-
-    Route::prefix('/tag')->name('.tag')->middleware('verified')->controller(TagController::class)->group(function () {
-
-        Route::post('/new', 'store')->name('.new');
-
-        Route::prefix('/{tag}')->where(['tag' => '[0-9]+'])->group(function () {
-
-            Route::get('', 'show')->name('');
-            Route::put('', 'update')->name('.update');
-            Route::delete('', 'destroy')->name('.delete');
-        });
-    });
-
-    Route::prefix('/notifications')->name('.notification')->middleware('verified')->controller(NotificationController::class)->group(function () {
-        Route::prefix('/{notification}')->group(function () {
-
-            Route::get('', 'show')->name('');
-
-            Route::put('/read', 'markAsRead')->name('.mark-read');
-            // Route::put('/unread', 'markAsUnread')->name('.mark-unread');
-        });
+    Route::prefix('/notifications/{notification}')->controller(NotificationController::class)->group(function () {
+        Route::get('', 'show')->name('notification.show');
+        Route::put('/read', 'markAsRead')->name('notification.mark-read');
     });
 });

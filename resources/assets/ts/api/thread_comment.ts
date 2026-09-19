@@ -12,7 +12,7 @@ export const getThreadComment = (threadCommentId: string) =>
     apiFetch<ThreadComment>(`/api/thread-comment/${threadCommentId}`);
 
 export const newThreadComment = (threadComment: ThreadComment) =>
-    apiFetch<ThreadComment>("/api/thread-comment/new", "POST", threadComment);
+    apiFetch<ThreadComment>("/api/thread-comment", "POST", threadComment);
 
 export const editThreadComment = (threadComment: ThreadComment) =>
     apiFetch<ThreadComment>(

@@ -50,7 +50,7 @@ export const getProject = (projectId: string) =>
     apiFetch<Project>(`/api/project/${projectId}`);
 
 export const newProject = (project: Project) =>
-    apiFetch<Project>(`/api/project/new`, "POST", project);
+    apiFetch<Project>("/api/project", "POST", project);
 
 export const editProject = (project: Project) =>
     apiFetch<Project>(`/api/project/${project.id}`, "PUT", project);

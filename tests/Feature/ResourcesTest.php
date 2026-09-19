@@ -16,7 +16,7 @@ it('marks a task comment as editable for its author but not for another member',
     $group = makeGroup($project, 1);
     $task = makeTask($group, 1);
 
-    $response = $this->actingAs($author)->postJson('/api/task-comment/new', [
+    $response = $this->actingAs($author)->postJson('/api/task-comment', [
         'task_id' => $task->id,
         'content' => 'Looks good to me!',
     ]);

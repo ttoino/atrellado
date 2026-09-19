@@ -12,7 +12,7 @@ export const getTaskComment = (taskCommentId: string) =>
     apiFetch<TaskComment>(`/api/task-comment/${taskCommentId}`);
 
 export const newTaskComment = (taskComment: TaskComment) =>
-    apiFetch<TaskComment>("/api/task-comment/new", "POST", taskComment);
+    apiFetch<TaskComment>("/api/task-comment", "POST", taskComment);
 
 export const editTaskComment = (taskComment: TaskComment) =>
     apiFetch<TaskComment>(

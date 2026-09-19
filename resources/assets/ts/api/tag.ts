@@ -3,7 +3,7 @@ import { Tag } from "../types/tag";
 
 export const getTag = (tagId: string) => apiFetch<Tag>(`/api/tag/${tagId}`);
 
-export const newTag = (tag: Tag) => apiFetch<Tag>(`/api/tag/new`, "POST", tag);
+export const newTag = (tag: Tag) => apiFetch<Tag>("/api/tag", "POST", tag);
 
 export const editTag = (tag: Tag) =>
     apiFetch<Tag>(`/api/tag/${tag.id}`, "PUT", tag);

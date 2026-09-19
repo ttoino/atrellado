@@ -21,7 +21,7 @@ export const getTask = (taskId: string) =>
     apiFetch<Task>(`/api/task/${taskId}`);
 
 export const newTask = (task: Task) =>
-    apiFetch<Task>(`/api/task/new`, "POST", task);
+    apiFetch<Task>("/api/task", "POST", task);
 
 export const editTask = (task: Task) =>
     apiFetch<Task>(`/api/task/${task.id}`, "PUT", task);
