@@ -12,6 +12,7 @@
             'name' => $name,
             'id' => $id,
             'type' => $type,
+            'value' => $type === 'password' ? '' : old($name),
         ]) }}
         aria-describedby="{{ $id }}-feedback">
     <label for="{{ $id }}" class="form-label">{{ $slot }}</label>
