@@ -15,7 +15,7 @@ class HomeController extends Controller
             return response()->view('pages.home');
         } elseif ($user->is_admin) {
             return redirect()->route('admin');
-        } elseif ($user->is_blocked) {
+        } elseif ($user->blocked) {
             abort(403);
         } else {
             return redirect()->route('project.list');
