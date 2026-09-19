@@ -115,9 +115,9 @@ class ThreadCommentController extends Controller
     public function updateThreadComment(ThreadComment $threadComment, Request $request)
     {
 
-        $data = $request->all(['content']);
+        $data = $request->only('content');
 
-        if (($data['content'] ??= null) !== null) {
+        if (($data['content'] ?? null) !== null) {
             $threadComment->content = $data['content'];
         }
 
