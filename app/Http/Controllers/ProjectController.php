@@ -105,7 +105,7 @@ class ProjectController extends Controller
 
         $this->authorize('setCoordinator', [$project, $user]);
 
-        $project->coordinator_id = $user;
+        $project->coordinator_id = $user->id;
         $project->save();
         $project = $project->fresh();
 
