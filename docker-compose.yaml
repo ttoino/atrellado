@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile.dev
       args:
         - "HOST_UID=1000"
+    env_file:
+      - .env
     environment:
       - "DB_HOST=postgres"
       - "PORT=8000"
@@ -41,7 +43,7 @@ services:
       - "25"
 
   postgres:
-    image: postgres:11
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -52,7 +54,7 @@ services:
       - "5432"
 
   pgadmin:
-    image: dpage/pgadmin4:6
+    image: dpage/pgadmin4:9
     environment:
       PGADMIN_DEFAULT_EMAIL: postgres@lbaw.com
       PGADMIN_DEFAULT_PASSWORD: pg!password
