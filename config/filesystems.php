@@ -30,6 +30,14 @@ return [
 
     'disks' => [
 
+        // Objects over the worker's R2 endpoint; see
+        // App\Support\R2\HttpR2Adapter.
+        'r2' => [
+            'driver' => 'r2',
+            'endpoint' => env('R2_ENDPOINT'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
