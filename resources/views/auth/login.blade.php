@@ -4,10 +4,11 @@
 
 @section('form')
 
-    <x-form.textfield type="email" name="email" autocomplete="email" required autofocus>
+    <x-form.textfield type="email" name="email" autocomplete="email" required autofocus feedback="Invalid email">
         Email
     </x-form.textfield>
-    <x-form.textfield type="password" name="password" autocomplete="current-password" required>
+    <x-form.textfield type="password" name="password" autocomplete="current-password" required
+        feedback="Invalid password">
         Password
     </x-form.textfield>
 

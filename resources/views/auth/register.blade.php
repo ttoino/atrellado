@@ -3,19 +3,22 @@
 @section('title', 'Register')
 
 @section('form')
-    <x-form.textfield name="name" autocomplete="username" minlength=6 maxlength=255 required autofocus>
+    <x-form.textfield name="name" autocomplete="username" minlength=6 maxlength=255 required autofocus
+        feedback="Invalid name">
         Name
     </x-form.textfield>
 
-    <x-form.textfield type="email" name="email" autocomplete="email" required>
+    <x-form.textfield type="email" name="email" autocomplete="email" required feedback="Invalid email">
         Email
     </x-form.textfield>
 
-    <x-form.textfield type="password" name="password" autocomplete="new-password" required>
+    <x-form.textfield type="password" name="password" autocomplete="new-password" required
+        feedback="Invalid password">
         Password
     </x-form.textfield>
 
-    <x-form.textfield type="password" name="password_confirmation" autocomplete="new-password" required>
+    <x-form.textfield type="password" name="password_confirmation" autocomplete="new-password" required
+        feedback="Passwords don't match">
         Confirm password
     </x-form.textfield>
 

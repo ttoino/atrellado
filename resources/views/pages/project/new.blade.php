@@ -11,7 +11,11 @@
             value="{{ old('name') }}" minlength="6" maxlength="512" required autofocus>
         <label for="name" class="form-label">Name</label>
         <div class="invalid-feedback" id="name-feedback">
-            Invalid name
+            @error('name')
+                {{ $message }}
+            @else
+                Invalid name
+            @enderror
         </div>
     </div>
 
@@ -20,7 +24,11 @@
             aria-describedby="description-feedback" id="description" name="description" minlength="6" maxlength="512" required>{{ old('description') }}</textarea>
         <label for="description" class="form-label">Description</label>
         <div class="invalid-feedback" id="description-feedback">
-            Invalid description
+            @error('description')
+                {{ $message }}
+            @else
+                Invalid description
+            @enderror
         </div>
     </div>
 

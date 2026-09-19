@@ -3,7 +3,7 @@
 @section('title', 'Reset password')
 
 @section('form')
-    <x-form.textfield type="email" name="email" autocomplete="email" required>
+    <x-form.textfield type="email" name="email" autocomplete="email" required feedback="Invalid email">
         Email
     </x-form.textfield>
 
