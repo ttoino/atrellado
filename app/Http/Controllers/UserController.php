@@ -66,8 +66,6 @@ class UserController extends Controller
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = $data['password'];
-        $user->is_blocked = $data['is_blocked'] ?? false;
-        $user->is_admin = $data['is_admin'] ?? false;
         $user->save();
 
         return $user;
@@ -84,8 +82,6 @@ class UserController extends Controller
                 Password::min(8)
                     ->letters(),
             ],
-            'is_blocked' => 'boolean',
-            'is_admin' => 'boolean',
         ]);
     }
 
