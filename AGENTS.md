@@ -9,19 +9,24 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 
 ## Commands
 
-- `composer install`: PHP dependencies
-- `pnpm install && npm run build:assets`: Frontend assets (Vite)
-- `php artisan`: Usual Laravel CLI
+- `composer install`: PHP dependencies (no host PHP — run artisan/pest/pint/phpstan through the `Dockerfile.dev` image)
+- `pnpm install && pnpm run build`: Frontend assets (Vite)
+- `pnpm run check` / `lint` / `format` (+`:fix`): tsc, eslint, prettier
 - `php artisan migrate`: Run migrations
-- `php artisan test`: PHPUnit/Pest suite
+- `./vendor/bin/pest`: Pest suite (sqlite in-memory)
+- `./vendor/bin/phpstan analyse --memory-limit=1G`: Larastan, level 5
 - `./vendor/bin/pint`: Code style fixer
 
 ## Architecture Notes
 
-- **Observers**: `app/Observers/` holds the Eloquent observers that replace the original plpgsql triggers, keeping the business rules portable across database drivers.
+- **Observers**: `app/Observers/` holds the Eloquent observers that replace the original plpgsql triggers; `creating` observers lock the parent row to serialize `max(position)+1` appends.
+- **Auth**: Fortify with `ignoreRoutes()` — routes keep the legacy URL/name contract in `routes/web.php`; OAuth identities match on `provider_user_id` with encrypted token columns.
+- **Notifications**: framework `database` channel with denormalized payloads (`notifications.data`); `TaskAssigned` fires on assignment; rows older than 90 days pruned daily via the scheduler.
+- **Queue**: `database` driver (`jobs` table); all notifications and `Send*` listeners are queued.
 - **Broadcasting**: Laravel Reverb (queued via the database connection) with `private-project.{id}` channels authorized by `ProjectPolicy::view`; the TS pages subscribe via `resources/assets/ts/echo.ts` and re-fetch over the API on `thread.created`/`thread-comment.created`/`task-comment.created` events.
 - **API resources**: `app/Http/Resources/` serializes the comment/thread models for JSON, adding the request-dependent `editable` flag (the models themselves carry no auth-dependent appends).
 - **Uploads**: profile pictures are bounded at 4000×4000 px by the form request and processed through the `Image` facade (orient → cover 512×512 → webp) in `UserController`.
+- **Observability**: Pulse (admin-gated) in production; Telescope is local-only (`APP_ENV=local` via `AppServiceProvider`).
 
 ## Code Style
 
@@ -34,4 +39,6 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 - `app/Observers/`: Eloquent observers (business triggers)
 - `app/Http/Resources/`: JSON serialization (incl. `editable` flag)
 - `database/migrations/`: Schema (driver-agnostic Laravel migrations)
-- `docker-compose.yaml`, `Dockerfile`, `etc/`: The original Docker dev setup
+- `Dockerfile`: Production image (FrankenPHP base; supervisord runs Octane :8000, Reverb :8080, `queue:work`, `schedule:work`; `etc/entrypoint.sh` migrates then caches config from runtime env)
+- `Dockerfile.dev`, `docker-compose.yaml`: Dev setup (app + postgres 17 + queue worker + reverb)
+- `phpstan.neon`, `.github/workflows/`: Larastan config and CI (PHP format/lint/test, JS format/lint/typecheck/build)

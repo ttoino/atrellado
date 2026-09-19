@@ -1,75 +1,44 @@
-FROM ubuntu:22.04 AS base
+FROM dunglas/frankenphp:1-php8.5 AS base
 
-# Install dependencies
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    git \
-    vim \
-    ssh \
-    gcc \
-    g++ \
-    make \
-    unzip \
-    libpq-dev \
-    php8.1-fpm \
-    php8.1-mbstring \
-    php8.1-xml \
-    php8.1-pgsql \
-    php8.1-curl \
-    php8.1-gd \
-    nginx
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl supervisor \
+        libgd-dev libwebp-dev libjpeg-dev libfreetype6-dev \
+        libpq-dev libsqlite3-dev libzip-dev libicu-dev \
+    && docker-php-ext-configure gd --with-webp --with-jpeg --with-freetype \
+    && docker-php-ext-install gd pdo_pgsql zip intl pcntl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
-WORKDIR /var/www
+FROM node:22 AS assets
 
-# Copy project code and install project dependencies
-COPY composer.json composer.lock ./
-RUN composer install --no-autoloader
-
-# Copy project configurations
-COPY --chown=root ./etc/php/php.ini /usr/local/etc/php/conf.d/php.ini
-COPY --chown=root ./etc/nginx/default.conf /etc/nginx/sites-enabled/default
-COPY --chown=root docker_run.sh /docker_run.sh
-
-###
-
-FROM node:18 AS assets
-
-WORKDIR /var/www
-
-COPY package.json package-lock.json ./
-RUN npm install
-
-COPY resources/ ./resources
-COPY vite.config.ts tsconfig.json ./
-COPY --from=base /var/www/vendor ./vendor
-
-RUN npm run build
-
-###
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN corepack enable pnpm && pnpm install --frozen-lockfile
+COPY . .
+RUN pnpm run build
 
 FROM base
 
-COPY --from=assets /var/www/public ./public
+WORKDIR /var/www
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-autoloader --no-scripts
+
 COPY . .
+COPY --from=assets /app/public/build public/build
 
-RUN rm .env*
-COPY .env .env
-COPY .env.prod .env.prod
-RUN cat .env.prod >> .env
+# Secrets and environment come from the container runtime, never the image.
+RUN composer dumpautoload --optimize \
+    && rm -f .env .env.* \
+    && chown -R www-data:www-data storage bootstrap/cache
 
-RUN composer dumpautoload
-RUN php artisan storage:link
-RUN php artisan key:generate --force
-RUN php artisan optimize
+COPY ./etc/php/php.ini /usr/local/etc/php/conf.d/php.ini
+COPY ./etc/supervisor/supervisord.conf /etc/supervisor/conf.d/atrellado.conf
+COPY ./etc/entrypoint.sh /entrypoint.sh
 
-RUN chown -R www-data storage bootstrap/cache
+EXPOSE 8000
+EXPOSE 8080
 
-EXPOSE 80
-
-# Start command
-CMD sh /docker_run.sh
+ENTRYPOINT ["/entrypoint.sh"]
