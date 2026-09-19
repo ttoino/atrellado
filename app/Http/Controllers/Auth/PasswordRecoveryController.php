@@ -64,7 +64,7 @@ class PasswordRecoveryController extends Controller
 
                 return redirect()->intended();
             } else {
-                return response()->route('home');
+                return redirect()->route('home');
             }
         } else {
             return back()->withErrors(['email' => [__($status)]]);
