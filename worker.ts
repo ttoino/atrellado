@@ -24,6 +24,27 @@ export default {
 			return new Response(request.method === "HEAD" ? null : object.body, { headers });
 		}
 
-		return getContainer(env.CONTAINER, "atrellado").fetch(request);
+		return fetchWithBootHold(request, env);
 	},
 } satisfies ExportedHandler<Env>;
+
+// A cold container answers 503 + Retry-After until its entrypoint finishes
+// migrating; hold the request instead of surfacing an error page. The app
+// owns the pacing via Retry-After, the worker owns the deadline — a 503
+// without the header is not the boot gate and passes through untouched.
+async function fetchWithBootHold(request: Request, env: Env): Promise<Response> {
+	const container = getContainer(env.CONTAINER, "atrellado");
+	const deadline = Date.now() + 25_000;
+
+	let response = await container.fetch(request.clone());
+	while (response.status === 503 && Date.now() < deadline) {
+		const retryAfter = Number(response.headers.get("retry-after"));
+		if (!Number.isFinite(retryAfter)) break;
+		await new Promise((resolve) =>
+			setTimeout(resolve, Math.min(Math.max(retryAfter * 1000, 500), 5_000)),
+		);
+		response = await container.fetch(request.clone());
+	}
+
+	return response;
+}
