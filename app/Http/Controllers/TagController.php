@@ -64,8 +64,6 @@ class TagController extends Controller
 
         $this->authorize('view', $tag);
 
-        $tag->comments = $tag->comments()->cursorPaginate(10);
-
         return response()->json($tag);
     }
 
