@@ -17,7 +17,7 @@ registerEnhancement<HTMLFormElement>({
                     .querySelector(".project-info .left")
                     ?.classList.remove("editing");
             },
-            (error) => {},
+            () => {},
         ),
     selector: "form#edit-project-form",
 });

@@ -13,7 +13,9 @@ import { renderToast } from "../toast";
 registerEnhancement<HTMLElement>({
     onattach: (el) => {
         const list = el.parentElement;
-        const userId = el.dataset.userId!;
+        const userId = el.dataset.userId;
+
+        if (!userId) return;
 
         const removeUserButton =
             el.querySelector<HTMLButtonElement>("button.remove-user");
@@ -90,7 +92,7 @@ registerEnhancement<HTMLFormElement>({
             () => {
                 renderToast?.({ text: "Invited user" });
             },
-            (e) => {},
+            () => {},
         ),
     selector: "form.invite-user-form",
 });

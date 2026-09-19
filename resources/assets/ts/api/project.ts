@@ -32,7 +32,14 @@ export const inviteUser = ({
 }: {
     email: string;
     projectId: string;
-}) => apiFetch<{}>(`/api/project/${projectId}/invite`, "POST", { email });
+}) =>
+    apiFetch<Record<string, never>>(
+        `/api/project/${projectId}/invite`,
+        "POST",
+        {
+            email,
+        },
+    );
 
 export const setCoordinator = (projectId: string, userId: string) =>
     apiFetch<Project>(`/api/project/${projectId}/coordinator`, "PUT", {

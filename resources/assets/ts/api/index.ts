@@ -25,7 +25,7 @@ interface SuccessfulResponse<T> extends Response {
 export const apiFetch = <T>(
     url: RequestInfo,
     method: APIMethod = "GET",
-    body?: any,
+    body?: unknown,
     options?: RequestInit,
 ): Promise<EnhancedResponse<T>> => {
     console.log(
@@ -35,7 +35,7 @@ export const apiFetch = <T>(
     );
 
     if (method === "GET") {
-        url += "?" + new URLSearchParams(body);
+        url += "?" + new URLSearchParams(body as Record<string, string>);
         body = undefined;
     }
 
@@ -52,7 +52,7 @@ export const apiFetch = <T>(
     });
 };
 
-export const tryRequest = async <K, Params extends Array<any>>(
+export const tryRequest = async <K, Params extends unknown[]>(
     fn: (...params: Params) => ReturnType<typeof apiFetch<K>>,
     error: string = "Request failed, are you online?",
     ...params: Params

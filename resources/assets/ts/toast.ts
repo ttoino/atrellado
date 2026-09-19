@@ -10,8 +10,8 @@ export const renderToast = appendListItem<{ text: string }>(
 
 registerEnhancement({
     onattach: (el) => {
-        const toast = Toast.getOrCreateInstance(el).show();
-        el.addEventListener("hidden.bs.toast", (e) => el.remove());
+        Toast.getOrCreateInstance(el).show();
+        el.addEventListener("hidden.bs.toast", () => el.remove());
     },
     selector: ".toast",
 });

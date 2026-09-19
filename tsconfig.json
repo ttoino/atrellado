@@ -9,7 +9,6 @@
         "types": ["vite/client"],
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "baseUrl": "resources/assets/ts",
         "allowSyntheticDefaultImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,

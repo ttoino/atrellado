@@ -7,7 +7,10 @@ import { render } from "../render";
 
 registerEnhancement({
     onattach: (el) => {
-        const tagId = el.dataset.tagId!;
+        const tagId = el.dataset.tagId;
+
+        if (!tagId) return;
+
         const list = el.parentElement;
 
         const deleteTagButton =
@@ -38,7 +41,7 @@ registerEnhancement({
                     render(el, tag);
                     el.classList.remove("editing");
                 },
-                (e) => {},
+                () => {},
             );
     },
     selector: "[data-tag-id]",
@@ -50,10 +53,10 @@ registerEnhancement<HTMLFormElement>({
             newTag,
             el,
             { project_id: parseInt(projectId) },
-            (tag) => {
+            () => {
                 window.location.reload();
             },
-            (e) => {},
+            () => {},
         ),
     selector: "form.new-tag-form",
 });

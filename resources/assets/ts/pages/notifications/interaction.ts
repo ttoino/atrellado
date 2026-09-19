@@ -4,7 +4,9 @@ import { registerEnhancement } from "../../enhancements";
 
 registerEnhancement<HTMLButtonElement>({
     onattach: (el) => {
-        const notificationId = el.parentElement!.dataset.notificationId!;
+        const notificationId = el.parentElement?.dataset.notificationId;
+
+        if (!notificationId) return;
 
         el.addEventListener("click", async () => {
             const result = await tryRequest(

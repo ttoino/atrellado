@@ -25,21 +25,24 @@ const renderMethods: {
         (el.value = String(p)),
 };
 
-export const render = <T extends Record<string, any>>(
-    el: HTMLElement,
-    data: T,
-) => {
+export const render = <T extends object>(el: HTMLElement, data: T) => {
     for (const method in renderMethods) {
         const selector = `[data-render-${method}]`;
         const places = el.querySelectorAll<HTMLElement>(selector);
 
         const apply = (place: HTMLElement) => {
-            const [prop, ...args] = place
-                .getAttribute(`data-render-${method}`)!
-                .split(",");
+            const [prop, ...args] = (
+                place.getAttribute(`data-render-${method}`) ?? ""
+            ).split(",");
             const value = prop
                 .split(".")
-                .reduce<any>((obj, key) => obj?.[key], data);
+                .reduce<unknown>(
+                    (obj, key) =>
+                        (obj as null | Record<string, unknown> | undefined)?.[
+                            key
+                        ],
+                    data,
+                );
             if (value !== undefined)
                 renderMethods[method](place, value, ...args);
         };
@@ -51,17 +54,13 @@ export const render = <T extends Record<string, any>>(
     return el;
 };
 
-export const renderSingleton = <T extends Record<string, any>>(
-    selector: string,
-) => {
+export const renderSingleton = <T extends object>(selector: string) => {
     const el = document.querySelector<HTMLElement>(selector);
 
     return el && ((data: T) => render(el, data));
 };
 
-export const renderTemplate = <T extends Record<string, any>>(
-    selector: string,
-) => {
+export const renderTemplate = <T extends object>(selector: string) => {
     const template = document.querySelector<HTMLTemplateElement>(
         `template${selector}`,
     )?.content.firstElementChild;
@@ -75,7 +74,7 @@ export const renderTemplate = <T extends Record<string, any>>(
     );
 };
 
-export const renderList = <T extends Record<string, any>>(
+export const renderList = <T extends object>(
     templateSelector: string,
     listSelector: HTMLElement | string,
 ) => {
@@ -96,7 +95,7 @@ export const renderList = <T extends Record<string, any>>(
 renderMethods.list = (el, p, templateSelector) =>
     p instanceof Array && renderList(templateSelector, el)?.(p);
 
-export const appendListItem = <T extends Record<string, any>>(
+export const appendListItem = <T extends object>(
     templateSelector: string,
     listSelector: string,
     first: boolean = false,
@@ -115,7 +114,7 @@ export const appendListItem = <T extends Record<string, any>>(
     );
 };
 
-export const appendListItems = <T extends Record<string, any>>(
+export const appendListItems = <T extends object>(
     templateSelector: string,
     listSelector: string,
 ) => {
@@ -133,7 +132,7 @@ export const appendListItems = <T extends Record<string, any>>(
 };
 
 export const renderMultiple =
-    <T extends Record<string, any>>(
+    <T extends object>(
         ...fns: Array<((arg: T) => unknown) | null | undefined>
     ) =>
     (arg: T) =>

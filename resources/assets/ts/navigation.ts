@@ -1,4 +1,4 @@
-import { apiFetch } from "./api";
+import { APIError, apiFetch } from "./api";
 
 export interface Route<Data> {
     data: Data;
@@ -9,7 +9,7 @@ export interface Route<Data> {
 export const navigation = (
     name: string,
     newUrl: string,
-    onNavigate: () => any,
+    onNavigate: () => unknown,
 ) => {
     window.addEventListener("popstate", (e) => {
         if (e.state.name != name) return;
@@ -29,37 +29,49 @@ export const navigation = (
     };
 };
 
-export const ajaxNavigation = <Data, Params extends Parameters<any>>(
+export const ajaxNavigation = <Data, Params extends unknown[]>(
     name: string,
-    fn: (...params: Params) => ReturnType<typeof apiFetch>,
-    ok: (response: Data) => any,
-    notOk: (response: any) => any,
-    loading: () => any,
+    fn: (...params: Params) => ReturnType<typeof apiFetch<Data>>,
+    ok: (response: Data) => unknown,
+    notOk: (response: unknown) => unknown,
+    loading: () => unknown,
 ) => {
     window.addEventListener("popstate", (e) => {
         if (e.state.name != name) return;
-        if (e.state.state == "ok") return ok(e.state.data);
-        if (e.state.state == "not ok") return notOk(e.state.data);
-        if (e.state.state == "loading") return loading();
+        if (e.state.state == "ok") ok(e.state.data);
+        else if (e.state.state == "not ok") notOk(e.state.data);
+        else if (e.state.state == "loading") loading();
     });
 
     return (newUrl: string, ...params: Params) => {
         fn(...params)
             .then(async (r) => {
-                const state: Route<any> = {
-                    data: await r.json(),
-                    name,
-                    state: "ok",
-                };
+                if (r.ok) {
+                    const state: Route<Data> = {
+                        data: await r.json(),
+                        name,
+                        state: "ok",
+                    };
 
-                if (history.state.name == name)
-                    history.replaceState(state, "", newUrl);
+                    if (history.state.name == name)
+                        history.replaceState(state, "", newUrl);
 
-                if (r.ok) ok(state.data);
-                else notOk(state.data);
+                    ok(state.data);
+                } else {
+                    const state: Route<APIError> = {
+                        data: await r.json(),
+                        name,
+                        state: "ok",
+                    };
+
+                    if (history.state.name == name)
+                        history.replaceState(state, "", newUrl);
+
+                    notOk(state.data);
+                }
             })
             .catch(async (r) => {
-                const state: Route<any> = {
+                const state: Route<unknown> = {
                     data: await r.json(),
                     name,
                     state: "not ok",

@@ -1,6 +1,6 @@
 import { registerEnhancement } from ".";
 
-function onreset(this: HTMLFormElement, e: Event) {
+function onreset(this: HTMLFormElement) {
     this.classList.remove("was-validated");
 }
 

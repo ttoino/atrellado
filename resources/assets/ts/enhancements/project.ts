@@ -5,7 +5,9 @@ import { deleteProject, toggleFavorite } from "../api/project";
 registerEnhancement<HTMLElement>({
     onattach: (el) => {
         const list = el.parentElement;
-        const projectId = el.dataset.projectId!;
+        const projectId = el.dataset.projectId;
+
+        if (!projectId) return;
 
         const toggleFavoriteButton = el.querySelector<HTMLButtonElement>(
             "button.favorite-toggle",

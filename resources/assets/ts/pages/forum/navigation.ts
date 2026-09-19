@@ -31,7 +31,7 @@ export const showForum = navigation(
     },
 );
 
-threadOffcanvasEl?.addEventListener("hide.bs.offcanvas", (e) => {
+threadOffcanvasEl?.addEventListener("hide.bs.offcanvas", () => {
     if (history.state.name != "project.forum") showForum();
 });
 
@@ -72,9 +72,9 @@ const showThread = ajaxNavigation(
 
         renderThreadListItem(thread);
         renderThread?.(thread);
-        renderThreadComments?.(thread.comments ?? []);
+        if (thread.comments) renderThreadComments(thread.comments);
     },
-    (e) => {
+    () => {
         showThreadOffcanvas();
         threadOffcanvasEl?.classList.remove("loading");
     },

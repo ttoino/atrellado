@@ -9,7 +9,7 @@ registerEnhancement<HTMLElement>({
 
         if (!input || !toggle) return;
 
-        toggle.addEventListener("click", (e) => {
+        toggle.addEventListener("click", () => {
             input.type = input.type == "password" ? "text" : "password";
         });
     },

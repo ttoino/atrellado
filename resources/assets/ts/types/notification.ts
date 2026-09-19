@@ -9,7 +9,7 @@ export interface Notification<T extends keyof NotificationTypeMap> {
     type: T;
 }
 
-interface NotificationTypeMap {
+export interface NotificationTypeMap {
     "App\\Notifications\\ProjectInvite": {
         url: string;
     };

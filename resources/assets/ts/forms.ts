@@ -10,7 +10,10 @@ export const ajaxForm = <K, P>(
 ) => {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const data: any = {};
+        const data: Record<
+            string,
+            Array<FormDataEntryValue> | FormDataEntryValue | null
+        > = {};
         const formData = new FormData(form);
 
         for (const key of formData.keys()) {
@@ -26,14 +29,14 @@ export const ajaxForm = <K, P>(
                 constantData instanceof Object
                     ? { ...constantData, ...data }
                     : constantData;
-            const response = await fn(payload);
+            const response = await fn(payload as P);
 
             if (response.ok) {
                 form.reset();
                 ok(await response.json());
             } else {
                 const error = await response.json();
-                if (error?.message) renderToast({ text: error.message });
+                if (error?.message) renderToast?.({ text: error.message });
                 notOk(error);
             }
         } catch {

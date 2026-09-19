@@ -9,7 +9,9 @@ import { appendTaskComments, renderTask, renderTaskCard } from "./render";
 // DELETE TASK GROUP
 registerEnhancement<HTMLElement>({
     onattach: (el) => {
-        const taskGroupId = parseInt(el.dataset.taskGroupId!);
+        if (!el.dataset.taskGroupId) return;
+
+        const taskGroupId = parseInt(el.dataset.taskGroupId);
         console.log(taskGroupId);
 
         const deleteGroupButton = el.querySelector<HTMLButtonElement>(
@@ -27,7 +29,7 @@ registerEnhancement<HTMLElement>({
         });
 
         const taskList = el.querySelector(":scope > ul");
-        taskList &&
+        if (taskList)
             new MutationObserver(() => {
                 console.log(taskList.children.length);
                 deleteGroupButton?.classList.toggle(

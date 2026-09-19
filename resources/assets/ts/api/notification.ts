@@ -1,11 +1,13 @@
 import { apiFetch } from ".";
-import { Notification } from "../types/notification";
+import { Notification, NotificationTypeMap } from "../types/notification";
 
 export const getNotification = (notificationId: string) =>
-    apiFetch<Notification<any>>(`/api/notifications/${notificationId}`);
+    apiFetch<Notification<keyof NotificationTypeMap>>(
+        `/api/notifications/${notificationId}`,
+    );
 
 export const markNotificationAsRead = (notificationId: string) =>
-    apiFetch<Notification<any>>(
+    apiFetch<Notification<keyof NotificationTypeMap>>(
         `/api/notifications/${notificationId}/read`,
         "PUT",
     );

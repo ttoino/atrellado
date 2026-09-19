@@ -3,6 +3,7 @@ import { editThreadComment, newThreadComment } from "../../api/thread_comment";
 import { registerEnhancement } from "../../enhancements";
 import { ajaxForm } from "../../forms";
 import { Route } from "../../navigation";
+import { Thread } from "../../types/thread";
 import { projectId } from "../project";
 import { showThreadOffcanvas } from "./navigation";
 import {
@@ -20,7 +21,7 @@ registerEnhancement<HTMLFormElement>({
             form,
             { project_id: parseInt(projectId) },
             (thread) => {
-                const state: Route<any> = {
+                const state: Route<Thread> = {
                     data: thread,
                     name: "project.thread",
                     state: "ok",
@@ -36,7 +37,7 @@ registerEnhancement<HTMLFormElement>({
                 renderThread?.(thread);
                 appendThreadListItem?.(thread);
             },
-            (error) => {},
+            () => {},
         );
     },
     selector: "#new-thread-offcanvas > form",
@@ -51,7 +52,7 @@ registerEnhancement<HTMLFormElement>({
             (threadComment) => {
                 appendThreadComment?.(threadComment);
             },
-            (error) => {},
+            () => {},
         );
     },
     selector: "form#new-comment-form",
@@ -69,7 +70,7 @@ registerEnhancement<HTMLFormElement>({
                 renderThreadListItem(thread);
                 document.querySelector("#thread")?.classList.remove("editing");
             },
-            (error) => {},
+            () => {},
         ),
     selector: "form#edit-thread-form",
 });
@@ -89,7 +90,7 @@ registerEnhancement<HTMLFormElement>({
                     )
                     ?.classList.remove("editing");
             },
-            (error) => {},
+            () => {},
         ),
     selector: "form.edit-thread-comment-form",
 });

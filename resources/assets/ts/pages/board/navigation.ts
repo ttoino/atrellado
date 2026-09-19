@@ -1,9 +1,9 @@
 import { Offcanvas } from "bootstrap";
-import { Task } from "types/task";
 
 import { getTask } from "../../api/task";
 import { registerEnhancement } from "../../enhancements";
 import { ajaxNavigation, navigation } from "../../navigation";
+import { Task } from "../../types/task";
 import { projectId } from "../project";
 import { renderTask, renderTaskComments } from "./render";
 
@@ -17,7 +17,7 @@ export const showBoard = navigation(
     () => taskOffcanvas?.hide(),
 );
 
-taskOffcanvasEl?.addEventListener("hide.bs.offcanvas", (e) => {
+taskOffcanvasEl?.addEventListener("hide.bs.offcanvas", () => {
     if (history.state?.name != "project.board") showBoard();
 });
 
@@ -29,11 +29,11 @@ const showTask = ajaxNavigation(
 
         document.querySelector("#task")?.classList.remove("editing");
         renderTask?.(task);
-        task.comments && renderTaskComments(task.comments);
+        if (task.comments) renderTaskComments(task.comments);
 
         taskOffcanvasEl?.classList.remove("loading");
     },
-    (e) => {
+    () => {
         taskOffcanvas?.show();
         taskOffcanvasEl?.classList.remove("loading");
     },

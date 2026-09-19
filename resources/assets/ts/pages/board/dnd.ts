@@ -7,7 +7,10 @@ import { registerEnhancement } from "../../enhancements";
 
 const undo = (e: SortableEvent) => {
     e.item.remove();
-    e.from.insertBefore(e.item, e.from.children[e.oldIndex!]);
+    e.from.insertBefore(
+        e.item,
+        e.oldIndex === undefined ? null : e.from.children[e.oldIndex],
+    );
 };
 
 registerEnhancement({

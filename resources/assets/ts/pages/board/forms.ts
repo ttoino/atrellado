@@ -22,7 +22,7 @@ registerEnhancement<HTMLFormElement>({
             form,
             { project_id: parseInt(projectId) },
             (group) => appendTaskGroup(group),
-            (error) => {},
+            () => {},
         ),
     selector: "form#new-task-group-form",
 });
@@ -35,7 +35,7 @@ registerEnhancement<HTMLFormElement>({
             form,
             {},
             (taskComment) => appendTaskComment?.(taskComment),
-            (error) => {},
+            () => {},
         ),
     selector: "form#new-comment-form",
 });
@@ -51,7 +51,7 @@ registerEnhancement<HTMLFormElement>({
                 appendTaskCard(
                     `.task-group[data-task-group-id="${task.task_group_id}"] > ul`,
                 )?.(task),
-            (error) => {},
+            () => {},
         ),
     selector: "form#new-task-form",
 });
@@ -68,7 +68,7 @@ registerEnhancement<HTMLFormElement>({
                 renderTaskCard(task);
                 document.querySelector("#task")?.classList.remove("editing");
             },
-            (error) => {},
+            () => {},
         ),
     selector: "form#edit-task-form",
 });
@@ -88,7 +88,7 @@ registerEnhancement<HTMLFormElement>({
                     )
                     ?.classList.remove("editing");
             },
-            (error) => {},
+            () => {},
         ),
     selector: "form.edit-task-comment-form",
 });
@@ -96,7 +96,9 @@ registerEnhancement<HTMLFormElement>({
 // NEW TASK, EDIT TASK GROUP
 registerEnhancement<HTMLElement>({
     onattach: (el) => {
-        const taskGroupId = parseInt(el.dataset.taskGroupId!);
+        if (!el.dataset.taskGroupId) return;
+
+        const taskGroupId = parseInt(el.dataset.taskGroupId);
         console.log(taskGroupId);
 
         const appendTask = appendTaskCard(
@@ -104,7 +106,7 @@ registerEnhancement<HTMLElement>({
         );
         const createTaskForm =
             el.querySelector<HTMLFormElement>("form.new-task-form");
-        createTaskForm &&
+        if (createTaskForm)
             ajaxForm(
                 newTask,
                 createTaskForm,
@@ -112,13 +114,13 @@ registerEnhancement<HTMLElement>({
                 (task) => {
                     appendTask?.(task);
                 },
-                (error) => {},
+                () => {},
             );
 
         const editGroupForm = el.querySelector<HTMLFormElement>(
             "form.edit-task-group-form",
         );
-        editGroupForm &&
+        if (editGroupForm)
             ajaxForm(
                 editTaskGroup,
                 editGroupForm,
@@ -126,7 +128,7 @@ registerEnhancement<HTMLElement>({
                 (group) => {
                     render(editGroupForm, group);
                 },
-                (error) => {},
+                () => {},
             );
     },
     selector: ".task-group[data-task-group-id]",
