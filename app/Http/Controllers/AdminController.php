@@ -114,8 +114,7 @@ class AdminController extends Controller
         $projects = Project::with('reports');
 
         if (! empty($search)) {
-            $projects = $projects->whereRaw('(fts_search @@ plainto_tsquery(\'english\', ?) OR project.name = ?)', [$search, $search])
-                ->orderByRaw('ts_rank(fts_search, plainto_tsquery(\'english\', ?)) DESC', [$search]);
+            $projects = $projects->searchText($search);
         }
 
         return $projects->cursorPaginate(10);

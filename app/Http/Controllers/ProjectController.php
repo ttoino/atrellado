@@ -120,8 +120,7 @@ class ProjectController extends Controller
         $userProjects = $request->user()->projects();
 
         if (! empty($searchTerm)) {
-            $userProjects = $userProjects->whereRaw('(fts_search @@ plainto_tsquery(\'english\', ?) OR project.name = ?)', [$searchTerm, $searchTerm])
-                ->orderByRaw('ts_rank(fts_search, plainto_tsquery(\'english\', ?)) DESC', [$searchTerm]);
+            $userProjects = $userProjects->searchText($searchTerm);
         }
 
         return $userProjects->paginate(10);
@@ -390,8 +389,7 @@ class ProjectController extends Controller
         $projectTasks = $project->tasks();
 
         if (! empty($searchTerm)) {
-            $projectTasks = $projectTasks->whereRaw('(task.fts_search @@ plainto_tsquery(\'english\', ?) OR task.name = ?)', [$searchTerm, $searchTerm])
-                ->orderByRaw('ts_rank(task.fts_search, plainto_tsquery(\'english\', ?)) DESC', [$searchTerm]);
+            $projectTasks = $projectTasks->searchText($searchTerm);
         }
 
         return $projectTasks->cursorPaginate(10);

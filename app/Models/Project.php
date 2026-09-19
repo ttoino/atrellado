@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Datetime;
 use App\Casts\Markdown;
+use App\Concerns\SearchableText;
 use App\Events\ProjectDeleted;
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
+    use HasFactory, SearchableText;
 
     // Coordinator-membership bookkeeping ported from the PL/pgSQL triggers.
     protected static function booted(): void
@@ -34,15 +35,6 @@ class Project extends Model
         'description',
         'coordinator_id',
         'edit_date',
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'fts_search',
     ];
 
     protected $casts = [

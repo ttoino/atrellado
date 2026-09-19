@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Datetime;
 use App\Casts\Markdown;
+use App\Concerns\SearchableText;
 use App\Observers\TaskObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 class Task extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SearchableText;
 
     const CREATED_AT = 'creation_date';
 
@@ -37,15 +38,6 @@ class Task extends Model
         'task_group_id',
         'creator_id',
         'position',
-    ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'fts_search',
     ];
 
     protected $casts = [
