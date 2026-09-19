@@ -56,7 +56,7 @@ class AdminController extends Controller
         User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
+            'password' => $request->input('password'),
         ]);
 
         return redirect()->route('admin.users');

@@ -26,7 +26,7 @@ class OAuthController extends Controller
             $user = User::create([
                 'email' => $oAuthUser->getEmail(),
                 'name' => $oAuthUser->getName(),
-                'password' => bcrypt(Str::random()), // encrypt in case of data leaks
+                'password' => Str::random(), // encrypted by the hashed cast
                 'profile_picture_path' => $oAuthUser->getAvatar(),
             ]);
         }
