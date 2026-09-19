@@ -94,7 +94,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Attribute::make(get: function ($_, $attributes) {
 
-            if ($attributes['profile_picture_path'] !== null) {
+            // Unpersisted attributes are absent on freshly created instances.
+            if (($attributes['profile_picture_path'] ?? null) !== null) {
                 return $attributes['profile_picture_path'];
             }
 

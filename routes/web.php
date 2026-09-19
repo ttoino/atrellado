@@ -106,7 +106,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 });
 
 // Admin
-Route::prefix('/admin')->middleware(['auth', 'isAdmin', 'verified'])->name('admin')->controller(AdminController::class)->group(function () {
+Route::prefix('/admin')->middleware(['auth', 'verified'])->name('admin')->controller(AdminController::class)->group(function () {
     Route::redirect('', '/admin/users')->name('');
 
     Route::get('/users', 'listUsers')->name('.users');

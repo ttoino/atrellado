@@ -6,14 +6,13 @@ use App\Http\Requests\StoreUserRequest;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 
+#[Middleware('can:admin-action')]
 class AdminController extends Controller
 {
     public function listUsers(Request $request)
     {
-
-        Gate::authorize('admin-action');
 
         $searchTerm = $request->query('q') ?? '';
 
@@ -27,8 +26,6 @@ class AdminController extends Controller
     public function listProjects(Request $request)
     {
 
-        Gate::authorize('admin-action');
-
         $searchTerm = $request->query('q') ?? '';
 
         $projects = $this->searchProjects($searchTerm)->withQueryString();
@@ -41,14 +38,11 @@ class AdminController extends Controller
     public function showCreateUser()
     {
 
-        Gate::authorize('admin-action');
-
         return response()->view('pages.admin.create.user');
     }
 
     public function createUser(StoreUserRequest $request)
     {
-        Gate::authorize('admin-action');
 
         User::create([
             'name' => $request->input('name'),
@@ -62,8 +56,6 @@ class AdminController extends Controller
     public function showUserReports(Request $request, User $user)
     {
 
-        Gate::authorize('admin-action');
-
         $reports = $user->reports()->cursorPaginate(10);
 
         return response()->view('pages.admin.reports.user', ['user' => $user, 'reports' => $reports]);
@@ -71,8 +63,6 @@ class AdminController extends Controller
 
     public function showProjectReports(Request $request, Project $project)
     {
-
-        Gate::authorize('admin-action');
 
         $reports = $project->reports()->cursorPaginate(10);
 
