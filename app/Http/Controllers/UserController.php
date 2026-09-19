@@ -192,7 +192,7 @@ class UserController extends Controller
 
     public function report(Request $request, User $user)
     {
-        $this->reportValidator($request);
+        $this->reportValidator($request)->validate();
 
         $this->authorize('report', $user);
 
@@ -209,7 +209,7 @@ class UserController extends Controller
     protected function reportValidator(Request $request)
     {
         return Validator::make($request->all(), [
-            'reason' => 'string|min:6|max:512',
+            'reason' => 'required|string|min:6|max:512',
         ]);
     }
 

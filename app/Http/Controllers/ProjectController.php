@@ -429,7 +429,7 @@ class ProjectController extends Controller
     public function report(Request $request, Project $project)
     {
 
-        $this->reportValidator($request);
+        $this->reportValidator($request)->validate();
 
         $requestData = $request->all();
 
@@ -448,7 +448,7 @@ class ProjectController extends Controller
     protected function reportValidator(Request $request)
     {
         return Validator::make($request->all(), [
-            'reason' => 'string|min:6|max:512',
+            'reason' => 'required|string|min:6|max:512',
         ]);
     }
 }
