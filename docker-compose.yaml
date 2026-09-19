@@ -39,6 +39,22 @@ services:
       - postgres
     command: php artisan queue:work --sleep=3 --tries=3
 
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - "HOST_UID=1000"
+    env_file:
+      - .env
+    environment:
+      - "DB_HOST=postgres"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+
   prod:
     build:
       context: .

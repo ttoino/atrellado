@@ -19,6 +19,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 ## Architecture Notes
 
 - **Observers**: `app/Observers/` holds the Eloquent observers that replace the original plpgsql triggers, keeping the business rules portable across database drivers.
+- **Broadcasting**: Laravel Reverb (queued via the database connection) with `private-project.{id}` channels authorized by `ProjectPolicy::view`; the TS pages subscribe via `resources/assets/ts/echo.ts` and re-fetch over the API on `thread.created`/`thread-comment.created`/`task-comment.created` events.
 - **API resources**: `app/Http/Resources/` serializes the comment/thread models for JSON, adding the request-dependent `editable` flag (the models themselves carry no auth-dependent appends).
 - **Uploads**: profile pictures are bounded at 4000×4000 px by the form request and processed through the `Image` facade (orient → cover 512×512 → webp) in `UserController`.
 
