@@ -9,6 +9,7 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(fn () => $this->withoutVite())
     ->in('Feature');
 
 // Small factories for the graph every feature test needs: a user, a project
