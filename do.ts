@@ -8,6 +8,14 @@ export class AtrelladoContainer extends Container<Env> {
 	sleepAfter = "10m";
 	pingEndpoint = "/ping";
 
+	override onStop(stop: { exitCode: number; reason: string }): void {
+		console.log(`container stopped: code=${stop.exitCode} reason=${stop.reason}`);
+	}
+
+	override onError(error: unknown): void {
+		console.log(`container error: ${error}`);
+	}
+
 	// Injected into the container at boot; secrets come from worker secrets.
 	envVars = {
 		APP_KEY: workerEnv.APP_KEY,
