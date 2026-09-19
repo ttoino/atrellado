@@ -15,7 +15,7 @@
         Password
     </x-form.textfield>
 
-    <x-form.textfield type="password" name="password" autocomplete="new-password" required>
+    <x-form.textfield type="password" name="password_confirmation" autocomplete="new-password" required>
         Confirm password
     </x-form.textfield>
 
