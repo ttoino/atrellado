@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
+use App\Support\D1\D1Connection;
 use App\Support\D1\HttpD1PDO;
-use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\ServiceProvider;
 
 // Registers a `d1` database driver whose PDO handle speaks to a D1 query
@@ -19,7 +19,7 @@ class D1ServiceProvider extends ServiceProvider
         $this->app['db']->extend('d1', function (array $config, string $name) {
             $config['name'] = $name;
 
-            return new SQLiteConnection(
+            return new D1Connection(
                 new HttpD1PDO($config['endpoint'] ?? ''),
                 $config['database'] ?? ':memory:',
                 $config['prefix'] ?? '',
