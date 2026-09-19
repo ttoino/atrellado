@@ -4,8 +4,9 @@ namespace App\Listeners;
 
 use App\Events\ProjectDeleted;
 use App\Notifications\ProjectDeleted as ProjectDeletedNotif;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendProjectDeleted
+class SendProjectDeleted implements ShouldQueue
 {
     public function handle(ProjectDeleted $event)
     {

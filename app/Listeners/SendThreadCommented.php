@@ -4,8 +4,9 @@ namespace App\Listeners;
 
 use App\Events\ThreadCommentCreated;
 use App\Notifications\ThreadCommented;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendThreadCommented
+class SendThreadCommented implements ShouldQueue
 {
     public function handle(ThreadCommentCreated $event)
     {

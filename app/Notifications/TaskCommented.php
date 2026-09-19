@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\TaskComment;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskCommented extends Notification
+class TaskCommented extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public TaskComment $comment;
 
     /**

@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\Thread;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ThreadNew extends Notification
+class ThreadNew extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public Thread $thread;
 
     /**

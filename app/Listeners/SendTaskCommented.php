@@ -4,8 +4,9 @@ namespace App\Listeners;
 
 use App\Events\TaskCommentCreated;
 use App\Notifications\TaskCommented;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendTaskCommented
+class SendTaskCommented implements ShouldQueue
 {
     public function handle(TaskCommentCreated $event)
     {

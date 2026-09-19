@@ -22,6 +22,23 @@ services:
     depends_on:
       - postgres
 
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - "HOST_UID=1000"
+    env_file:
+      - .env
+    environment:
+      - "DB_HOST=postgres"
+    volumes:
+      - "./app:/var/www/app"
+      - "./storage:/var/www/storage"
+    depends_on:
+      - postgres
+    command: php artisan queue:work --sleep=3 --tries=3
+
   prod:
     build:
       context: .

@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\Project;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ProjectInvite extends Notification
+class ProjectInvite extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public string $url;
 
     public Project $project;

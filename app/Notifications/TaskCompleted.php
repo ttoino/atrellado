@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\Task;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TaskCompleted extends Notification
+class TaskCompleted extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public Task $task;
 
     /**
