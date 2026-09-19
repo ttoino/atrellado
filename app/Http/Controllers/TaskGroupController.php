@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskGroupRequest;
+use App\Http\Requests\UpdateTaskGroupRequest;
 use App\Models\Project;
 use App\Models\TaskGroup;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class TaskGroupController extends Controller
 {
@@ -23,10 +24,8 @@ class TaskGroupController extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreTaskGroupRequest $request)
     {
-        $this->taskGroupCreationValidator($request)->validate();
-
         $project = Project::findOrFail($request->input('project_id'));
 
         $this->authorize('edit', $project);
@@ -53,25 +52,8 @@ class TaskGroupController extends Controller
         return $taskGroup->fresh();
     }
 
-    /**
-     * Get a validator for an incoming project creation request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function taskGroupCreationValidator(Request $request)
+    public function update(UpdateTaskGroupRequest $request, TaskGroup $taskGroup)
     {
-        return Validator::make($request->all(), [
-            'name' => 'required|string|min:4|max:255',
-            'description' => 'string|min:6|max:512',
-            'project_id' => 'required|integer',
-        ]);
-    }
-
-    public function update(Request $request, TaskGroup $taskGroup)
-    {
-
-        $this->taskGroupUpdateValidator($request)->validate();
 
         $this->authorize('edit', $taskGroup->project);
         $this->authorize('update', $taskGroup);
@@ -79,15 +61,6 @@ class TaskGroupController extends Controller
         $taskGroup = $this->updateTaskGroup($taskGroup, $request);
 
         return response()->json($taskGroup);
-    }
-
-    protected function taskGroupUpdateValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'position' => 'integer|min:0',
-            'name' => 'string|min:4|max:255',
-            'description' => 'string|min:6|max:512',
-        ]);
     }
 
     public function updateTaskGroup(TaskGroup $taskGroup, Request $request)

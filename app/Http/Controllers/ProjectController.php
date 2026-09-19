@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProjectRequest;
+use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\Report;
 use App\Models\User;
@@ -10,7 +13,6 @@ use App\Notifications\ProjectInvite;
 use App\Notifications\ProjectRemoved;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Validator;
 
 class ProjectController extends Controller
 {
@@ -134,10 +136,8 @@ class ProjectController extends Controller
         return view('pages.project.new');
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $this->projectCreationValidator($request)->validate();
-
         $this->authorize('create', Project::class);
 
         $project = $this->createProject($request);
@@ -167,24 +167,8 @@ class ProjectController extends Controller
         return $project;
     }
 
-    /**
-     * Get a validator for an incoming project creation request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function projectCreationValidator(Request $request)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-        return Validator::make($request->all(), [
-            'name' => 'required|string|min:6|max:255',
-            'description' => 'string|min:6|max:512',
-        ]);
-    }
-
-    public function update(Request $request, Project $project)
-    {
-        $this->projectUpdateValidator($request)->validate();
-
         // this is different than 'edit' in that only the project's coordinator can update the project's attributes
         $this->authorize('update', $project);
 
@@ -224,22 +208,6 @@ class ProjectController extends Controller
         $project->save();
 
         return $project;
-    }
-
-    /**
-     * Get a validator for an incoming project creation request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function projectUpdateValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'name' => 'string|min:6|max:255',
-            'description' => 'string|min:6|max:512',
-            'coordinator_id' => 'integer',
-            'archived' => 'boolean',
-        ]);
     }
 
     /**
@@ -426,10 +394,8 @@ class ProjectController extends Controller
         return view('pages.reportproject', ['project' => $project]);
     }
 
-    public function report(Request $request, Project $project)
+    public function report(StoreReportRequest $request, Project $project)
     {
-
-        $this->reportValidator($request)->validate();
 
         $requestData = $request->all();
 
@@ -443,12 +409,5 @@ class ProjectController extends Controller
         $report->save();
 
         return redirect()->route('project', ['project' => $project]);
-    }
-
-    protected function reportValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'reason' => 'required|string|min:6|max:512',
-        ]);
     }
 }

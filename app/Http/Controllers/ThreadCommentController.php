@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreThreadCommentRequest;
+use App\Http\Requests\UpdateThreadCommentRequest;
 use App\Models\Thread;
 use App\Models\ThreadComment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class ThreadCommentController extends Controller
 {
@@ -34,10 +35,8 @@ class ThreadCommentController extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreThreadCommentRequest $request)
     {
-        $this->threadCommentCreationValidator($request)->validate();
-
         $thread = Thread::findOrFail($request->input('thread_id'));
 
         $this->authorize('edit', $thread->project);
@@ -46,14 +45,6 @@ class ThreadCommentController extends Controller
         $threadComment = $this->createThreadComment($request, $thread);
 
         return response()->json($threadComment);
-    }
-
-    public function threadCommentCreationValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'content' => 'required|string|min:0|max:512',
-            'thread_id' => 'required|integer',
-        ]);
     }
 
     public function createThreadComment(Request $request, Thread $thread)
@@ -89,10 +80,8 @@ class ThreadCommentController extends Controller
      *
      * @return Response
      */
-    public function update(Request $request, ThreadComment $threadComment)
+    public function update(UpdateThreadCommentRequest $request, ThreadComment $threadComment)
     {
-
-        $this->threadCommentEditionValidator($request)->validate();
 
         $thread = $threadComment->thread;
 
@@ -103,13 +92,6 @@ class ThreadCommentController extends Controller
 
         return response()->json($threadComment);
 
-    }
-
-    public function threadCommentEditionValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'content' => 'string|min:0|max:512',
-        ]);
     }
 
     public function updateThreadComment(ThreadComment $threadComment, Request $request)

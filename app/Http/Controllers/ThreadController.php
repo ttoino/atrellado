@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreThreadRequest;
+use App\Http\Requests\UpdateThreadRequest;
 use App\Models\Project;
 use App\Models\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class ThreadController extends Controller
 {
@@ -37,10 +38,8 @@ class ThreadController extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreThreadRequest $request)
     {
-        $this->threadCreationValidator($request)->validate();
-
         $project = Project::findOrFail($request->input('project_id'));
 
         $this->authorize('edit', $project);
@@ -68,14 +67,6 @@ class ThreadController extends Controller
         return $thread->fresh();
     }
 
-    public function threadCreationValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'title' => 'required|string|min:6|max:50',
-            'content' => 'required|string|min:6|max:512',
-        ]);
-    }
-
     /**
      * Display the specified resource.
      *
@@ -98,10 +89,8 @@ class ThreadController extends Controller
      *
      * @return Response
      */
-    public function update(Request $request, Thread $thread)
+    public function update(UpdateThreadRequest $request, Thread $thread)
     {
-
-        $this->threadEditionValidator($request)->validate();
 
         $this->authorize('edit', $thread->project);
         $this->authorize('update', $thread);
@@ -109,14 +98,6 @@ class ThreadController extends Controller
         $thread = $this->editThread($thread, $request);
 
         return response()->json($thread);
-    }
-
-    public function threadEditionValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'title' => 'string|min:6|max:50',
-            'content' => 'string|min:6|max:512',
-        ]);
     }
 
     public function editThread(Thread $thread, Request $request)

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTagRequest;
+use App\Http\Requests\UpdateTagRequest;
 use App\Models\Project;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class TagController extends Controller
 {
@@ -15,10 +16,8 @@ class TagController extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreTagRequest $request)
     {
-
-        $this->tagCreationValidator($request)->validate();
 
         $project = Project::findOrFail($request->input('project_id'));
 
@@ -46,14 +45,6 @@ class TagController extends Controller
         return $tag->fresh();
     }
 
-    public function tagCreationValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'title' => 'required|string|min:6|max:50',
-            'color' => 'required|string|regex:/^#[0-9a-f]{6}$/',
-        ]);
-    }
-
     /**
      * Display the specified resource.
      *
@@ -72,24 +63,14 @@ class TagController extends Controller
      *
      * @return Response
      */
-    public function update(Request $request, Tag $tag)
+    public function update(UpdateTagRequest $request, Tag $tag)
     {
-        $this->tagEditionValidator($request)->validate();
-
         $this->authorize('edit', $tag->project);
         $this->authorize('update', $tag);
 
         $tag = $this->editTag($tag, $request);
 
         return response()->json($tag);
-    }
-
-    public function tagEditionValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'title' => 'required|string|min:6|max:50',
-            'color' => 'required|string|regex:/^#[0-9a-f]{6}$/',
-        ]);
     }
 
     public function editTag(Tag $tag, Request $request)

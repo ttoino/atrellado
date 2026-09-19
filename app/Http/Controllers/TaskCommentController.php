@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskCommentRequest;
+use App\Http\Requests\UpdateTaskCommentRequest;
 use App\Models\Task;
 use App\Models\TaskComment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class TaskCommentController extends Controller
 {
@@ -33,10 +34,8 @@ class TaskCommentController extends Controller
      *
      * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreTaskCommentRequest $request)
     {
-        $this->taskCommentCreationValidator($request)->validate();
-
         $task = Task::findOrFail($request->input('task_id'));
 
         $this->authorize('edit', $task->project);
@@ -45,14 +44,6 @@ class TaskCommentController extends Controller
         $taskComment = $this->createTaskComment($request, $task);
 
         return response()->json($taskComment, 201);
-    }
-
-    public function taskCommentCreationValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'content' => 'required|string|min:0|max:512',
-            'task_id' => 'required|integer',
-        ]);
     }
 
     public function createTaskComment(Request $request, Task $task)
@@ -86,10 +77,8 @@ class TaskCommentController extends Controller
      *
      * @return Response
      */
-    public function update(Request $request, TaskComment $taskComment)
+    public function update(UpdateTaskCommentRequest $request, TaskComment $taskComment)
     {
-        $this->taskCommentEditionValidator($request)->validate();
-
         $task = $taskComment->task;
 
         $this->authorize('edit', $task->project);
@@ -98,13 +87,6 @@ class TaskCommentController extends Controller
         $taskComment = $this->updateTaskComment($taskComment, $request);
 
         return response()->json($taskComment);
-    }
-
-    public function taskCommentEditionValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'content' => 'string|min:0|max:512',
-        ]);
     }
 
     public function updateTaskComment(TaskComment $taskComment, Request $request)

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Files;
+use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\File;
-use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -46,10 +45,8 @@ class UserController extends Controller
      *
      * @return User The user registered.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-
-        $this->userCreationValidator($request)->validate();
 
         $user = $this->storeUser($request);
 
@@ -71,24 +68,8 @@ class UserController extends Controller
         return $user;
     }
 
-    public function userCreationValidator(Request $request)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        return Validator::make($request->all(), [
-            'name' => 'required|string|min:6|max:255',
-            'email' => 'required|string|email|unique:user_profile',
-            'password' => [
-                'required',
-                'confirmed',
-                Password::min(8)
-                    ->letters(),
-            ],
-        ]);
-    }
-
-    public function update(Request $request, User $user)
-    {
-
-        $this->userEditionValidator($request)->validate();
 
         $this->authorize('update', $user);
 
@@ -136,22 +117,6 @@ class UserController extends Controller
         return $user;
     }
 
-    protected function userEditionValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'name' => 'string|min:6|max:255',
-            'profile_picture' => [
-                File::image()
-                    ->max(5 * 1024)
-                    // Compressed size says nothing about the decoded
-                    // bitmap; cap dimensions so GD decodes stay bounded.
-                    ->dimensions(Rule::dimensions()->maxWidth(4000)->maxHeight(4000)),
-            ],
-            'blocked' => 'boolean',
-            'is_admin' => 'boolean',
-        ]);
-    }
-
     public function edit(User $user)
     {
         $this->authorize('showProfileEditPage', $user);
@@ -190,10 +155,8 @@ class UserController extends Controller
         return view('pages.reportuser', ['user' => $user]);
     }
 
-    public function report(Request $request, User $user)
+    public function report(StoreReportRequest $request, User $user)
     {
-        $this->reportValidator($request)->validate();
-
         $this->authorize('report', $user);
 
         $report = new Report;
@@ -204,13 +167,6 @@ class UserController extends Controller
         $report->save();
 
         return redirect()->route('user.profile', ['user' => $user]);
-    }
-
-    protected function reportValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'reason' => 'required|string|min:6|max:512',
-        ]);
     }
 
     public function destroy(Request $request, User $user)

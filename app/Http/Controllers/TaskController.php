@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Project;
 use App\Models\Tag;
 use App\Models\Task;
@@ -13,14 +15,11 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        $this->taskCreationValidator($request)->validate();
-
         $task_group = TaskGroup::findOrFail($request->input('task_group_id'));
         $project = Project::findOrFail($task_group->project_id);
 
@@ -65,23 +64,6 @@ class TaskController extends Controller
         }
 
         return $task->fresh();
-    }
-
-    /**
-     * Get a validator for an incoming task creation request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function taskCreationValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'name' => 'required|string|min:4|max:255',
-            'description' => 'nullable|string|min:6|max:512',
-            'task_group_id' => 'required|integer',
-            'assignees' => 'nullable|array|max:5',
-            'tags' => 'nullable|array|max:5',
-        ]);
     }
 
     /**
@@ -139,10 +121,8 @@ class TaskController extends Controller
             : response()->view('pages.project.task', ['task' => $task, 'project' => $project]);
     }
 
-    public function update(Request $request, Project $project, Task $task)
+    public function update(UpdateTaskRequest $request, Project $project, Task $task)
     {
-
-        $this->editTaskValidator($request)->validate();
 
         $this->authorize('edit', $task->project);
         $this->authorize('edit', $task);
@@ -190,18 +170,6 @@ class TaskController extends Controller
         $task->push();
 
         return $task->fresh();
-    }
-
-    public function editTaskValidator(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'name' => 'string|min:4|max:255',
-            'description' => 'nullable|string|min:6|max:512',
-            'task_group_id' => 'integer',
-            'position' => 'integer|min:0',
-            'assignees' => 'nullable|array|max:5',
-            'tags' => 'nullable|array|max:5',
-        ]);
     }
 
     public function createComment(Request $request, Project $project, Task $task)
