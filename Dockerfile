@@ -1,5 +1,5 @@
 # Multi-stage build for the app container: vite assets, composer vendor,
-# then a lean php-fpm + nginx runtime. Built by wrangler on deploy.
+# then a FrankenPHP runtime. Built by wrangler on deploy.
 
 FROM node:24-alpine AS assets
 WORKDIR /app
@@ -23,26 +23,20 @@ RUN composer install --no-dev --no-scripts --no-autoloader --ignore-platform-req
 COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
-FROM php:8.5-fpm AS runtime
-# curl, mbstring and opcache are already compiled into php:8.5-fpm;
-# re-installing those breaks docker-php-ext-install.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        nginx \
-        libpng-dev libjpeg62-turbo-dev libwebp-dev \
-        libzip-dev libicu-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-configure gd --with-jpeg --with-webp \
-    && docker-php-ext-install gd intl bcmath zip
+FROM dunglas/frankenphp:1-php8.5-bookworm AS runtime
+# install-php-extensions skips extensions that are already compiled in.
+RUN install-php-extensions gd intl bcmath zip opcache \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-WORKDIR /var/www/html
-COPY --from=vendor /app /var/www/html
-COPY --from=assets /app/public/build /var/www/html/public/build
-COPY etc/nginx.conf /etc/nginx/conf.d/default.conf
+# Plain HTTP on the container's default port; TLS ends at the edge.
+ENV SERVER_NAME=:8080
+
+WORKDIR /app
+COPY --from=vendor /app /app
+COPY --from=assets /app/public/build /app/public/build
 COPY etc/entrypoint.sh /entrypoint.sh
 COPY etc/php-overrides.ini /usr/local/etc/php/conf.d/atrellado.ini
-RUN rm -f /etc/nginx/sites-enabled/default \
-    && chmod +x /entrypoint.sh \
-    && chown -R www-data:www-data storage bootstrap/cache
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]

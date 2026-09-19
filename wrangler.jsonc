@@ -13,6 +13,7 @@
 	"upload_source_maps": true,
 	"containers": [
 		{
+			"name": "atrellado",
 			"class_name": "AtrelladoContainer",
 			"image": "./Dockerfile",
 			"max_instances": 2,
