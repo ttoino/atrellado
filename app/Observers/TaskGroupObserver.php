@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Project;
 use App\Models\TaskGroup;
 
 // Port of the task_group reorder/close-gap PL/pgSQL triggers. The schema
@@ -13,6 +14,18 @@ use App\Models\TaskGroup;
 // in-memory instances, and stale positions shift the wrong range.
 class TaskGroupObserver
 {
+    public function creating(TaskGroup $taskGroup): void
+    {
+        if (array_key_exists('position', $taskGroup->getAttributes())) {
+            return;
+        }
+
+        // Same locking strategy as TaskObserver: the project row
+        // serializes concurrent group appends; explicit positions stay raw.
+        Project::whereKey($taskGroup->project_id)->lockForUpdate()->value('id');
+        $taskGroup->position = (TaskGroup::where('project_id', $taskGroup->project_id)->max('position') ?? 0) + 1;
+    }
+
     public function updating(TaskGroup $taskGroup): void
     {
         if (! $taskGroup->isDirty('position')) {

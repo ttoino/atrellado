@@ -17,6 +17,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -44,10 +45,11 @@ class TaskController extends Controller
         $task->name = $data['name'];
         $task->description = $data['description'] ?? '';
         $task->task_group_id = $task_group->id;
-        $task->position = (Task::where('task_group_id', $task->task_group_id)->max('position') ?? 0) + 1;
         $task->creator_id = $request->user()->id;
 
-        $task->save();
+        DB::transaction(function () use ($task) {
+            $task->save();
+        });
 
         try {
             foreach ($data['tags'] ?? [] as $tagId) {

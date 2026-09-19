@@ -9,6 +9,7 @@ use App\Models\TaskGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TaskGroupController extends Controller
 {
@@ -47,8 +48,10 @@ class TaskGroupController extends Controller
 
         $taskGroup->name = $data['name'];
         $taskGroup->project_id = $project->id;
-        $taskGroup->position = (TaskGroup::where('project_id', $taskGroup->project_id)->max('position') ?? 0) + 1;
-        $taskGroup->save();
+
+        DB::transaction(function () use ($taskGroup) {
+            $taskGroup->save();
+        });
 
         return $taskGroup->fresh();
     }

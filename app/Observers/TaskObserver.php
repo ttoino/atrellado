@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Task;
+use App\Models\TaskGroup;
 
 // Port of the task reorder/cross-group/close-gap PL/pgSQL triggers. The
 // schema dropped the original DEFERRABLE uniques (sqlite checks unique
@@ -13,6 +14,19 @@ use App\Models\Task;
 // in-memory instances, and stale positions shift the wrong range.
 class TaskObserver
 {
+    public function creating(Task $task): void
+    {
+        if (array_key_exists('position', $task->getAttributes())) {
+            return;
+        }
+
+        // The group row lock serializes concurrent appends within a group;
+        // aggregates cannot be locked on postgres. Explicit positions are
+        // inserted as-is (no sibling shift) by design.
+        TaskGroup::whereKey($task->task_group_id)->lockForUpdate()->value('id');
+        $task->position = (Task::where('task_group_id', $task->task_group_id)->max('position') ?? 0) + 1;
+    }
+
     public function updating(Task $task): void
     {
         if ($task->isDirty('task_group_id')) {
