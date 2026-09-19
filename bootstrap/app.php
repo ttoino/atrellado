@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Old Http\Kernel stack, framework classes only. TrustHosts keeps
         // its default (all subdomains of the app URL).
         $middleware->use([
+            \App\Http\Middleware\WaitForBoot::class,
             \Illuminate\Http\Middleware\TrustHosts::class,
             \Illuminate\Http\Middleware\TrustProxies::class,
             \Illuminate\Http\Middleware\HandleCors::class,

@@ -44,6 +44,12 @@ export class AtrelladoContainer extends Container<Env> {
 // App\Support\D1\D1HttpClient, App\Support\R2\HttpR2Adapter and
 // App\Support\Mailer\HttpMailTransport.
 AtrelladoContainer.outboundByHost = {
+	// Debug: the container posts boot output here; shows up in the tail.
+	"log.app": async (request) => {
+		console.log("container boot:", await request.text());
+		return new Response("ok");
+	},
+
 	"d1.app": async (request, env) => {
 		try {
 			const url = new URL(request.url);
