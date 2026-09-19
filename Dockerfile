@@ -4,7 +4,7 @@
 FROM node:24-alpine AS assets
 WORKDIR /app
 RUN npm install -g pnpm@latest
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
@@ -24,13 +24,15 @@ COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev
 
 FROM php:8.5-fpm AS runtime
+# curl, mbstring and opcache are already compiled into php:8.5-fpm;
+# re-installing those breaks docker-php-ext-install.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         nginx \
         libpng-dev libjpeg62-turbo-dev libwebp-dev \
-        libcurl4-openssl-dev libzip-dev libicu-dev libonig-dev \
+        libzip-dev libicu-dev \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-configure gd --with-jpeg --with-webp \
-    && docker-php-ext-install -j"$(nproc)" gd curl mbstring intl bcmath zip opcache
+    && docker-php-ext-install gd intl bcmath zip
 
 WORKDIR /var/www/html
 COPY --from=vendor /app /var/www/html
