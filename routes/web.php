@@ -14,11 +14,7 @@
 
 use App\Enums\ProviderType;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\Auth\EmailVerificationController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\OAuthController;
-use App\Http\Controllers\Auth\PasswordRecoveryController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
@@ -31,6 +27,13 @@ use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
 use App\Models\Project;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use Laravel\Fortify\Http\Controllers\EmailVerificationNotificationController;
+use Laravel\Fortify\Http\Controllers\EmailVerificationPromptController;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
+use Laravel\Fortify\Http\Controllers\RegisteredUserController;
+use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 
 Route::get('', [HomeController::class, 'show'])->name('home');
 
@@ -124,22 +127,22 @@ Route::prefix('/admin')->middleware(['auth', 'verified'])->name('admin')->contro
     });
 });
 
-// Authentication
-Route::name('')->middleware('guest')->group(function () {
-    Route::controller(LoginController::class)->group(function () {
-        Route::get('/login', 'showLoginForm')->name('login');
-        Route::post('/login', 'login');
-        Route::get('/logout', 'logout')->withoutMiddleware('guest')->middleware('auth')->name('logout');
-    });
-    Route::controller(RegisterController::class)->group(function () {
-        Route::get('/register', 'showRegistrationForm')->name('register');
-        Route::post('/register', 'register');
-    });
-    Route::controller(PasswordRecoveryController::class)->name('password')->group(function () {
-        Route::get('/recover-password', 'showPasswordRecoveryForm')->name('.request');
-        Route::post('/recover-password', 'sendPasswordRecoveryLink')->name('.request-action');
-        Route::get('/reset-password/{token}', 'showPasswordResetForm')->name('.reset');
-        Route::post('/reset-password', 'resetPassword')->name('.reset-action');
+// Authentication (Fortify controllers, hand-registered to keep the
+// original URLs and route names after dropping laravel/ui)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    // GET instead of Fortify's POST: the navbar links logout via a plain anchor.
+    Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])->withoutMiddleware('guest')->middleware('auth')->name('logout');
+
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+
+    Route::name('password')->group(function () {
+        Route::get('/recover-password', [PasswordResetLinkController::class, 'create'])->name('.request');
+        Route::post('/recover-password', [PasswordResetLinkController::class, 'store'])->name('.request-action');
+        Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('.reset');
+        Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('.reset-action');
     });
 
     Route::controller(OAuthController::class)->prefix('/oauth/{provider}')->whereIn('provider', ProviderType::values())->name('oauth')->group(function () {
@@ -147,10 +150,10 @@ Route::name('')->middleware('guest')->group(function () {
         Route::get('/callback', 'handleOAuthCallback')->name('.callback');
     });
 
-    Route::controller(EmailVerificationController::class)->prefix('/email')->withoutMiddleware('guest')->middleware('auth')->name('verification')->group(function () {
-        Route::get('/verify', 'showEmailVerificationNotice')->name('.notice');
-        Route::get('/verify/{id}/{hash}', 'verifyEmail')->middleware('signed')->name('.verify');
-        Route::post('/verification-notice', 'sendNewVerificationEmail')->middleware('throttle:6,1')->name('.send');
+    Route::prefix('/email')->withoutMiddleware('guest')->middleware('auth')->name('verification')->group(function () {
+        Route::get('/verify', EmailVerificationPromptController::class)->name('.notice');
+        Route::get('/verify/{id}/{hash}', VerifyEmailController::class)->middleware('signed')->name('.verify');
+        Route::post('/verification-notice', [EmailVerificationNotificationController::class, 'store'])->middleware('throttle:6,1')->name('.send');
     });
 });
 

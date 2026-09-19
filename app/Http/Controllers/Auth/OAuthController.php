@@ -21,7 +21,15 @@ class OAuthController extends Controller
         /** @var \Laravel\Socialite\Two\User $oAuthUser */
         $oAuthUser = Socialite::driver($provider)->user();
 
-        $user = User::firstWhere('email', $oAuthUser->getEmail());
+        // Primary lookup: the stable provider account id, immune to email
+        // changes and token rotation.
+        $userOAuthSignIn = OAuthUser::where('provider_type', $provider)
+            ->where('provider_user_id', $oAuthUser->getId())
+            ->first();
+
+        $user = $userOAuthSignIn !== null
+            ? $userOAuthSignIn->user
+            : User::firstWhere('email', $oAuthUser->getEmail());
 
         if (! $user) { // OAuth Sign Up
             $user = User::create([
@@ -32,25 +40,29 @@ class OAuthController extends Controller
             ]);
         }
 
-        $userOAuthSignIn = $user->oAuthProfiles
-            ->where('provider_type', $provider)
-            ->where('provider_token', $oAuthUser->token)
-            ->first();
-
         if (! $userOAuthSignIn) {
-            // first time using this provider's OAuth service
+            $userOAuthSignIn = $user->oAuthProfiles
+                ->where('provider_type', $provider)
+                ->where('provider_token', $oAuthUser->token)
+                ->first();
 
-            $userOAuthSignIn = OAuthUser::create([
-                'provider_type' => $provider,
-                'provider_token' => $oAuthUser->token,
-                // Socialite exposes refresh_token only through its magic __get.
-                // @phpstan-ignore property.notFound
-                'provider_refresh_token' => $oAuthUser->refresh_token,
-                'user_id' => $user->id,
-            ]);
-        } else {
-            // check refresh token if needed
+            if ($userOAuthSignIn) {
+                // Legacy row linked by token before provider ids were stored:
+                // stamp it so the next login matches by provider_user_id.
+                $userOAuthSignIn->forceFill(['provider_user_id' => $oAuthUser->getId()])->save();
+            } else {
+                // first time using this provider's OAuth service
 
+                OAuthUser::create([
+                    'provider_type' => $provider,
+                    'provider_user_id' => $oAuthUser->getId(),
+                    'provider_token' => $oAuthUser->token,
+                    // Socialite exposes refresh_token only through its magic __get.
+                    // @phpstan-ignore property.notFound
+                    'provider_refresh_token' => $oAuthUser->refresh_token,
+                    'user_id' => $user->id,
+                ]);
+            }
         }
 
         Auth::login($user, true);

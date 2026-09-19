@@ -12,11 +12,15 @@ class OAuthUser extends Model
 
     protected $casts = [
         'provider_type' => ProviderType::class,
+        'provider_token' => 'encrypted',
+        'provider_refresh_token' => 'encrypted',
     ];
 
     protected $fillable = [
         'provider_type',
+        'provider_user_id',
         'provider_token',
+        'provider_refresh_token',
         'user_id',
     ];
 
