@@ -14,5 +14,16 @@ export interface Markdown {
 
 export interface Paginator<T> {
     data: Array<T>;
-    next_cursor?: string;
+    links: {
+        first: null | string;
+        last: null | string;
+        next: null | string;
+        prev: null | string;
+    };
+    meta: {
+        next_cursor: null | string;
+        path: string;
+        per_page: number;
+        prev_cursor: null | string;
+    };
 }

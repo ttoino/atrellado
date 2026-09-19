@@ -6,10 +6,8 @@ use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\ThreadCommentCreated;
 use App\Observers\ThreadCommentObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class ThreadComment extends Model
 {
@@ -56,8 +54,6 @@ class ThreadComment extends Model
         'created' => ThreadCommentCreated::class,
     ];
 
-    protected $appends = ['editable'];
-
     public function thread()
     {
         return $this->belongsTo(
@@ -69,11 +65,6 @@ class ThreadComment extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);
-    }
-
-    protected function editable(): Attribute
-    {
-        return Attribute::make(get: fn () => Auth::user()?->can('update', $this));
     }
 
     protected $table = 'thread_comment';

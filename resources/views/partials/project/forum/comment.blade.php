@@ -7,7 +7,7 @@
     ])
 
     @can('edit', $project)
-        <div @class(['hstack', 'gap-2', 'd-none' => !$threadComment->editable]) data-render-class-condition="editable,d-none,false">
+        <div @class(['hstack', 'gap-2', 'd-none' => !auth()->user()?->can('update', $threadComment)]) data-render-class-condition="editable,d-none,false">
             <button class="edit-thread-comment-button btn btn-outline-primary">
                 <i class="bi bi-pencil"></i> Edit
             </button>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskCommentRequest;
 use App\Http\Requests\UpdateTaskCommentRequest;
+use App\Http\Resources\TaskCommentResource;
 use App\Models\Task;
 use App\Models\TaskComment;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class TaskCommentController extends Controller
 
         $comments = $task->comments()->cursorPaginate(10);
 
-        return response()->json($comments);
+        return TaskCommentResource::collection($comments);
     }
 
     /**
@@ -43,7 +44,7 @@ class TaskCommentController extends Controller
 
         $taskComment = $this->createTaskComment($request, $task);
 
-        return response()->json($taskComment, 201);
+        return response()->json(new TaskCommentResource($taskComment), 201);
     }
 
     public function createTaskComment(Request $request, Task $task)
@@ -69,7 +70,7 @@ class TaskCommentController extends Controller
     {
         $this->authorize('view', [$taskComment]);
 
-        return response()->json($taskComment);
+        return response()->json(new TaskCommentResource($taskComment));
     }
 
     /**
@@ -86,7 +87,7 @@ class TaskCommentController extends Controller
 
         $taskComment = $this->updateTaskComment($taskComment, $request);
 
-        return response()->json($taskComment);
+        return response()->json(new TaskCommentResource($taskComment));
     }
 
     public function updateTaskComment(TaskComment $taskComment, Request $request)
@@ -116,6 +117,6 @@ class TaskCommentController extends Controller
 
         $taskComment->delete();
 
-        return response()->json($taskComment);
+        return response()->json(new TaskCommentResource($taskComment));
     }
 }

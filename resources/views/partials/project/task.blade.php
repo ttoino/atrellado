@@ -1,4 +1,5 @@
 @php($task ??= new \App\Models\Task())
+@php($comments ??= $task->comments)
 
 <article id="task" data-task-id="{{ $task->id }}" class="editable" data-render-attr="id,task-id">
     <header class="offcanvas-header">
@@ -103,7 +104,7 @@
 </article>
 
 <ul id="task-comments">
-    @each('partials.project.board.comment', $task->comments, 'taskComment')
+    @each('partials.project.board.comment', $comments, 'taskComment')
 </ul>
 
 <button @class([
@@ -112,11 +113,11 @@
     'mx-auto',
     'mb-3',
     'd-none' =>
-        $task->comments instanceof \Illuminate\Pagination\CursorPaginator &&
-        $task->comments?->nextCursor() == null,
-]) id="load-comments-button" data-render-class-condition="next_cursor,d-none,false"
-    data-next-cursor="{{ $task->comments instanceof \Illuminate\Pagination\CursorPaginator ? $task->comments?->nextCursor()?->encode() : '' }}"
-    data-render-attr="next_cursor,next-cursor">
+        $comments instanceof \Illuminate\Pagination\CursorPaginator &&
+        $comments?->nextCursor() == null,
+]) id="load-comments-button" data-render-class-condition="meta.next_cursor,d-none,false"
+    data-next-cursor="{{ $comments instanceof \Illuminate\Pagination\CursorPaginator ? $comments?->nextCursor()?->encode() : '' }}"
+    data-render-attr="meta.next_cursor,next-cursor">
     Load more comments
 </button>
 

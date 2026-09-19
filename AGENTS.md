@@ -19,6 +19,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 ## Architecture Notes
 
 - **Observers**: `app/Observers/` holds the Eloquent observers that replace the original plpgsql triggers, keeping the business rules portable across database drivers.
+- **API resources**: `app/Http/Resources/` serializes the comment/thread models for JSON, adding the request-dependent `editable` flag (the models themselves carry no auth-dependent appends).
 - **Uploads**: profile pictures are bounded at 4000×4000 px and converted to webp in `app/Helpers/Files.php`; the decoded bitmaps are freed immediately after resampling.
 
 ## Code Style
@@ -30,6 +31,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 ## Important Files
 
 - `app/Observers/`: Eloquent observers (business triggers)
+- `app/Http/Resources/`: JSON serialization (incl. `editable` flag)
 - `app/Helpers/Files.php`: Bounded image conversion (webp)
 - `database/migrations/`: Schema (driver-agnostic Laravel migrations)
 - `docker-compose.yaml`, `Dockerfile`, `etc/`: The original Docker dev setup

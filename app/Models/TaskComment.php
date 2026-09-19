@@ -6,10 +6,8 @@ use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\TaskCommentCreated;
 use App\Observers\TaskCommentObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class TaskComment extends Model
 {
@@ -56,8 +54,6 @@ class TaskComment extends Model
         'created' => TaskCommentCreated::class,
     ];
 
-    protected $appends = ['editable'];
-
     public function task()
     {
         return $this->belongsTo(
@@ -69,11 +65,6 @@ class TaskComment extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);
-    }
-
-    protected function editable(): Attribute
-    {
-        return Attribute::make(fn () => Auth::user()?->can('update', $this));
     }
 
     protected $table = 'task_comment';

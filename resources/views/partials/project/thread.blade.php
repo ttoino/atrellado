@@ -1,4 +1,5 @@
 @php($thread ??= new \App\Models\Thread())
+@php($comments ??= $thread->comments)
 
 <article id="thread" class="editable" data-thread-id="{{ $thread->id }}" data-render-attr="id,thread-id">
     <header class="offcanvas-header">
@@ -14,7 +15,7 @@
     ])
 
     @can('edit', $project)
-        <div @class(['hstack', 'gap-2', 'd-none' => !$thread->editable]) data-render-class-condition="editable,d-none,false">
+        <div @class(['hstack', 'gap-2', 'd-none' => !auth()->user()?->can('update', $thread)]) data-render-class-condition="editable,d-none,false">
             <button id="edit-thread-button" class="btn btn-outline-primary">
                 <i class="bi bi-pencil"></i> Edit
             </button>
@@ -53,7 +54,7 @@
 </article>
 
 <ul id="thread-comments">
-    @foreach ($thread->comments ?? [] as $threadComment)
+    @foreach ($comments as $threadComment)
         @include('partials.project.forum.comment', [
             'threadComment' => $threadComment,
         ])
@@ -66,11 +67,11 @@
     'mx-auto',
     'mb-3',
     'd-none' =>
-        $thread->comments instanceof \Illuminate\Pagination\CursorPaginator &&
-        $thread->comments?->nextCursor() == null,
-]) id="load-comments-button" data-render-class-condition="next_cursor,d-none,false"
-    data-next-cursor="{{ $thread->comments instanceof \Illuminate\Pagination\CursorPaginator ? $thread->comments?->nextCursor()?->encode() : '' }}"
-    data-render-attr="next_cursor,next-cursor">
+        $comments instanceof \Illuminate\Pagination\CursorPaginator &&
+        $comments?->nextCursor() == null,
+]) id="load-comments-button" data-render-class-condition="meta.next_cursor,d-none,false"
+    data-next-cursor="{{ $comments instanceof \Illuminate\Pagination\CursorPaginator ? $comments?->nextCursor()?->encode() : '' }}"
+    data-render-attr="meta.next_cursor,next-cursor">
     Load more comments
 </button>
 

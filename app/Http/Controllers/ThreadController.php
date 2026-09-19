@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreThreadRequest;
 use App\Http\Requests\UpdateThreadRequest;
+use App\Http\Resources\ThreadResource;
 use App\Models\Project;
 use App\Models\Thread;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class ThreadController extends Controller
         $thread = $this->createThread($request, $project);
 
         return $request->wantsJson()
-            ? response()->json($thread->toArray(), 201)
+            ? response()->json(new ThreadResource($thread), 201)
             : redirect()->route('project.thread', ['project' => $project, 'thread' => $thread]);
     }
 
@@ -77,11 +78,11 @@ class ThreadController extends Controller
 
         $this->authorize('view', $thread);
 
-        $thread->comments = $thread->comments()->cursorPaginate(10);
+        $comments = $thread->comments()->cursorPaginate(10);
 
         return $request->wantsJson()
-            ? response()->json($thread)
-            : response()->view('pages.project.thread', ['project' => $project, 'thread' => $thread]);
+            ? response()->json((new ThreadResource($thread))->withComments($comments))
+            : response()->view('pages.project.thread', ['project' => $project, 'thread' => $thread, 'comments' => $comments]);
     }
 
     /**
@@ -97,7 +98,7 @@ class ThreadController extends Controller
 
         $thread = $this->editThread($thread, $request);
 
-        return response()->json($thread);
+        return response()->json(new ThreadResource($thread));
     }
 
     public function editThread(Thread $thread, Request $request)
@@ -131,6 +132,6 @@ class ThreadController extends Controller
 
         $thread->delete();
 
-        return response()->json($thread);
+        return response()->json(new ThreadResource($thread));
     }
 }

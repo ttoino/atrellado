@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreThreadCommentRequest;
 use App\Http\Requests\UpdateThreadCommentRequest;
+use App\Http\Resources\ThreadCommentResource;
 use App\Models\Thread;
 use App\Models\ThreadComment;
 use Illuminate\Http\Request;
@@ -27,7 +28,7 @@ class ThreadCommentController extends Controller
 
         $comments = ThreadComment::cursorPaginate(10);
 
-        return response()->json($comments);
+        return ThreadCommentResource::collection($comments);
     }
 
     /**
@@ -44,7 +45,7 @@ class ThreadCommentController extends Controller
 
         $threadComment = $this->createThreadComment($request, $thread);
 
-        return response()->json($threadComment);
+        return response()->json(new ThreadCommentResource($threadComment));
     }
 
     public function createThreadComment(Request $request, Thread $thread)
@@ -72,7 +73,7 @@ class ThreadCommentController extends Controller
     {
         $this->authorize('view', [$threadComment]);
 
-        return response()->json($threadComment);
+        return response()->json(new ThreadCommentResource($threadComment));
     }
 
     /**
@@ -90,7 +91,7 @@ class ThreadCommentController extends Controller
 
         $threadComment = $this->updateThreadComment($threadComment, $request);
 
-        return response()->json($threadComment);
+        return response()->json(new ThreadCommentResource($threadComment));
 
     }
 
@@ -121,6 +122,6 @@ class ThreadCommentController extends Controller
 
         $threadComment->delete();
 
-        return response()->json($threadComment);
+        return response()->json(new ThreadCommentResource($threadComment));
     }
 }

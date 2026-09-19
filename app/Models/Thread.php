@@ -6,10 +6,8 @@ use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\ThreadCreated;
 use App\Observers\ThreadObserver;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class Thread extends Model
 {
@@ -54,8 +52,6 @@ class Thread extends Model
         'created' => ThreadCreated::class,
     ];
 
-    protected $appends = ['editable'];
-
     public function project()
     {
         return $this->belongsTo(
@@ -75,11 +71,6 @@ class Thread extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);
-    }
-
-    protected function editable(): Attribute
-    {
-        return Attribute::make(get: fn () => Auth::user()?->can('update', $this));
     }
 
     protected $table = 'thread';

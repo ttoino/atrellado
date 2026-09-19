@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskCommentResource;
+use App\Http\Resources\TaskResource;
 use App\Models\Project;
 use App\Models\Tag;
 use App\Models\Task;
@@ -114,11 +116,11 @@ class TaskController extends Controller
 
         $this->authorize('view', [$task, $project]);
 
-        $task->comments = $task->comments()->cursorPaginate(10);
+        $comments = $task->comments()->cursorPaginate(10);
 
         return $isApi
-            ? response()->json($task)
-            : response()->view('pages.project.task', ['task' => $task, 'project' => $project]);
+            ? response()->json((new TaskResource($task))->withComments($comments))
+            : response()->view('pages.project.task', ['task' => $task, 'project' => $project, 'comments' => $comments]);
     }
 
     public function update(UpdateTaskRequest $request, Project $project, Task $task)
@@ -186,7 +188,7 @@ class TaskController extends Controller
         $task_comment->save();
 
         return $request->wantsJson()
-            ? response()->json([$task_comment], 201)
+            ? response()->json([new TaskCommentResource($task_comment)], 201)
             : redirect()->route('project.task.info', ['project' => $project, 'task' => $task]);
     }
 
