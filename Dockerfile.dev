@@ -1,33 +1,19 @@
-FROM ubuntu:22.04
-ARG HOST_UID=33
+FROM php:8.5-cli
 
-# Install dependencies
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    git \
-    vim \
-    ssh \
-    gcc \
-    g++ \
-    make \
-    unzip
+ARG HOST_UID=1000
 
-RUN apt-get install -y --no-install-recommends \
-    libpq-dev \
-    php8.1-fpm \
-    php8.1-mbstring \
-    php8.1-xml \
-    php8.1-pgsql \
-    php8.1-curl \
-    php8.1-gd
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git unzip curl \
+        libgd-dev libpq-dev libsqlite3-dev libzip-dev libicu-dev \
+    && docker-php-ext-install gd pdo_pgsql pdo_sqlite zip intl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt-get install -y --no-install-recommends nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && corepack enable pnpm \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www
 
@@ -36,34 +22,24 @@ VOLUME [ \
     "/var/www/resources", "/var/www/routes" \
     ]
 
-RUN chown www-data /var/www
-RUN chmod 700 /var/www
-RUN usermod -u $HOST_UID www-data
+RUN chown www-data /var/www && chmod 700 /var/www && usermod -u $HOST_UID www-data
 USER www-data
 
-# Copy project code and install project dependencies
+# Copy dependency manifests first for layer caching
 COPY --chown=www-data composer.json composer.lock ./
 RUN composer install --no-autoloader
 
-COPY --chown=www-data package.json package-lock.json ./
-RUN npm install
+COPY --chown=www-data package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY --chown=www-data . .
 
-RUN rm .env*
-COPY --chown=www-data .env .env
-COPY --chown=www-data .env.dev .env.dev
-RUN cat .env.dev >> .env
+RUN composer dumpautoload && php artisan storage:link || true
 
-RUN composer dumpautoload
-
-RUN php artisan storage:link
-
-# Copy project configurations
 COPY --chown=www-data ./etc/php/php.ini /usr/local/etc/php/conf.d/php.ini
 
 EXPOSE 8000
 EXPOSE 5173
 
-# Start command
-CMD npm run dev & php artisan serve --host=0.0.0.0 --port=$PORT
+# Configuration comes from compose's environment block
+CMD pnpm run dev & php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
