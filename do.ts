@@ -5,7 +5,7 @@ import { createMimeMessage } from "mimetext";
 
 export class AtrelladoContainer extends Container<Env> {
 	defaultPort = 8080;
-	sleepAfter = "10m";
+	sleepAfter = "1h";
 	pingEndpoint = "/ping.php";
 
 	override onStop(stop: { exitCode: number; reason: string }): void {
