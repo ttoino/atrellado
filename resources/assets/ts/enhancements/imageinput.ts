@@ -6,10 +6,9 @@ function cancelEvent(e: Event) {
 }
 
 registerEnhancement<HTMLLabelElement>({
-    selector: "label.image-input",
     onattach: (imageInput) => {
         const input = imageInput.querySelector<HTMLInputElement>(
-            'input[type="file"][accept^="image/"]'
+            'input[type="file"][accept^="image/"]',
         );
         const image = imageInput.querySelector<HTMLImageElement>("img");
 
@@ -20,7 +19,7 @@ registerEnhancement<HTMLLabelElement>({
 
             reader.addEventListener(
                 "load",
-                () => (image.src = reader.result?.toString() ?? "")
+                () => (image.src = reader.result?.toString() ?? ""),
             );
 
             if (input.files && input.files[0].type.startsWith("image/"))
@@ -41,5 +40,6 @@ registerEnhancement<HTMLLabelElement>({
 
         input.addEventListener("change", updatePreview);
     },
+    selector: "label.image-input",
     // TODO: ondettach
 });

@@ -14,7 +14,6 @@ function onsubmit(this: HTMLFormElement, e: SubmitEvent) {
 }
 
 registerEnhancement<HTMLFormElement>({
-    selector: "form.needs-validation",
     onattach: (e) => {
         e.addEventListener("submit", onsubmit);
         e.addEventListener("reset", onreset);
@@ -23,4 +22,5 @@ registerEnhancement<HTMLFormElement>({
         e.removeEventListener("submit", onsubmit);
         e.removeEventListener("reset", onreset);
     },
+    selector: "form.needs-validation",
 });

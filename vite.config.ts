@@ -1,15 +1,25 @@
-import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import path from "path";
+import { defineConfig } from "vite";
 
 export default defineConfig({
+    css: {
+        preprocessorOptions: {
+            scss: {
+                // Bootstrap 5.3 still uses @import internally; silence the
+                // deprecation until the bootstrap 6 @use migration.
+                quietDeps: true,
+                silenceDeprecations: ["import"],
+            },
+        },
+    },
     plugins: [
         laravel({
-            publicDirectory: "public",
             input: [
                 "resources/assets/ts/app.ts",
                 "resources/assets/sass/app.scss",
             ],
+            publicDirectory: "public",
             refresh: true,
         }),
     ],
@@ -19,18 +29,8 @@ export default defineConfig({
             // url("./fonts/..."); alias so vite emits them as assets.
             "./fonts": path.resolve(
                 __dirname,
-                "node_modules/bootstrap-icons/font/fonts"
+                "node_modules/bootstrap-icons/font/fonts",
             ),
-        },
-    },
-    css: {
-        preprocessorOptions: {
-            scss: {
-                // Bootstrap 5.3 still uses @import internally; silence the
-                // deprecation until the bootstrap 6 @use migration.
-                quietDeps: true,
-                silenceDeprecations: ["import"],
-            },
         },
     },
 });

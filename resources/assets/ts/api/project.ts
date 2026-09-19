@@ -1,12 +1,12 @@
-import { Project } from "../types/project";
 import { apiFetch } from ".";
 import { Paginator } from "../types/misc";
+import { Project } from "../types/project";
 import { User } from "../types/user";
 
 export const toggleFavorite = (projectId: string) =>
     apiFetch<{ isFavorite: boolean }>(
         `/api/project/${projectId}/favorite/toggle`,
-        "POST"
+        "POST",
     );
 
 export const archiveProject = (projectId: string) =>
@@ -27,11 +27,11 @@ export const removeProjectMember = (projectId: string, userId: string) =>
     apiFetch<Project>(`/api/project/${projectId}/members/${userId}`, "DELETE");
 
 export const inviteUser = ({
-    projectId,
     email,
+    projectId,
 }: {
-    projectId: string;
     email: string;
+    projectId: string;
 }) => apiFetch<{}>(`/api/project/${projectId}/invite`, "POST", { email });
 
 export const setCoordinator = (projectId: string, userId: string) =>

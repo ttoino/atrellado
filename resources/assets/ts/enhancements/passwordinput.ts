@@ -1,10 +1,9 @@
 import { registerEnhancement } from ".";
 
 registerEnhancement<HTMLElement>({
-    selector: ".password-input",
     onattach: (element) => {
         const input = element.querySelector<HTMLInputElement>(
-            "input[type=password]"
+            "input[type=password]",
         );
         const toggle = element.querySelector("button");
 
@@ -14,4 +13,5 @@ registerEnhancement<HTMLElement>({
             input.type = input.type == "password" ? "text" : "password";
         });
     },
+    selector: ".password-input",
 });

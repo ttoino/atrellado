@@ -1,9 +1,9 @@
-import { TaskGroup } from "../types/task_group";
 import { apiFetch } from ".";
+import { TaskGroup } from "../types/task_group";
 
 export const repositionTaskGroup = (
     taskGroupId: string,
-    position: string | null
+    position: null | string,
 ) =>
     apiFetch<TaskGroup>(`/api/task-group/${taskGroupId}/reposition`, "POST", {
         position,

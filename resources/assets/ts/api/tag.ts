@@ -1,5 +1,5 @@
-import { Tag } from "../types/tag";
 import { apiFetch } from ".";
+import { Tag } from "../types/tag";
 
 export const getTag = (tagId: string) => apiFetch<Tag>(`/api/tag/${tagId}`);
 

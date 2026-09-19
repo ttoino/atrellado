@@ -1,11 +1,11 @@
-import { Paginator } from "../types/misc";
 import { apiFetch } from ".";
+import { Paginator } from "../types/misc";
 import { TaskComment } from "../types/task_comment";
 
 export const getTaskComments = (taskId: string, cursor = "") =>
     apiFetch<Paginator<TaskComment>>(`/api/task-comment/`, "GET", {
-        task_id: taskId,
         cursor,
+        task_id: taskId,
     });
 
 export const getTaskComment = (taskCommentId: string) =>
@@ -18,7 +18,7 @@ export const editTaskComment = (taskComment: TaskComment) =>
     apiFetch<TaskComment>(
         `/api/task-comment/${taskComment.id}`,
         "PUT",
-        taskComment
+        taskComment,
     );
 
 export const deleteTaskComment = (taskCommentId: string) =>

@@ -4,30 +4,30 @@ const format = (format: string, arg: unknown) =>
 const renderMethods: {
     [k: string]: (el: HTMLElement, prop: unknown, ...args: string[]) => unknown;
 } = {
-    text: (el, p) => (el.innerText = String(p)),
-    html: (el, p) => (el.innerHTML = String(p)),
-    datetime: (el, p) =>
-        el instanceof HTMLTimeElement &&
-        (typeof p == "string" || typeof p == "number" || p instanceof Date) &&
-        (el.dateTime = new Date(p).toString()),
-    src: (el, p, fmt = "{}") =>
-        el instanceof HTMLImageElement && (el.src = format(fmt, p)),
-    href: (el, p, fmt = "{}") =>
-        el instanceof HTMLAnchorElement && (el.href = format(fmt, p)),
-    value: (el, p) =>
-        (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) &&
-        (el.value = String(p)),
     attr: (el, p, ...attrs) =>
         attrs.forEach((a) => el.setAttribute(`data-${a}`, String(p))),
     "class-condition": (el, p, clas = "", flipped = "true") =>
         el.classList.toggle(clas, Boolean(p) === (flipped === "true")),
     "css-var": (el, p, ...vars) =>
         vars.forEach((v) => el.style.setProperty(`--${v}`, String(p))),
+    datetime: (el, p) =>
+        el instanceof HTMLTimeElement &&
+        (typeof p == "string" || typeof p == "number" || p instanceof Date) &&
+        (el.dateTime = new Date(p).toString()),
+    href: (el, p, fmt = "{}") =>
+        el instanceof HTMLAnchorElement && (el.href = format(fmt, p)),
+    html: (el, p) => (el.innerHTML = String(p)),
+    src: (el, p, fmt = "{}") =>
+        el instanceof HTMLImageElement && (el.src = format(fmt, p)),
+    text: (el, p) => (el.innerText = String(p)),
+    value: (el, p) =>
+        (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) &&
+        (el.value = String(p)),
 };
 
 export const render = <T extends Record<string, any>>(
     el: HTMLElement,
-    data: T
+    data: T,
 ) => {
     for (const method in renderMethods) {
         const selector = `[data-render-${method}]`;
@@ -52,7 +52,7 @@ export const render = <T extends Record<string, any>>(
 };
 
 export const renderSingleton = <T extends Record<string, any>>(
-    selector: string
+    selector: string,
 ) => {
     const el = document.querySelector<HTMLElement>(selector);
 
@@ -60,10 +60,10 @@ export const renderSingleton = <T extends Record<string, any>>(
 };
 
 export const renderTemplate = <T extends Record<string, any>>(
-    selector: string
+    selector: string,
 ) => {
     const template = document.querySelector<HTMLTemplateElement>(
-        `template${selector}`
+        `template${selector}`,
     )?.content.firstElementChild;
 
     return (
@@ -77,7 +77,7 @@ export const renderTemplate = <T extends Record<string, any>>(
 
 export const renderList = <T extends Record<string, any>>(
     templateSelector: string,
-    listSelector: string | HTMLElement
+    listSelector: HTMLElement | string,
 ) => {
     const list =
         typeof listSelector === "string"
@@ -99,7 +99,7 @@ renderMethods.list = (el, p, templateSelector) =>
 export const appendListItem = <T extends Record<string, any>>(
     templateSelector: string,
     listSelector: string,
-    first: boolean = false
+    first: boolean = false,
 ) => {
     const list = document.querySelector<HTMLElement>(listSelector);
 
@@ -117,7 +117,7 @@ export const appendListItem = <T extends Record<string, any>>(
 
 export const appendListItems = <T extends Record<string, any>>(
     templateSelector: string,
-    listSelector: string
+    listSelector: string,
 ) => {
     const list = document.querySelector<HTMLElement>(listSelector);
 

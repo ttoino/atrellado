@@ -1,12 +1,12 @@
 export interface Enhancement<E extends HTMLElement> {
-    selector: string;
     onattach?: (e: Enhanced<E>) => any;
     ondettach?: (e: Enhanced<E>) => any;
+    selector: string;
 }
 
-type Enhanced<E extends HTMLElement> = E & {
+type Enhanced<E extends HTMLElement> = {
     enhancements: Set<Enhancement<E>>;
-};
+} & E;
 
 export const enhancements = new Set<Enhancement<any>>();
 
@@ -38,12 +38,12 @@ mutationObserver.observe(document, {
 });
 
 export const registerEnhancement = <E extends HTMLElement>(
-    enhancement: Enhancement<E>
+    enhancement: Enhancement<E>,
 ) => {
     enhancements.add(enhancement);
 
     const elements = document.querySelectorAll<Enhanced<E>>(
-        enhancement.selector
+        enhancement.selector,
     );
 
     elements.forEach(addEnhancement(enhancement));

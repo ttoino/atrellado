@@ -1,15 +1,15 @@
 import { apiFetch } from "./api";
 
 export interface Route<Data> {
-    name: string;
     data: Data;
-    state: "ok" | "not ok" | "loading";
+    name: string;
+    state: "loading" | "not ok" | "ok";
 }
 
 export const navigation = (
     name: string,
     newUrl: string,
-    onNavigate: () => any
+    onNavigate: () => any,
 ) => {
     window.addEventListener("popstate", (e) => {
         if (e.state.name != name) return;
@@ -20,9 +20,9 @@ export const navigation = (
         if (window.location.toString() == newUrl) return;
 
         const state: Route<null> = {
+            data: null,
             name,
             state: "ok",
-            data: null,
         };
         history.pushState(state, "", newUrl);
         onNavigate();
@@ -34,7 +34,7 @@ export const ajaxNavigation = <Data, Params extends Parameters<any>>(
     fn: (...params: Params) => ReturnType<typeof apiFetch>,
     ok: (response: Data) => any,
     notOk: (response: any) => any,
-    loading: () => any
+    loading: () => any,
 ) => {
     window.addEventListener("popstate", (e) => {
         if (e.state.name != name) return;
@@ -47,9 +47,9 @@ export const ajaxNavigation = <Data, Params extends Parameters<any>>(
         fn(...params)
             .then(async (r) => {
                 const state: Route<any> = {
+                    data: await r.json(),
                     name,
                     state: "ok",
-                    data: await r.json(),
                 };
 
                 if (history.state.name == name)
@@ -60,9 +60,9 @@ export const ajaxNavigation = <Data, Params extends Parameters<any>>(
             })
             .catch(async (r) => {
                 const state: Route<any> = {
+                    data: await r.json(),
                     name,
                     state: "not ok",
-                    data: await r.json(),
                 };
 
                 if (history.state.name == name)
@@ -73,12 +73,12 @@ export const ajaxNavigation = <Data, Params extends Parameters<any>>(
 
         history.pushState(
             {
+                data: null,
                 name,
                 state: "loading",
-                data: null,
             },
             "",
-            newUrl
+            newUrl,
         );
         loading();
     };

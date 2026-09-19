@@ -1,9 +1,8 @@
-import { markNotificationAsRead } from "../../api/notification";
 import { tryRequest } from "../../api";
+import { markNotificationAsRead } from "../../api/notification";
 import { registerEnhancement } from "../../enhancements";
 
 registerEnhancement<HTMLButtonElement>({
-    selector: "[data-notification-id] > button.read-notification-button",
     onattach: (el) => {
         const notificationId = el.parentElement!.dataset.notificationId!;
 
@@ -11,7 +10,7 @@ registerEnhancement<HTMLButtonElement>({
             const result = await tryRequest(
                 markNotificationAsRead,
                 undefined,
-                notificationId
+                notificationId,
             );
 
             if (result) {
@@ -22,4 +21,5 @@ registerEnhancement<HTMLButtonElement>({
             }
         });
     },
+    selector: "[data-notification-id] > button.read-notification-button",
 });

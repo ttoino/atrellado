@@ -1,9 +1,9 @@
 import Sortable, { SortableEvent } from "sortablejs";
 
-import { registerEnhancement } from "../../enhancements";
 import { tryRequest } from "../../api";
 import { repositionTask } from "../../api/task";
 import { repositionTaskGroup } from "../../api/task_group";
+import { registerEnhancement } from "../../enhancements";
 
 const undo = (e: SortableEvent) => {
     e.item.remove();
@@ -11,14 +11,13 @@ const undo = (e: SortableEvent) => {
 };
 
 registerEnhancement({
-    selector: ".project-board",
     onattach: (taskGroupsContainer) => {
         new Sortable(taskGroupsContainer, {
+            animation: 150,
+            draggable: ".task-group[data-task-group-id]",
+            easing: "ease-in-out",
             group: "taskGroups",
             handle: ".task-group > header > .grip",
-            animation: 150,
-            easing: "ease-in-out",
-            draggable: ".task-group[data-task-group-id]",
 
             onEnd: async (e) => {
                 const taskGroupId = e.item.dataset.taskGroupId;
@@ -32,20 +31,21 @@ registerEnhancement({
                     taskGroupId,
                     "position",
                     newPosition,
-                    e
+                    e,
                 );
 
                 const result = await tryRequest(
                     repositionTaskGroup,
                     undefined,
                     taskGroupId,
-                    newPosition
+                    newPosition,
                 );
 
                 if (result === null) undo(e);
             },
         });
     },
+    selector: ".project-board",
 });
 
 const onTaskMove = async (e: SortableEvent) => {
@@ -63,7 +63,7 @@ const onTaskMove = async (e: SortableEvent) => {
         "task-group",
         taskGroup,
         "position",
-        newPosition
+        newPosition,
     );
 
     const result = await tryRequest(
@@ -71,21 +71,21 @@ const onTaskMove = async (e: SortableEvent) => {
         undefined,
         taskId,
         taskGroup,
-        newPosition
+        newPosition,
     );
 
     if (result === null) undo(e);
 };
 
 registerEnhancement({
-    selector: ".task-group > ul",
     onattach: (group) => {
         new Sortable(group, {
-            group: "tasks",
-            handle: ".grip",
             animation: 150,
             easing: "cubic-bezier(1, 0, 0, 1)",
+            group: "tasks",
+            handle: ".grip",
             onEnd: onTaskMove,
         });
     },
+    selector: ".task-group > ul",
 });

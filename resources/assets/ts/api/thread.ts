@@ -1,5 +1,5 @@
-import { Thread } from "../types/thread";
 import { apiFetch } from ".";
+import { Thread } from "../types/thread";
 
 export const getThread = (threadId: string) =>
     apiFetch<Thread>(`/api/thread/${threadId}`);

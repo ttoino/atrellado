@@ -3,14 +3,14 @@ import { Task } from "./task";
 import { User } from "./user";
 
 export interface TaskComment {
-    id: number;
+    author?: User;
+    author_id: number;
     content: Markdown;
     creation_date: Datetime;
+
     edit_date: Datetime;
+    id: number;
 
-    author_id: number;
-    author?: User;
-
-    task_id: number;
     task?: Task;
+    task_id: number;
 }

@@ -6,11 +6,11 @@ export const ajaxForm = <K, P>(
     form: HTMLFormElement,
     constantData: Partial<P>,
     ok: (data: K) => unknown,
-    notOk: (error?: APIError) => unknown
+    notOk: (error?: APIError) => unknown,
 ) => {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        let data: any = {};
+        const data: any = {};
         const formData = new FormData(form);
 
         for (const key of formData.keys()) {

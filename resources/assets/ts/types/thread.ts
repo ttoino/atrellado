@@ -3,14 +3,14 @@ import { ThreadComment } from "./thread_comment";
 import { User } from "./user";
 
 export interface Thread {
-    id: number;
-    title: string;
+    author?: User;
+    author_id: number;
+    comments?: Paginator<ThreadComment>;
     content: Markdown;
     creation_date: Datetime;
     edit_date: Datetime;
-    author_id: number;
-    project_id: number;
+    id: number;
 
-    author?: User;
-    comments?: Paginator<ThreadComment>;
+    project_id: number;
+    title: string;
 }

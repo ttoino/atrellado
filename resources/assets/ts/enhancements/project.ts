@@ -1,21 +1,20 @@
-import { tryRequest } from "../api";
 import { registerEnhancement } from ".";
+import { tryRequest } from "../api";
 import { deleteProject, toggleFavorite } from "../api/project";
 
 registerEnhancement<HTMLElement>({
-    selector: "[data-project-id]",
     onattach: (el) => {
         const list = el.parentElement;
         const projectId = el.dataset.projectId!;
 
         const toggleFavoriteButton = el.querySelector<HTMLButtonElement>(
-            "button.favorite-toggle"
+            "button.favorite-toggle",
         );
         toggleFavoriteButton?.addEventListener("click", async () => {
             const result = await tryRequest(
                 toggleFavorite,
                 undefined,
-                projectId
+                projectId,
             );
 
             if (result) {
@@ -32,13 +31,13 @@ registerEnhancement<HTMLElement>({
         });
 
         const deleteProjectButton = el.querySelector<HTMLButtonElement>(
-            "button.delete-project"
+            "button.delete-project",
         );
         deleteProjectButton?.addEventListener("click", async () => {
             const result = await tryRequest(
                 deleteProject,
                 undefined,
-                projectId
+                projectId,
             );
 
             if (result) {
@@ -47,4 +46,5 @@ registerEnhancement<HTMLElement>({
             }
         });
     },
+    selector: "[data-project-id]",
 });

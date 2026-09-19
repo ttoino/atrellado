@@ -1,5 +1,5 @@
-import { User } from "../types/user";
 import { apiFetch } from ".";
+import { User } from "../types/user";
 
 export const deleteUser = (userId: string) =>
     apiFetch<User>(`/api/user/${userId}`, "DELETE");

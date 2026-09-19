@@ -1,14 +1,15 @@
-import { Thread } from "../../types/thread";
+import { Offcanvas } from "bootstrap";
+
 import { getThread } from "../../api/thread";
 import { registerEnhancement } from "../../enhancements";
 import { ajaxNavigation, navigation } from "../../navigation";
-import { Offcanvas } from "bootstrap";
+import { Thread } from "../../types/thread";
+import { projectId } from "../project";
 import {
     renderThread,
     renderThreadComments,
     renderThreadListItem,
 } from "./render";
-import { projectId } from "../project";
 
 const newThreadButton =
     document.querySelector<HTMLAnchorElement>("#new-thread-button");
@@ -27,7 +28,7 @@ export const showForum = navigation(
     () => {
         threadOffcanvas?.hide();
         threadOffcanvasEl?.classList.remove("show");
-    }
+    },
 );
 
 threadOffcanvasEl?.addEventListener("hide.bs.offcanvas", (e) => {
@@ -80,11 +81,10 @@ const showThread = ajaxNavigation(
     () => {
         showThreadOffcanvas();
         threadOffcanvasEl?.classList.add("loading");
-    }
+    },
 );
 
 registerEnhancement({
-    selector: ".thread[data-thread-id]",
     onattach: (el) => {
         const threadId = el.dataset.threadId ?? "";
         const a = el.querySelector<HTMLAnchorElement>("a.stretched-link");
@@ -94,4 +94,5 @@ registerEnhancement({
             showThread(`/project/${projectId}/thread/${threadId}`, threadId);
         });
     },
+    selector: ".thread[data-thread-id]",
 });

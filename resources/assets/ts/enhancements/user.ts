@@ -1,17 +1,16 @@
+import { tryRequest } from "../api";
 import {
     inviteUser,
     removeProjectMember,
     setCoordinator,
 } from "../api/project";
-import { projectId } from "../pages/project";
-import { tryRequest } from "../api";
 import { blockUser, deleteUser, unblockUser } from "../api/user";
 import { registerEnhancement } from "../enhancements";
 import { ajaxForm } from "../forms";
+import { projectId } from "../pages/project";
 import { renderToast } from "../toast";
 
 registerEnhancement<HTMLElement>({
-    selector: "[data-user-id]",
     onattach: (el) => {
         const list = el.parentElement;
         const userId = el.dataset.userId!;
@@ -23,7 +22,7 @@ registerEnhancement<HTMLElement>({
                 removeProjectMember,
                 undefined,
                 projectId,
-                userId
+                userId,
             );
 
             if (result) {
@@ -32,14 +31,14 @@ registerEnhancement<HTMLElement>({
         });
 
         const setCoordinatorButton = el.querySelector<HTMLButtonElement>(
-            "button.set-coordinator"
+            "button.set-coordinator",
         );
         setCoordinatorButton?.addEventListener("click", async () => {
             const result = await tryRequest(
                 setCoordinator,
                 undefined,
                 projectId,
-                userId
+                userId,
             );
 
             if (result) {
@@ -69,7 +68,7 @@ registerEnhancement<HTMLElement>({
         });
 
         const unblockUserButton = el.querySelector<HTMLButtonElement>(
-            "button.unblock-user"
+            "button.unblock-user",
         );
         unblockUserButton?.addEventListener("click", async () => {
             const result = await tryRequest(unblockUser, undefined, userId);
@@ -79,10 +78,10 @@ registerEnhancement<HTMLElement>({
             }
         });
     },
+    selector: "[data-user-id]",
 });
 
 registerEnhancement<HTMLFormElement>({
-    selector: "form.invite-user-form",
     onattach: (el) =>
         ajaxForm(
             inviteUser,
@@ -91,13 +90,13 @@ registerEnhancement<HTMLFormElement>({
             () => {
                 renderToast?.({ text: "Invited user" });
             },
-            (e) => { }
+            (e) => {},
         ),
+    selector: "form.invite-user-form",
 });
 
 // TODO: Move this to user page script
 registerEnhancement<HTMLElement>({
-    selector: "main",
     onattach: (el) => {
         const userId = /user\/(\d+)/.exec(location.pathname)?.[0][1];
 
@@ -109,8 +108,8 @@ registerEnhancement<HTMLElement>({
         deleteUserButton?.addEventListener("click", async () => {
             const result = await tryRequest(deleteUser, undefined, userId);
 
-            if (result)
-                window.location.reload();
+            if (result) window.location.reload();
         });
-    }
-})
+    },
+    selector: "main",
+});

@@ -1,6 +1,6 @@
-import { deleteTaskComment, getTaskComments } from "../../api/task_comment";
 import { tryRequest } from "../../api";
 import { completeTask, deleteTask, incompleteTask } from "../../api/task";
+import { deleteTaskComment, getTaskComments } from "../../api/task_comment";
 import { deleteTaskGroup } from "../../api/task_group";
 import { registerEnhancement } from "../../enhancements";
 import { showBoard } from "./navigation";
@@ -8,20 +8,19 @@ import { appendTaskComments, renderTask, renderTaskCard } from "./render";
 
 // DELETE TASK GROUP
 registerEnhancement<HTMLElement>({
-    selector: ".task-group[data-task-group-id]",
     onattach: (el) => {
         const taskGroupId = parseInt(el.dataset.taskGroupId!);
         console.log(taskGroupId);
 
         const deleteGroupButton = el.querySelector<HTMLButtonElement>(
-            "button.delete-task-group"
+            "button.delete-task-group",
         );
         deleteGroupButton?.addEventListener("click", () => {
             if (
                 tryRequest(
                     deleteTaskGroup,
                     undefined,
-                    taskGroupId.toString()
+                    taskGroupId.toString(),
                 ) !== null
             )
                 el.remove();
@@ -33,21 +32,21 @@ registerEnhancement<HTMLElement>({
                 console.log(taskList.children.length);
                 deleteGroupButton?.classList.toggle(
                     "d-none",
-                    taskList?.children.length !== 0
+                    taskList?.children.length !== 0,
                 );
             }).observe(taskList, {
                 childList: true,
             });
     },
+    selector: ".task-group[data-task-group-id]",
 });
 
 registerEnhancement<HTMLElement>({
-    selector: "#task",
     onattach: (task) => {
         const taskId = () => task.dataset.taskId ?? "";
 
         const completeTaskButton = task.querySelector<HTMLButtonElement>(
-            "#complete-task-button"
+            "#complete-task-button",
         );
         completeTaskButton?.addEventListener("click", async () => {
             const result = await tryRequest(completeTask, undefined, taskId());
@@ -59,13 +58,13 @@ registerEnhancement<HTMLElement>({
         });
 
         const incompleteTaskButton = task.querySelector<HTMLButtonElement>(
-            "#incomplete-task-button"
+            "#incomplete-task-button",
         );
         incompleteTaskButton?.addEventListener("click", async () => {
             const result = await tryRequest(
                 incompleteTask,
                 undefined,
-                taskId()
+                taskId(),
             );
 
             if (result) {
@@ -75,7 +74,7 @@ registerEnhancement<HTMLElement>({
         });
 
         const deleteTaskButton = task.querySelector<HTMLButtonElement>(
-            "#delete-task-button"
+            "#delete-task-button",
         );
         deleteTaskButton?.addEventListener("click", async () => {
             const result = await tryRequest(deleteTask, undefined, taskId());
@@ -91,11 +90,11 @@ registerEnhancement<HTMLElement>({
         const editTaskButton =
             task.querySelector<HTMLButtonElement>("#edit-task-button");
         editTaskButton?.addEventListener("click", () =>
-            task.classList.add("editing")
+            task.classList.add("editing"),
         );
 
         const loadCommentsButton = document.querySelector<HTMLButtonElement>(
-            "#load-comments-button"
+            "#load-comments-button",
         );
         loadCommentsButton?.addEventListener("click", async () => {
             const cursor = loadCommentsButton.dataset.nextCursor;
@@ -106,34 +105,34 @@ registerEnhancement<HTMLElement>({
                 getTaskComments,
                 undefined,
                 taskId(),
-                cursor
+                cursor,
             );
 
             if (result) appendTaskComments(result);
         });
     },
+    selector: "#task",
 });
 
 registerEnhancement<HTMLElement>({
-    selector: ".task-comment",
     onattach: (taskComment) => {
         const taskCommentId = () => taskComment.dataset.taskCommentId ?? "";
 
         const deleteTaskCommentButton =
             taskComment.querySelector<HTMLButtonElement>(
-                ".delete-task-comment-button"
+                ".delete-task-comment-button",
             );
         deleteTaskCommentButton?.addEventListener("click", async () => {
             const result = await tryRequest(
                 deleteTaskComment,
                 undefined,
-                taskCommentId()
+                taskCommentId(),
             );
 
             if (result) {
                 document
                     .querySelector(
-                        `.task-comment[data-task-comment-id="${taskCommentId()}"]`
+                        `.task-comment[data-task-comment-id="${taskCommentId()}"]`,
                     )
                     ?.remove();
             }
@@ -141,10 +140,11 @@ registerEnhancement<HTMLElement>({
 
         const editTaskCommentButton =
             taskComment.querySelector<HTMLButtonElement>(
-                ".edit-task-comment-button"
+                ".edit-task-comment-button",
             );
         editTaskCommentButton?.addEventListener("click", () =>
-            taskComment.classList.add("editing")
+            taskComment.classList.add("editing"),
         );
     },
+    selector: ".task-comment",
 });

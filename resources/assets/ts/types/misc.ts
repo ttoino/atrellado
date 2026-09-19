@@ -1,15 +1,15 @@
 export interface Datetime {
+    date: string;
+    datetime: string;
+    diff: string;
     iso: string;
     long_diff: string;
-    diff: string;
-    datetime: string;
-    date: string;
     time: string;
 }
 
 export interface Markdown {
-    raw: string;
     formatted: string;
+    raw: string;
 }
 
 export interface Paginator<T> {

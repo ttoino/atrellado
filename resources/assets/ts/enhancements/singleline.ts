@@ -12,7 +12,6 @@ function onKeypress(this: HTMLTextAreaElement, e: KeyboardEvent) {
 }
 
 registerEnhancement<HTMLTextAreaElement>({
-    selector: "textarea.single-line",
     onattach: (e) => {
         e.addEventListener("input", onInput);
         e.addEventListener("keypress", onKeypress);
@@ -22,4 +21,5 @@ registerEnhancement<HTMLTextAreaElement>({
         e.removeEventListener("input", onInput);
         e.removeEventListener("keypress", onKeypress);
     },
+    selector: "textarea.single-line",
 });

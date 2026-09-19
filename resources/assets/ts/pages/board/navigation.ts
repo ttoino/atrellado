@@ -1,10 +1,11 @@
-import { getTask } from "../../api/task";
 import { Offcanvas } from "bootstrap";
 import { Task } from "types/task";
-import { ajaxNavigation, navigation } from "../../navigation";
+
+import { getTask } from "../../api/task";
 import { registerEnhancement } from "../../enhancements";
-import { renderTask, renderTaskComments } from "./render";
+import { ajaxNavigation, navigation } from "../../navigation";
 import { projectId } from "../project";
+import { renderTask, renderTaskComments } from "./render";
 
 const taskOffcanvasEl = document.querySelector("#task-offcanvas");
 const taskOffcanvas =
@@ -13,7 +14,7 @@ const taskOffcanvas =
 export const showBoard = navigation(
     "project.board",
     `/project/${projectId}/board`,
-    () => taskOffcanvas?.hide()
+    () => taskOffcanvas?.hide(),
 );
 
 taskOffcanvasEl?.addEventListener("hide.bs.offcanvas", (e) => {
@@ -39,11 +40,10 @@ const showTask = ajaxNavigation(
     () => {
         taskOffcanvas?.show();
         taskOffcanvasEl?.classList.add("loading");
-    }
+    },
 );
 
 registerEnhancement({
-    selector: ".task",
     onattach: (task) => {
         const taskId = task.dataset.taskId;
         if (!taskId) return;
@@ -56,4 +56,5 @@ registerEnhancement({
             showTask(`/project/${projectId}/task/${taskId}`, taskId ?? "");
         });
     },
+    selector: ".task",
 });

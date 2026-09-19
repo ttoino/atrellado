@@ -1,12 +1,11 @@
-import { projectId } from "../project";
-import { registerEnhancement } from "../../enhancements";
 import { editProject } from "../../api/project";
+import { registerEnhancement } from "../../enhancements";
 import { ajaxForm } from "../../forms";
+import { projectId } from "../project";
 import { renderProject } from "./render";
 
 // EDIT PROJECT
 registerEnhancement<HTMLFormElement>({
-    selector: "form#edit-project-form",
     onattach: (form) =>
         ajaxForm(
             editProject,
@@ -18,6 +17,7 @@ registerEnhancement<HTMLFormElement>({
                     .querySelector(".project-info .left")
                     ?.classList.remove("editing");
             },
-            (error) => {}
+            (error) => {},
         ),
+    selector: "form#edit-project-form",
 });

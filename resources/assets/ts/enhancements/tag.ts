@@ -1,12 +1,11 @@
+import { registerEnhancement } from ".";
 import { tryRequest } from "../api";
 import { deleteTag, editTag, newTag } from "../api/tag";
-import { registerEnhancement } from ".";
 import { ajaxForm } from "../forms";
-import { render } from "../render";
 import { projectId } from "../pages/project";
+import { render } from "../render";
 
 registerEnhancement({
-    selector: "[data-tag-id]",
     onattach: (el) => {
         const tagId = el.dataset.tagId!;
         const list = el.parentElement;
@@ -39,13 +38,13 @@ registerEnhancement({
                     render(el, tag);
                     el.classList.remove("editing");
                 },
-                (e) => {}
+                (e) => {},
             );
     },
+    selector: "[data-tag-id]",
 });
 
 registerEnhancement<HTMLFormElement>({
-    selector: "form.new-tag-form",
     onattach: (el) =>
         ajaxForm(
             newTag,
@@ -54,6 +53,7 @@ registerEnhancement<HTMLFormElement>({
             (tag) => {
                 window.location.reload();
             },
-            (e) => {}
+            (e) => {},
         ),
+    selector: "form.new-tag-form",
 });

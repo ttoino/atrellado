@@ -1,20 +1,19 @@
-import { ajaxForm } from "../../forms";
-import { registerEnhancement } from "../../enhancements";
 import { editThread, newThread } from "../../api/thread";
-import { projectId } from "../project";
-import { Route } from "../../navigation";
-import {
-    appendThreadListItem,
-    appendThreadComment,
-    renderThread,
-    renderThreadListItem,
-    renderThreadComment,
-} from "./render";
-import { showThreadOffcanvas } from "./navigation";
 import { editThreadComment, newThreadComment } from "../../api/thread_comment";
+import { registerEnhancement } from "../../enhancements";
+import { ajaxForm } from "../../forms";
+import { Route } from "../../navigation";
+import { projectId } from "../project";
+import { showThreadOffcanvas } from "./navigation";
+import {
+    appendThreadComment,
+    appendThreadListItem,
+    renderThread,
+    renderThreadComment,
+    renderThreadListItem,
+} from "./render";
 
 registerEnhancement<HTMLFormElement>({
-    selector: "#new-thread-offcanvas > form",
     onattach: (form) => {
         ajaxForm(
             newThread,
@@ -22,28 +21,28 @@ registerEnhancement<HTMLFormElement>({
             { project_id: parseInt(projectId) },
             (thread) => {
                 const state: Route<any> = {
+                    data: thread,
                     name: "project.thread",
                     state: "ok",
-                    data: thread,
                 };
 
                 history.pushState(
                     state,
                     "",
-                    `/project/${projectId}/thread/${thread.id}`
+                    `/project/${projectId}/thread/${thread.id}`,
                 );
 
                 showThreadOffcanvas();
                 renderThread?.(thread);
                 appendThreadListItem?.(thread);
             },
-            (error) => {}
+            (error) => {},
         );
     },
+    selector: "#new-thread-offcanvas > form",
 });
 
 registerEnhancement<HTMLFormElement>({
-    selector: "form#new-comment-form",
     onattach: (form) => {
         ajaxForm(
             newThreadComment,
@@ -52,14 +51,14 @@ registerEnhancement<HTMLFormElement>({
             (threadComment) => {
                 appendThreadComment?.(threadComment);
             },
-            (error) => {}
+            (error) => {},
         );
     },
+    selector: "form#new-comment-form",
 });
 
 // EDIT THREAD
 registerEnhancement<HTMLFormElement>({
-    selector: "form#edit-thread-form",
     onattach: (form) =>
         ajaxForm(
             editThread,
@@ -70,13 +69,13 @@ registerEnhancement<HTMLFormElement>({
                 renderThreadListItem(thread);
                 document.querySelector("#thread")?.classList.remove("editing");
             },
-            (error) => {}
+            (error) => {},
         ),
+    selector: "form#edit-thread-form",
 });
 
 // EDIT THREAD COMMENT
 registerEnhancement<HTMLFormElement>({
-    selector: "form.edit-thread-comment-form",
     onattach: (form) =>
         ajaxForm(
             editThreadComment,
@@ -86,10 +85,11 @@ registerEnhancement<HTMLFormElement>({
                 renderThreadComment?.(threadComment);
                 document
                     .querySelector(
-                        `.thread-comment[data-thread-comment-id="${threadComment.id}"]`
+                        `.thread-comment[data-thread-comment-id="${threadComment.id}"]`,
                     )
                     ?.classList.remove("editing");
             },
-            (error) => {}
+            (error) => {},
         ),
+    selector: "form.edit-thread-comment-form",
 });

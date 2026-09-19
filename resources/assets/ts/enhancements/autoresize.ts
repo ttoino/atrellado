@@ -9,7 +9,6 @@ function oninput(this: HTMLTextAreaElement) {
 const onreset = (el: HTMLTextAreaElement) => () => oninput.call(el);
 
 registerEnhancement<HTMLTextAreaElement>({
-    selector: "textarea.auto-resize",
     onattach: (e) => {
         e.addEventListener("input", oninput);
         e.form?.addEventListener("reset", onreset(e));
@@ -18,4 +17,5 @@ registerEnhancement<HTMLTextAreaElement>({
     ondettach: (e) => {
         e.removeEventListener("input", oninput);
     },
+    selector: "textarea.auto-resize",
 });

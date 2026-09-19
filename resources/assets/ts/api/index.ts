@@ -8,30 +8,30 @@ export interface APIError {
     message: string;
 }
 
-interface ErrorResponse extends Response {
-    ok: false;
-    json(): Promise<APIError>;
-}
-
-interface SuccessfulResponse<T> extends Response {
-    ok: true;
-    json(): Promise<T>;
-}
+export type APIMethod = "DELETE" | "GET" | "POST" | "PUT";
 
 export type EnhancedResponse<T> = ErrorResponse | SuccessfulResponse<T>;
 
-export type APIMethod = "GET" | "POST" | "PUT" | "DELETE";
+interface ErrorResponse extends Response {
+    json(): Promise<APIError>;
+    ok: false;
+}
+
+interface SuccessfulResponse<T> extends Response {
+    json(): Promise<T>;
+    ok: true;
+}
 
 export const apiFetch = <T>(
     url: RequestInfo,
     method: APIMethod = "GET",
     body?: any,
-    options?: RequestInit
+    options?: RequestInit,
 ): Promise<EnhancedResponse<T>> => {
     console.log(
         `Making ${method} request to ${url} with options ${options} and body ${JSON.stringify(
-            body
-        )}`
+            body,
+        )}`,
     );
 
     if (method === "GET") {
@@ -41,14 +41,14 @@ export const apiFetch = <T>(
 
     return fetch(url, {
         ...options,
-        method,
         body: JSON.stringify(body),
         headers: {
             ...options?.headers,
-            "X-CSRF-TOKEN": token,
+            Accept: "application/json",
             "Content-Type": "application/json",
-            "Accept": "application/json",
+            "X-CSRF-TOKEN": token,
         },
+        method,
     });
 };
 

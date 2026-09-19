@@ -4,17 +4,17 @@ import { TaskComment } from "./task_comment";
 import { User } from "./user";
 
 export interface Task {
-    id: number;
-    name: string;
-    description: Markdown;
-    creation_date: Datetime;
-    edit_date: Datetime;
-    completed: boolean;
-    creator_id: number;
-    position: number;
-    task_group_id: number;
-
     assignees?: Array<User>;
     comments?: Paginator<TaskComment>;
+    completed: boolean;
+    creation_date: Datetime;
+    creator_id: number;
+    description: Markdown;
+    edit_date: Datetime;
+    id: number;
+    name: string;
+
+    position: number;
     tags?: Array<Tag>;
+    task_group_id: number;
 }

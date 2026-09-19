@@ -1,4 +1,3 @@
-import { TaskGroup } from "../../types/task_group";
 import {
     appendListItem,
     appendListItems,
@@ -7,25 +6,26 @@ import {
     renderSingleton,
     renderTemplate,
 } from "../../render";
+import { Paginator } from "../../types/misc";
 import { Task } from "../../types/task";
 import { TaskComment } from "../../types/task_comment";
-import { Paginator } from "../../types/misc";
+import { TaskGroup } from "../../types/task_group";
 
 export const renderTask = renderMultiple(
     renderSingleton<Task>("#task"),
-    renderSingleton<Task>("#new-comment-form")
+    renderSingleton<Task>("#new-comment-form"),
 );
 
 export const renderTaskCard = (task: Task) =>
     renderSingleton(`.task[data-task-id="${task.id}"]`)?.(task);
 
 export const renderTaskGroup = renderTemplate<TaskGroup>(
-    "#task-group-template"
+    "#task-group-template",
 );
 
 const board = document.querySelector<HTMLElement>(".project-board");
 const newTaskGroupForm = board?.querySelector<HTMLElement>(
-    ".task-group:last-of-type"
+    ".task-group:last-of-type",
 );
 
 export const appendTaskGroup = (group: TaskGroup) => {
@@ -42,30 +42,30 @@ export const appendTaskCard = (listSelector: string) =>
 
 const renderTaskCommentsList = renderList<TaskComment>(
     "#task-comment-template",
-    "#task-comments"
+    "#task-comments",
 );
 
 const appendTaskCommentsList = appendListItems<TaskComment>(
     "#task-comment-template",
-    "#task-comments"
+    "#task-comments",
 );
 
 export const renderTaskComments = renderMultiple<Paginator<TaskComment>>(
     renderSingleton("#load-comments-button"),
-    (p) => renderTaskCommentsList?.(p.data)
+    (p) => renderTaskCommentsList?.(p.data),
 );
 
 export const appendTaskComments = renderMultiple<Paginator<TaskComment>>(
     renderSingleton("#load-comments-button"),
-    (p) => appendTaskCommentsList?.(p.data)
+    (p) => appendTaskCommentsList?.(p.data),
 );
 
 export const appendTaskComment = appendListItem(
     "#task-comment-template",
-    "#task-comments"
+    "#task-comments",
 );
 
 export const renderTaskComment = (taskComment: TaskComment) =>
     renderSingleton(
-        `.task-comment[data-task-comment-id="${taskComment.id}"]`
+        `.task-comment[data-task-comment-id="${taskComment.id}"]`,
     )?.(taskComment);

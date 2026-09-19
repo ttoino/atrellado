@@ -1,5 +1,5 @@
-import { Task } from "../types/task";
 import { apiFetch } from ".";
+import { Task } from "../types/task";
 
 export const completeTask = (taskId: string) =>
     apiFetch<Task>(`/api/task/${taskId}/complete`, "PUT");
@@ -10,11 +10,11 @@ export const incompleteTask = (taskId: string) =>
 export const repositionTask = (
     taskId: string,
     task_group_id: string,
-    position: string
+    position: string,
 ) =>
     apiFetch<Task>(`/api/task/${taskId}/reposition`, "POST", {
-        task_group_id,
         position,
+        task_group_id,
     });
 
 export const getTask = (taskId: string) =>

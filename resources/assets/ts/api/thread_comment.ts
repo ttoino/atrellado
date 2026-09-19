@@ -1,11 +1,11 @@
-import { Paginator } from "../types/misc";
 import { apiFetch } from ".";
+import { Paginator } from "../types/misc";
 import { ThreadComment } from "../types/thread_comment";
 
 export const getThreadComments = (threadId: string, cursor = "") =>
     apiFetch<Paginator<ThreadComment>>(`/api/thread-comment/`, "GET", {
-        thread_id: threadId,
         cursor,
+        thread_id: threadId,
     });
 
 export const getThreadComment = (threadCommentId: string) =>
@@ -18,7 +18,7 @@ export const editThreadComment = (threadComment: ThreadComment) =>
     apiFetch<ThreadComment>(
         `/api/thread-comment/${threadComment.id}`,
         "PUT",
-        threadComment
+        threadComment,
     );
 
 export const deleteThreadComment = (threadCommentId: string) =>
