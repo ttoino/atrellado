@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\Task;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class TaskCompleted extends Notification {
+class TaskCompleted extends Notification
+{
     public Task $task;
 
     /**
@@ -15,7 +14,8 @@ class TaskCompleted extends Notification {
      *
      * @return void
      */
-    public function __construct(Task $task) {
+    public function __construct(Task $task)
+    {
         $this->task = $task;
     }
 
@@ -25,9 +25,10 @@ class TaskCompleted extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -35,13 +36,14 @@ class TaskCompleted extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line("Task '" . $this->task->name . "' has been set as complete.")
-                    ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
-                    ->line('Thank you for using our application!');
+            ->line("Task '".$this->task->name."' has been set as complete.")
+            ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -50,9 +52,10 @@ class TaskCompleted extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
-            'task' => $this->task
+            'task' => $this->task,
         ];
     }
 }

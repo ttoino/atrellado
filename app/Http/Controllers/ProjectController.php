@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Project;
 use App\Models\Report;
+use App\Models\User;
+use App\Notifications\ProjectArchived;
 use App\Notifications\ProjectInvite;
 use App\Notifications\ProjectRemoved;
-use App\Notifications\ProjectArchived;
 use Illuminate\Http\Request;
-
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 
-class ProjectController extends Controller {
-
-    public function show(Project $project) {
+class ProjectController extends Controller
+{
+    public function show(Project $project)
+    {
         $this->authorize('view', $project);
 
         return response()->json($project->toArray());
     }
 
-    public function showProjectBoard(Request $request, Project $project) {
+    public function showProjectBoard(Request $request, Project $project)
+    {
 
         $this->authorize('view', $project);
 
@@ -31,7 +31,8 @@ class ProjectController extends Controller {
             : response()->view('pages.project.board', ['project' => $project]);
     }
 
-    public function showProjectInfo(Request $request, Project $project) {
+    public function showProjectInfo(Request $request, Project $project)
+    {
         $this->authorize('view', $project);
 
         return $request->wantsJson()
@@ -39,7 +40,8 @@ class ProjectController extends Controller {
             : response()->view('pages.project.info', ['project' => $project]);
     }
 
-    public function showProjectTimeline(Request $request, Project $project) {
+    public function showProjectTimeline(Request $request, Project $project)
+    {
         $this->authorize('view', $project);
 
         return $request->wantsJson()
@@ -47,7 +49,8 @@ class ProjectController extends Controller {
             : response()->view('pages.project.tbd', ['project' => $project]);
     }
 
-    public function showProjectForum(Request $request, Project $project) {
+    public function showProjectForum(Request $request, Project $project)
+    {
         $this->authorize('view', $project);
 
         return $request->wantsJson()
@@ -55,7 +58,8 @@ class ProjectController extends Controller {
             : response()->view('pages.project.forum', ['project' => $project]);
     }
 
-    public function leaveProject(Request $request, Project $project) {
+    public function leaveProject(Request $request, Project $project)
+    {
         $user = $request->user();
 
         $this->authorize('leaveProject', $project);
@@ -67,7 +71,8 @@ class ProjectController extends Controller {
             : redirect()->route('project.list');
     }
 
-    public function joinProject(Request $request, Project $project) {
+    public function joinProject(Request $request, Project $project)
+    {
 
         $this->authorize('joinProject', $project);
 
@@ -78,7 +83,8 @@ class ProjectController extends Controller {
         return redirect()->route('project', ['project' => $project]);
     }
 
-    public function removeUser(Request $request, Project $project, User $user) {
+    public function removeUser(Request $request, Project $project, User $user)
+    {
 
         $this->authorize('removeUser', [$project, $user]);
 
@@ -91,7 +97,8 @@ class ProjectController extends Controller {
             : redirect()->route('project.list');
     }
 
-    public function setCoordinator(Request $request, Project $project) {
+    public function setCoordinator(Request $request, Project $project)
+    {
         $requestData = $request->all();
 
         $user = User::findOrFail($requestData['user']);
@@ -107,25 +114,29 @@ class ProjectController extends Controller {
             : redirect()->route('project.members', ['project' => $project]);
     }
 
-    public function searchProjects(Request $request, string $searchTerm) {
+    public function searchProjects(Request $request, string $searchTerm)
+    {
 
         $userProjects = $request->user()->projects();
 
-        if (!empty($searchTerm))
+        if (! empty($searchTerm)) {
             $userProjects = $userProjects->whereRaw('(fts_search @@ plainto_tsquery(\'english\', ?) OR project.name = ?)', [$searchTerm, $searchTerm])
                 ->orderByRaw('ts_rank(fts_search, plainto_tsquery(\'english\', ?)) DESC', [$searchTerm]);
+        }
 
         return $userProjects->paginate(10);
     }
 
-    public function create() {
+    public function create()
+    {
 
         $this->authorize('create', Project::class);
 
         return view('pages.project.new');
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $this->projectCreationValidator($request)->validate();
 
         $this->authorize('create', Project::class);
@@ -142,13 +153,14 @@ class ProjectController extends Controller {
      *
      * @return Project The project created.
      */
-    public function createProject(Request $request) {
+    public function createProject(Request $request)
+    {
 
-        $project = new Project();
+        $project = new Project;
         $data = $request->all();
 
         $project->name = $data['name'];
-        $project->archived = FALSE;
+        $project->archived = false;
         $project->description = $data['description'];
         $project->coordinator_id = $request->user()->id;
         $project->save();
@@ -162,15 +174,16 @@ class ProjectController extends Controller {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function projectCreationValidator(Request $request) {
+    protected function projectCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'name' => 'required|string|min:6|max:255',
             'description' => 'string|min:6|max:512',
         ]);
     }
 
-
-    public function update(Request $request, Project $project) {
+    public function update(Request $request, Project $project)
+    {
         $this->projectUpdateValidator($request)->validate();
 
         // this is different than 'edit' in that only the project's coordinator can update the project's attributes
@@ -188,21 +201,26 @@ class ProjectController extends Controller {
      *
      * @return Project The project created.
      */
-    public function updateProject(Project $project, Request $request) {
+    public function updateProject(Project $project, Request $request)
+    {
 
         $data = $request->all();
 
-        if (($data['name'] ??= null) !== null)
+        if (($data['name'] ??= null) !== null) {
             $project->name = $data['name'];
+        }
 
-        if (($data['archived'] ??= null) !== null)
+        if (($data['archived'] ??= null) !== null) {
             $project->archived = $data['archived'];
+        }
 
-        if (($data['description'] ??= null) !== null)
+        if (($data['description'] ??= null) !== null) {
             $project->description = $data['description'];
+        }
 
-        if (($data['coordinator_id'] ??= null) !== null)
+        if (($data['coordinator_id'] ??= null) !== null) {
             $project->coordinator_id = $data['coordinator_id'];
+        }
 
         $project->save();
 
@@ -215,12 +233,13 @@ class ProjectController extends Controller {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function projectUpdateValidator(Request $request) {
+    protected function projectUpdateValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'name' => 'string|min:6|max:255',
             'description' => 'string|min:6|max:512',
             'coordinator_id' => 'integer',
-            'archived' => 'boolean'
+            'archived' => 'boolean',
         ]);
     }
 
@@ -229,7 +248,8 @@ class ProjectController extends Controller {
      *
      * @return Response
      */
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
 
         $this->authorize('viewAny', [Project::class]);
 
@@ -240,14 +260,16 @@ class ProjectController extends Controller {
         return response()->view('pages.project.list', ['projects' => $projects]);
     }
 
-    public function showInviteUserPage(Project $project) {
+    public function showInviteUserPage(Project $project)
+    {
 
         $this->authorize('showAddUserPage', $project);
 
         return response()->view('pages.project.add', ['project' => $project]);
     }
 
-    public function inviteUser(Request $request, Project $project) {
+    public function inviteUser(Request $request, Project $project)
+    {
 
         $user = User::where('email', $request->input('email'))->first();
 
@@ -262,19 +284,21 @@ class ProjectController extends Controller {
             : redirect()->route('project', ['project' => $project]);
     }
 
-    public function toggleFavorite(Request $request, Project $project) {
+    public function toggleFavorite(Request $request, Project $project)
+    {
 
         $this->authorize('toggleFavorite', $project);
 
-        $member = $project->users()->get()->first(fn(User $user) => $user->id === $request->user()->id);
+        $member = $project->users()->get()->first(fn (User $user) => $user->id === $request->user()->id);
 
-        $member->pivot->is_favorite = !$member->pivot->is_favorite;
+        $member->pivot->is_favorite = ! $member->pivot->is_favorite;
         $member->pivot->save();
 
         return response()->json(['isFavorite' => $member->pivot->is_favorite]);
     }
 
-    public function archive(Request $request, Project $project) {
+    public function archive(Request $request, Project $project)
+    {
         $this->authorize('archive', $project);
 
         $project->archived = true;
@@ -289,7 +313,8 @@ class ProjectController extends Controller {
             : redirect()->route('project.info', ['project' => $project]);
     }
 
-    public function unarchive(Request $request, Project $project) {
+    public function unarchive(Request $request, Project $project)
+    {
         $this->authorize('unarchive', $project);
 
         $project->archived = false;
@@ -300,7 +325,8 @@ class ProjectController extends Controller {
             : redirect()->route('project.info', ['project' => $project]);
     }
 
-    public function destroy(Request $request, Project $project) {
+    public function destroy(Request $request, Project $project)
+    {
 
         $this->authorize('delete', $project);
         $project->delete();
@@ -310,7 +336,8 @@ class ProjectController extends Controller {
             : redirect()->route('project.list');
     }
 
-    public function getProjectMembers(Request $request, Project $project) {
+    public function getProjectMembers(Request $request, Project $project)
+    {
 
         $this->authorize('getProjectMembers', $project);
 
@@ -323,25 +350,28 @@ class ProjectController extends Controller {
             : response()->view('pages.project.members', ['project' => $project, 'members' => $members]);
     }
 
-    public function searchMembers(Project $project, string $search) {
+    public function searchMembers(Project $project, string $search)
+    {
         $members = $project->users();
 
-        if (!empty($search)) {
-            $members = $members->where('name', 'like', '%' . ProjectController::escape_like($search) . '%');
+        if (! empty($search)) {
+            $members = $members->where('name', 'like', '%'.ProjectController::escape_like($search).'%');
         }
 
         return $members->cursorPaginate(10);
     }
 
-    protected function escape_like(string $value, string $char = '\\') {
+    protected function escape_like(string $value, string $char = '\\')
+    {
         return str_replace(
             [$char, '%', '_'],
-            [$char . $char, $char . '%', $char . '_'],
+            [$char.$char, $char.'%', $char.'_'],
             $value
         );
     }
 
-    public function getProjectTasks(Request $request, Project $project) {
+    public function getProjectTasks(Request $request, Project $project)
+    {
 
         $this->authorize('getProjectTasks', $project);
 
@@ -354,18 +384,21 @@ class ProjectController extends Controller {
             : response()->view('pages.project.tasks', ['tasks' => $tasks]);
     }
 
-    public function searchTasks(string $searchTerm, Project $project) {
+    public function searchTasks(string $searchTerm, Project $project)
+    {
 
         $projectTasks = $project->tasks();
 
-        if (!empty($searchTerm))
+        if (! empty($searchTerm)) {
             $projectTasks = $projectTasks->whereRaw('(task.fts_search @@ plainto_tsquery(\'english\', ?) OR task.name = ?)', [$searchTerm, $searchTerm])
                 ->orderByRaw('ts_rank(task.fts_search, plainto_tsquery(\'english\', ?)) DESC', [$searchTerm]);
+        }
 
         return $projectTasks->cursorPaginate(10);
     }
 
-    public function getProjectTags(Request $request, Project $project) {
+    public function getProjectTags(Request $request, Project $project)
+    {
         $this->authorize('getProjectTags', $project);
 
         $searchTerm = $request->query('q') ?? '';
@@ -377,31 +410,34 @@ class ProjectController extends Controller {
             : response()->view('pages.project.tags', ['tags' => $tags]);
     }
 
-    public function searchTags(Project $project, string $search) {
+    public function searchTags(Project $project, string $search)
+    {
         $members = $project->tags();
 
-        if (!empty($search)) {
-            $members = $members->where('title', 'like', '%' . ProjectController::escape_like($search) . '%');
+        if (! empty($search)) {
+            $members = $members->where('title', 'like', '%'.ProjectController::escape_like($search).'%');
         }
 
         return $members->cursorPaginate(10);
     }
 
-    public function showReportForm(Project $project) {
+    public function showReportForm(Project $project)
+    {
         $this->authorize('report', $project);
 
         return view('pages.reportproject', ['project' => $project]);
     }
 
-    public function report(Request $request, Project $project) {
-        
+    public function report(Request $request, Project $project)
+    {
+
         $this->reportValidator($request);
 
         $requestData = $request->all();
 
         $this->authorize('report', $project);
 
-        $report = new Report();
+        $report = new Report;
 
         $report->reason = $requestData['reason'];
         $report->project_id = $project->id;
@@ -411,10 +447,10 @@ class ProjectController extends Controller {
         return redirect()->route('project', ['project' => $project]);
     }
 
-    protected function reportValidator(Request $request) {
+    protected function reportValidator(Request $request)
+    {
         return Validator::make($request->all(), [
-            'reason' => 'string|min:6|max:512'
+            'reason' => 'string|min:6|max:512',
         ]);
     }
-
 }

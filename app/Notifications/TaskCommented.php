@@ -3,12 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\TaskComment;
-use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class TaskCommented extends Notification {
+class TaskCommented extends Notification
+{
     public TaskComment $comment;
 
     /**
@@ -16,7 +14,8 @@ class TaskCommented extends Notification {
      *
      * @return void
      */
-    public function __construct(TaskComment $comment) {
+    public function __construct(TaskComment $comment)
+    {
         $this->comment = $comment;
     }
 
@@ -26,9 +25,10 @@ class TaskCommented extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -36,13 +36,14 @@ class TaskCommented extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line($this->comment->author()->name . "has left a comment on a task you're assigned to - " . $this->comment->task->name . ".")
-                    ->action('View the task', route('project.task.info', ['project' => $this->comment->task()->project, 'task' => $this->comment->task]))
-                    ->line('Thank you for using our application!');
+            ->line($this->comment->author()->name."has left a comment on a task you're assigned to - ".$this->comment->task->name.'.')
+            ->action('View the task', route('project.task.info', ['project' => $this->comment->task()->project, 'task' => $this->comment->task]))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -51,9 +52,10 @@ class TaskCommented extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
-            'comment' => $this->comment
+            'comment' => $this->comment,
         ];
     }
 }

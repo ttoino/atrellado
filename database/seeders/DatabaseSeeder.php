@@ -9,14 +9,15 @@ use Illuminate\Support\Facades\DB;
 // database/migrations + model observers now. populate.sql remains the
 // course fixture (PostgreSQL-only, e.g. x'..'::COLOR casts); the factory
 // mode is driver-agnostic.
-class DatabaseSeeder extends Seeder {
-
+class DatabaseSeeder extends Seeder
+{
     /**
      * Seed the application's database.
      *
      * @return void
      */
-    public function run() {
+    public function run()
+    {
         if (env('DB_LARGE_DATA')) {
             $this->call([
                 UserSeeder::class,

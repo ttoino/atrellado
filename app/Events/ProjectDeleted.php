@@ -2,5 +2,4 @@
 
 namespace App\Events;
 
-class ProjectDeleted extends ProjectEvent {
-}
+class ProjectDeleted extends ProjectEvent {}

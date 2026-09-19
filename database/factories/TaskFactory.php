@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Collection;
-
 use App\Models\Task;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
+ * @extends Factory<Task>
  */
-class TaskFactory extends Factory {
-
+class TaskFactory extends Factory
+{
     const TASKS_WITH_DESCRIPTION_PERCENTAGE = 0.45;
+
     const EDITED_TASK_PERCENTAGE = 0.4;
 
     /**
@@ -20,7 +20,8 @@ class TaskFactory extends Factory {
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'name' => $this->faker->sentence,
             'description' => $this->faker->optional(TaskFactory::TASKS_WITH_DESCRIPTION_PERCENTAGE)->paragraph,
@@ -28,19 +29,21 @@ class TaskFactory extends Factory {
             'edit_date' => function ($attributes) {
                 return $this->faker->optional(TaskFactory::EDITED_TASK_PERCENTAGE)->dateTimeBetween($attributes['creation_date']);
             },
-            'completed' => $this->faker->boolean()
+            'completed' => $this->faker->boolean(),
         ];
     }
 
-    public function withPosition() {
+    public function withPosition()
+    {
         return $this->sequence(
-            fn($sequence) => ['position' => $sequence->index + 1]
+            fn ($sequence) => ['position' => $sequence->index + 1]
         );
     }
 
-    public function withCreators(Collection $creators) {
+    public function withCreators(Collection $creators)
+    {
         return $this->sequence(
-            fn($sequence) => ['creator_id' => $creators->random()]
+            fn ($sequence) => ['creator_id' => $creators->random()]
         );
     }
 

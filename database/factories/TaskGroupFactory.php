@@ -2,15 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\TaskGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use App\Models\TaskGroup;
-
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TaskGroup>
+ * @extends Factory<TaskGroup>
  */
-class TaskGroupFactory extends Factory {
-    
+class TaskGroupFactory extends Factory
+{
     const TASK_GROUPS_WITH_DESCRIPTION_PERCENTAGE = 0.4;
 
     /**
@@ -18,14 +17,16 @@ class TaskGroupFactory extends Factory {
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'name' => $this->faker->sentence,
             'description' => $this->faker->optional(TaskGroupFactory::TASK_GROUPS_WITH_DESCRIPTION_PERCENTAGE)->paragraph,
         ];
     }
 
-    public function withPosition() {
+    public function withPosition()
+    {
         return $this->sequence(
             fn ($sequence) => ['position' => $sequence->index + 1]
         );

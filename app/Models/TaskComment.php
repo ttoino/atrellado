@@ -5,21 +5,24 @@ namespace App\Models;
 use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\TaskCommentCreated;
+use App\Observers\TaskCommentObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Spatie\LaravelMarkdown\MarkdownRenderer;
 
-class TaskComment extends Model {
+class TaskComment extends Model
+{
     use HasFactory;
 
     // Author-membership validation ported from the PL/pgSQL triggers.
-    protected static function booted(): void {
-        static::observe(\App\Observers\TaskCommentObserver::class);
+    protected static function booted(): void
+    {
+        static::observe(TaskCommentObserver::class);
     }
 
     const CREATED_AT = 'creation_date';
+
     const UPDATED_AT = 'edit_date';
 
     /**
@@ -28,7 +31,7 @@ class TaskComment extends Model {
      * @var array
      */
     protected $fillable = [
-        'content'
+        'content',
     ];
 
     /**
@@ -40,33 +43,37 @@ class TaskComment extends Model {
 
     protected $with = ['author'];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'creation_date' => Datetime::class,
             'edit_date' => Datetime::class,
-            'content' => Markdown::class
+            'content' => Markdown::class,
         ];
     }
 
     protected $dispatchesEvents = [
-        'created' => TaskCommentCreated::class
+        'created' => TaskCommentCreated::class,
     ];
 
     protected $appends = ['editable'];
 
-    public function task() {
+    public function task()
+    {
         return $this->belongsTo(
-                Task::class,
+            Task::class,
             'task_id'
         );
     }
 
-    public function author() {
+    public function author()
+    {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);
     }
 
-    protected function editable(): Attribute {
-        return Attribute::make(fn() => Auth::user()?->can('update', $this));
+    protected function editable(): Attribute
+    {
+        return Attribute::make(fn () => Auth::user()?->can('update', $this));
     }
 
     protected $table = 'task_comment';

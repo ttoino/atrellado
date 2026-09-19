@@ -2,45 +2,50 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
-class UserPolicy {
+class UserPolicy
+{
     use HandlesAuthorization;
 
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function viewAny(User $user) {
+    public function viewAny(User $user)
+    {
         //
     }
 
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function view(User $user, User $model) {
+    public function view(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if ($user->is_admin)
+        if ($user->is_admin) {
             return $this->allow();
+        }
 
-        if ($user->id === $model->id)
+        if ($user->id === $model->id) {
             return $this->allow();
+        }
 
         $projectsInCommon = $user->projects->intersect($model->projects)->count() > 0;
 
-        if ($projectsInCommon)
+        if ($projectsInCommon) {
             return $this->allow();
+        }
 
         return $this->deny('Only admins, the profile\'s owner or users that share a project with the profile\'s owner can view this profile');
     }
@@ -48,119 +53,141 @@ class UserPolicy {
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function create(User $user) {
+    public function create(User $user)
+    {
         //
     }
 
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function update(User $user, User $model) {
+    public function update(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if ($user->is_admin)
+        if ($user->is_admin) {
             return $this->allow();
+        }
 
-        if ($user->id === $model->id)
+        if ($user->id === $model->id) {
             return $this->allow();
+        }
 
         return $this->deny('Only admins or the profile\'s owner can update this user profile');
     }
 
-    public function showProfileEditPage(User $user, User $model) {
+    public function showProfileEditPage(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if ($user->is_admin)
+        if ($user->is_admin) {
             return $this->allow();
+        }
 
-        if ($user->id === $model->id)
+        if ($user->id === $model->id) {
             return $this->allow();
+        }
 
         return $this->deny('Only admins or the profile\'s owner can update this user profile');
     }
 
-    public function block(User $user, User $model) {
+    public function block(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if (!$user->is_admin)
+        if (! $user->is_admin) {
             return $this->deny('Only admins can perform this action');
+        }
 
-        if ($model->is_admin)
+        if ($model->is_admin) {
             return $this->deny('This action can\'t be performed on admins');
+        }
 
-        if ($model->blocked)
+        if ($model->blocked) {
             return $this->deny('User is already blocked');
+        }
 
         return $this->allow();
     }
 
-    public function unblock(User $user, User $model) {
+    public function unblock(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if (!$user->is_admin)
+        if (! $user->is_admin) {
             return $this->deny('Only admins can perform this action');
+        }
 
-        if ($model->is_admin)
+        if ($model->is_admin) {
             return $this->deny('This action can\'t be performed on admins');
+        }
 
-        if (!$model->blocked)
+        if (! $model->blocked) {
             return $this->deny('User is not blocked');
+        }
 
         return $this->allow();
     }
-
 
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function delete(User $user, User $model) {
+    public function delete(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked');  
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if ($model->is_admin)
+        if ($model->is_admin) {
             return $this->deny('Cannot delete admin accounts');
+        }
 
-        if (!$user->is_admin && $user->id !== $model->id)
+        if (! $user->is_admin && $user->id !== $model->id) {
             return $this->deny('Only admins can delete accounts that belong to other users');
+        }
 
         $userProjects = Project::where('coordinator_id', $model->id)->count();
 
-        if ($userProjects > 0)
+        if ($userProjects > 0) {
             return $this->deny('Cannot delete coordinator account while new coordinators are not assigned for the user\'s projects');
+        }
 
         return $this->allow();
     }
 
-    public function report(User $user, User $model) {
+    public function report(User $user, User $model)
+    {
 
-        if ($user->blocked)
-            return $this->deny('Your user account has been blocked'); 
+        if ($user->blocked) {
+            return $this->deny('Your user account has been blocked');
+        }
 
-        if ($user->id === $model->id)
-            return $this->deny('You cannot report yourself'); 
+        if ($user->id === $model->id) {
+            return $this->deny('You cannot report yourself');
+        }
 
-        if ($user->is_admin)
+        if ($user->is_admin) {
             return $this->deny('Admins cannot report users');
+        }
 
         return $this->allow();
     }
@@ -168,22 +195,20 @@ class UserPolicy {
     /**
      * Determine whether the user can restore the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function restore(User $user, User $model) {
+    public function restore(User $user, User $model)
+    {
         //
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
+     * @return Response|bool
      */
-    public function forceDelete(User $user, User $model) {
+    public function forceDelete(User $user, User $model)
+    {
         //
     }
 }

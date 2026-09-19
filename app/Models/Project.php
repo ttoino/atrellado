@@ -5,20 +5,22 @@ namespace App\Models;
 use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\ProjectDeleted;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Model;
+use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Spatie\LaravelMarkdown\MarkdownRenderer;
+use Illuminate\Database\Eloquent\Model;
 
-class Project extends Model {
+class Project extends Model
+{
     use HasFactory;
 
     // Coordinator-membership bookkeeping ported from the PL/pgSQL triggers.
-    protected static function booted(): void {
-        static::observe(\App\Observers\ProjectObserver::class);
+    protected static function booted(): void
+    {
+        static::observe(ProjectObserver::class);
     }
 
     const CREATED_AT = 'creation_date';
+
     const UPDATED_AT = 'edit_date';
 
     /**
@@ -31,7 +33,7 @@ class Project extends Model {
         'archived',
         'description',
         'coordinator_id',
-        'edit_date'
+        'edit_date',
     ];
 
     /**
@@ -40,24 +42,26 @@ class Project extends Model {
      * @var array
      */
     protected $hidden = [
-        'fts_search'
+        'fts_search',
     ];
 
     protected $casts = [
         'creation_date' => Datetime::class,
         'edit_date' => Datetime::class,
-        'description' => Markdown::class
+        'description' => Markdown::class,
     ];
 
     protected $dispatchesEvents = [
-        'deleting' => ProjectDeleted::class
+        'deleting' => ProjectDeleted::class,
     ];
 
-    public function coordinator() {
+    public function coordinator()
+    {
         return $this->belongsTo(User::class, 'coordinator_id');
     }
 
-    public function users() {
+    public function users()
+    {
         return $this->belongsToMany(
             User::class,
             'project_member',
@@ -66,14 +70,16 @@ class Project extends Model {
         )->withPivot('is_favorite');
     }
 
-    public function taskGroups() {
+    public function taskGroups()
+    {
         return $this->hasMany(
             TaskGroup::class,
             'project_id'
         )->orderBy('position');
     }
 
-    public function tasks() {
+    public function tasks()
+    {
         return $this->hasManyThrough(
             Task::class,
             TaskGroup::class,
@@ -82,21 +88,24 @@ class Project extends Model {
         );
     }
 
-    public function tags() {
+    public function tags()
+    {
         return $this->hasMany(
             Tag::class,
             'project_id'
         );
     }
 
-    public function threads() {
+    public function threads()
+    {
         return $this->hasMany(
             Thread::class,
             'project_id'
-        )->orderBy('creation_date', "desc");
+        )->orderBy('creation_date', 'desc');
     }
 
-    public function reports() {
+    public function reports()
+    {
         return $this->hasMany(Report::class, 'project_id');
     }
 

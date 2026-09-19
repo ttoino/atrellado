@@ -7,7 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class ThreadCommentEvent {
+abstract class ThreadCommentEvent
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public ThreadComment $comment;
@@ -17,7 +18,8 @@ abstract class ThreadCommentEvent {
      *
      * @return void
      */
-    public function __construct(ThreadComment $comment) {
+    public function __construct(ThreadComment $comment)
+    {
         $this->comment = $comment;
     }
 }

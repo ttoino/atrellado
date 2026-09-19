@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Casts\Datetime;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectTimelineAction extends Model {
+class ProjectTimelineAction extends Model
+{
     public $timestamps = false;
 
     /**
@@ -15,7 +15,7 @@ class ProjectTimelineAction extends Model {
      * @var array
      */
     protected $fillable = [
-        'description'
+        'description',
     ];
 
     /**
@@ -26,10 +26,11 @@ class ProjectTimelineAction extends Model {
     protected $hidden = [];
 
     protected $casts = [
-        'creation_date' => Datetime::class
+        'creation_date' => Datetime::class,
     ];
 
-    public function project() {
+    public function project()
+    {
         return $this->belongsTo(Project::class, 'project_id');
     }
 

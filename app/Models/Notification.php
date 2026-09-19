@@ -5,11 +5,11 @@ namespace App\Models;
 use App\Casts\Datetime;
 use App\Casts\NotificationJson;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 // Since we wanted to customize the behavior of Notifications, we needed to copy the whole model from the Laravel source code in order to perform modifications
-class Notification extends Model {
+class Notification extends Model
+{
     public $timestamps = false;
 
     /**
@@ -22,7 +22,7 @@ class Notification extends Model {
         'type',
         'notifiable_id',
         'read_date',
-        'creation_date'
+        'creation_date',
     ];
 
     protected $casts = [
@@ -36,7 +36,8 @@ class Notification extends Model {
      *
      * @return void
      */
-    public function markAsRead() {
+    public function markAsRead()
+    {
         if (is_null($this->read_date)) {
             $this->forceFill(['read_date' => $this->freshTimestamp()])->save();
         }
@@ -47,8 +48,9 @@ class Notification extends Model {
      *
      * @return void
      */
-    public function markAsUnread() {
-        if (!is_null($this->read_date)) {
+    public function markAsUnread()
+    {
+        if (! is_null($this->read_date)) {
             $this->forceFill(['read_date' => null])->save();
         }
     }
@@ -58,7 +60,8 @@ class Notification extends Model {
      *
      * @return bool
      */
-    public function read() {
+    public function read()
+    {
         return $this->read_date !== null;
     }
 
@@ -67,27 +70,28 @@ class Notification extends Model {
      *
      * @return bool
      */
-    public function unread() {
+    public function unread()
+    {
         return $this->read_date === null;
     }
 
     /**
      * Scope a query to only include read notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
-    public function scopeRead(Builder $query) {
+    public function scopeRead(Builder $query)
+    {
         return $query->whereNotNull('read_date');
     }
 
     /**
      * Scope a query to only include unread notifications.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return Builder
      */
-    public function scopeUnread(Builder $query) {
+    public function scopeUnread(Builder $query)
+    {
         return $query->whereNull('read_date');
     }
 

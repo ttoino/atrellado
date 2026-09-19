@@ -4,20 +4,24 @@ namespace App\Models;
 
 use App\Casts\Datetime;
 use App\Casts\Markdown;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Model;
+use App\Observers\TaskObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Validation\ValidationException;
 
-class Task extends Model {
-    use Notifiable, HasFactory;
+class Task extends Model
+{
+    use HasFactory, Notifiable;
 
     const CREATED_AT = 'creation_date';
+
     const UPDATED_AT = 'edit_date';
 
     // Sibling-position bookkeeping ported from the PL/pgSQL triggers.
-    protected static function booted(): void {
-        static::observe(\App\Observers\TaskObserver::class);
+    protected static function booted(): void
+    {
+        static::observe(TaskObserver::class);
     }
 
     /**
@@ -32,7 +36,7 @@ class Task extends Model {
         'completed',
         'task_group_id',
         'creator_id',
-        'position'
+        'position',
     ];
 
     /**
@@ -41,22 +45,23 @@ class Task extends Model {
      * @var array
      */
     protected $hidden = [
-        'fts_search'
+        'fts_search',
     ];
 
     protected $casts = [
         'creation_date' => Datetime::class,
         'edit_date' => Datetime::class,
         'completed' => 'boolean',
-        'description' => Markdown::class
+        'description' => Markdown::class,
     ];
 
     protected $with = ['tags', 'creator', 'assignees'];
 
-    public function project() {
+    public function project()
+    {
         return $this->hasOneThrough(
-                Project::class,
-                TaskGroup::class,
+            Project::class,
+            TaskGroup::class,
             'id',
             'id',
             'task_group_id',
@@ -64,36 +69,41 @@ class Task extends Model {
         );
     }
 
-    public function taskGroup() {
+    public function taskGroup()
+    {
         return $this->belongsTo(
-                TaskGroup::class,
+            TaskGroup::class,
             'task_group_id'
         );
     }
 
-    public function creator() {
+    public function creator()
+    {
         return $this->belongsTo(User::class, 'creator_id')->withDefault(User::DELETED_USER);
     }
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(
-                TaskComment::class,
+            TaskComment::class,
             'task_id'
         );
     }
 
-    public function tags() {
+    public function tags()
+    {
         return $this->belongsToMany(
-                Tag::class,
+            Tag::class,
             'task_tag',
             'task_id',
             'tag_id'
         );
     }
 
-    public function assignees() {
+    public function assignees()
+    {
         return $this->belongsToMany(
-                User::class,
+            User::class,
             'task_assignee',
             'task_id',
             'user_profile_id'
@@ -102,7 +112,8 @@ class Task extends Model {
 
     // Backstops the old invalid_task_tag trigger; pivot inserts fire no
     // model events, so the check lives next to the attach.
-    public function attachTag(Tag $tag): void {
+    public function attachTag(Tag $tag): void
+    {
         if ($tag->project_id !== $this->project->id) {
             throw ValidationException::withMessages([
                 'tags' => 'Cannot apply tag to task of another project!',
@@ -112,8 +123,9 @@ class Task extends Model {
     }
 
     // Backstops the old validate_assignee_project_member trigger.
-    public function attachAssignee(User $assignee): void {
-        if (!$this->project->users()->where('user_profile_id', $assignee->id)->exists()) {
+    public function attachAssignee(User $assignee): void
+    {
+        if (! $this->project->users()->where('user_profile_id', $assignee->id)->exists()) {
             throw ValidationException::withMessages([
                 'assignees' => 'Task assignee must be a member of the task\'s project!',
             ]);

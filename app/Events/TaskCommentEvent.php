@@ -7,7 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class TaskCommentEvent {
+abstract class TaskCommentEvent
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public TaskComment $comment;
@@ -17,7 +18,8 @@ abstract class TaskCommentEvent {
      *
      * @return void
      */
-    public function __construct(TaskComment $comment) {
+    public function __construct(TaskComment $comment)
+    {
         $this->comment = $comment;
     }
 }

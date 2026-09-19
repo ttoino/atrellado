@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\Project;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ProjectArchived extends Notification {
+class ProjectArchived extends Notification
+{
     public Project $project;
 
     /**
@@ -15,18 +14,21 @@ class ProjectArchived extends Notification {
      *
      * @return void
      */
-    public function __construct(Project $project) {
+    public function __construct(Project $project)
+    {
         $this->project = $project;
     }
+
     /**
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -34,13 +36,14 @@ class ProjectArchived extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line("A project you're a member of - " . $this->project->name . " - has been archived.")
-                    ->action('View the project', route('project.board', ['project' => $this->project]))
-                    ->line('Thank you for using our application!');
+            ->line("A project you're a member of - ".$this->project->name.' - has been archived.')
+            ->action('View the project', route('project.board', ['project' => $this->project]))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -49,9 +52,10 @@ class ProjectArchived extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
-            'project' => $this->project
+            'project' => $this->project,
         ];
     }
 }

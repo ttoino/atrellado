@@ -15,8 +15,10 @@ use App\Models\Thread;
 use App\Models\ThreadComment;
 use App\Models\User;
 
-class DebugController extends Controller {
-    public function dump() {
+class DebugController extends Controller
+{
+    public function dump()
+    {
         echo '<pre>';
         echo 'notifications: ';
         print_r(Notification::all()->toArray());

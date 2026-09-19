@@ -2,17 +2,16 @@
 
 namespace Database\Factories;
 
+use App\Models\Report;
+use App\Models\Thread;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use Illuminate\Database\Eloquent\Collection;
-
-use App\Models\Thread;
-
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Report>
+ * @extends Factory<Report>
  */
-class ThreadFactory extends Factory {
-
+class ThreadFactory extends Factory
+{
     const EDITED_THREAD_PERCENTAGE = 0.4;
 
     /**
@@ -20,7 +19,8 @@ class ThreadFactory extends Factory {
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'title' => $this->faker->sentence(3),
             'content' => $this->faker->paragraph,
@@ -31,7 +31,8 @@ class ThreadFactory extends Factory {
         ];
     }
 
-    public function withAuthors(Collection $author) {
+    public function withAuthors(Collection $author)
+    {
         return $this->sequence(
             fn ($sequence) => ['author_id' => $author->random()]
         );

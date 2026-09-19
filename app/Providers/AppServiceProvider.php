@@ -2,24 +2,25 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
-
-use Illuminate\Support\Collection;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider {
+class AppServiceProvider extends ServiceProvider
+{
     /**
      * Register any application services.
      *
      * @return void
      */
-    public function register() {
+    public function register()
+    {
         //
     }
 
@@ -28,7 +29,8 @@ class AppServiceProvider extends ServiceProvider {
      *
      * @return void
      */
-    public function boot() {
+    public function boot()
+    {
         Paginator::useBootstrapFive();
         Route::pattern('id', '[0-9]+');
         RateLimiter::for('api', function (Request $request) {
@@ -52,7 +54,7 @@ class AppServiceProvider extends ServiceProvider {
 
         if (env('FORCE_HTTPS', false)) {
             error_log('configuring https');
-            $app_url = config("app.url");
+            $app_url = config('app.url');
             URL::forceRootUrl($app_url);
             $schema = explode(':', $app_url)[0];
             URL::forceScheme($schema);

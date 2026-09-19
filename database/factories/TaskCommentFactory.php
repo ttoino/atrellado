@@ -2,22 +2,22 @@
 
 namespace Database\Factories;
 
+use App\Models\TaskComment;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use App\Models\TaskComment;
-
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TaskComment>
+ * @extends Factory<TaskComment>
  */
-class TaskCommentFactory extends Factory {
-
+class TaskCommentFactory extends Factory
+{
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'content' => $this->faker->paragraph,
             'creation_date' => $this->faker->dateTimeBetween('-5 month'),
@@ -27,7 +27,8 @@ class TaskCommentFactory extends Factory {
         ];
     }
 
-    public function withAuthors(Collection $authors) {
+    public function withAuthors(Collection $authors)
+    {
         return $this->sequence(
             fn ($sequence) => ['author_id' => $authors->random()]
         );

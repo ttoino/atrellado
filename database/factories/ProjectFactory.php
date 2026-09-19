@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
+ * @extends Factory<Project>
  */
-class ProjectFactory extends Factory {
-
+class ProjectFactory extends Factory
+{
     const EDITED_PROJECT_PERCENTAGE = 0.6;
+
     const PROJECTS_WITH_DESCRIPTION_PERCENTAGE = 0.7;
 
     /**
@@ -20,7 +20,8 @@ class ProjectFactory extends Factory {
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'name' => $this->faker->company,
             'description' => $this->faker->optional(ProjectFactory::PROJECTS_WITH_DESCRIPTION_PERCENTAGE)->paragraph,
@@ -32,21 +33,24 @@ class ProjectFactory extends Factory {
         ];
     }
 
-    public function archived() {
+    public function archived()
+    {
         return $this->state(function (array $attributes) {
             return [
-                'archived' => true
+                'archived' => true,
             ];
         });
     }
 
-    public function withCoordinators(Collection $coordinators) {
+    public function withCoordinators(Collection $coordinators)
+    {
         return $this->sequence(
             fn () => ['coordinator_id' => $coordinators->random()]
         );
     }
 
-    public function withMembers(Collection $members, float $memberRatio) {
+    public function withMembers(Collection $members, float $memberRatio)
+    {
         return $this->hasAttached(
             $members->random($memberRatio),
             ['is_favorite' => $this->faker->boolean()],

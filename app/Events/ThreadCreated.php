@@ -2,5 +2,4 @@
 
 namespace App\Events;
 
-class ThreadCreated extends ThreadEvent {
-}
+class ThreadCreated extends ThreadEvent {}

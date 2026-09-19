@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tag;
 use App\Models\Project;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
-class TagController extends Controller {
-
+class TagController extends Controller
+{
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $this->tagCreationValidator($request)->validate();
 
@@ -32,9 +32,10 @@ class TagController extends Controller {
             : redirect()->route('project.tag', ['project' => $project, 'tag' => $tag]);
     }
 
-    public function createTag(Project $project, Request $request) {
+    public function createTag(Project $project, Request $request)
+    {
 
-        $tag = new Tag();
+        $tag = new Tag;
         $data = $request->only(['title', 'color']);
 
         $tag->title = $data['title'];
@@ -45,7 +46,8 @@ class TagController extends Controller {
         return $tag->fresh();
     }
 
-    public function tagCreationValidator(Request $request) {
+    public function tagCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'title' => 'required|string|min:6|max:50',
             'color' => 'required|string|regex:/^#[0-9a-f]{6}$/',
@@ -55,10 +57,10 @@ class TagController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Tag  $tag
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show(Request $request, Project $project, Tag $tag) {
+    public function show(Request $request, Project $project, Tag $tag)
+    {
 
         $this->authorize('view', $tag);
 
@@ -70,11 +72,10 @@ class TagController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Tag  $tag
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function update(Request $request, Tag $tag) {
+    public function update(Request $request, Tag $tag)
+    {
         $this->tagEditionValidator($request)->validate();
 
         $this->authorize('edit', $tag->project);
@@ -85,22 +86,26 @@ class TagController extends Controller {
         return response()->json($tag);
     }
 
-    public function tagEditionValidator(Request $request) {
+    public function tagEditionValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'title' => 'required|string|min:6|max:50',
             'color' => 'required|string|regex:/^#[0-9a-f]{6}$/',
         ]);
     }
 
-    public function editTag(Tag $tag, Request $request) {
+    public function editTag(Tag $tag, Request $request)
+    {
 
         $data = $request->only(['title', 'color']);
 
-        if (($data['title'] ??= null) !== null)
+        if (($data['title'] ??= null) !== null) {
             $tag->title = $data['title'];
+        }
 
-        if (($data['color'] ??= null) !== null)
+        if (($data['color'] ??= null) !== null) {
             $tag->color = intval(substr($data['color'], 1), 16);
+        }
 
         $tag->save();
 
@@ -110,10 +115,10 @@ class TagController extends Controller {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Tag  $tag
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function destroy(Request $request, Tag $tag) {
+    public function destroy(Request $request, Tag $tag)
+    {
 
         $this->authorize('edit', $tag->project);
         $this->authorize('delete', $tag);

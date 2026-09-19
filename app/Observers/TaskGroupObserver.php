@@ -11,10 +11,11 @@ use App\Models\TaskGroup;
 // query-builder updates deliberately skip model events (no recursion).
 // Callers operate on freshly loaded models: mass steps do not sync
 // in-memory instances, and stale positions shift the wrong range.
-class TaskGroupObserver {
-
-    public function updating(TaskGroup $taskGroup): void {
-        if (!$taskGroup->isDirty('position')) {
+class TaskGroupObserver
+{
+    public function updating(TaskGroup $taskGroup): void
+    {
+        if (! $taskGroup->isDirty('position')) {
             return;
         }
         $old = (int) $taskGroup->getOriginal('position');
@@ -35,11 +36,13 @@ class TaskGroupObserver {
         $taskGroup->setAttribute('position', $new);
     }
 
-    public function deleted(TaskGroup $taskGroup): void {
+    public function deleted(TaskGroup $taskGroup): void
+    {
         $this->step((int) $taskGroup->project_id, [$taskGroup->position + 1, null], 'asc', 'decrement');
     }
 
-    private function step(int $projectId, array $range, string $order, string $direction): void {
+    private function step(int $projectId, array $range, string $order, string $direction): void
+    {
         $query = TaskGroup::where('project_id', $projectId)->where('position', '>=', $range[0]);
         if ($range[1] !== null) {
             $query->where('position', '<=', $range[1]);

@@ -11,9 +11,10 @@ use App\Models\Task;
 // order. Mass query-builder updates deliberately skip model events.
 // Callers operate on freshly loaded models: mass steps do not sync
 // in-memory instances, and stale positions shift the wrong range.
-class TaskObserver {
-
-    public function updating(Task $task): void {
+class TaskObserver
+{
+    public function updating(Task $task): void
+    {
         if ($task->isDirty('task_group_id')) {
             $oldGroup = (int) $task->getOriginal('task_group_id');
             $oldPosition = (int) $task->getOriginal('position');
@@ -24,9 +25,10 @@ class TaskObserver {
             $this->step($oldGroup, [$oldPosition + 1, null], 'asc', 'decrement');
             $this->step($newGroup, [$newPosition, null], 'desc', 'increment');
             $task->setAttribute('position', $newPosition);
+
             return;
         }
-        if (!$task->isDirty('position')) {
+        if (! $task->isDirty('position')) {
             return;
         }
         $old = (int) $task->getOriginal('position');
@@ -45,11 +47,13 @@ class TaskObserver {
         $task->setAttribute('position', $new);
     }
 
-    public function deleted(Task $task): void {
+    public function deleted(Task $task): void
+    {
         $this->step((int) $task->task_group_id, [(int) $task->position + 1, null], 'asc', 'decrement');
     }
 
-    private function step(int $groupId, array $range, string $order, string $direction): void {
+    private function step(int $groupId, array $range, string $order, string $direction): void
+    {
         $query = Task::where('task_group_id', $groupId)->where('position', '>=', $range[0]);
         if ($range[1] !== null) {
             $query->where('position', '<=', $range[1]);

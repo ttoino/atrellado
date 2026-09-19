@@ -2,16 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Models\Project;
+use App\Models\TaskGroup;
 use Illuminate\Database\Seeder;
 
-use App\Models\TaskGroup;
-use App\Models\Project;
-
-use Illuminate\Database\Eloquent\Factories\Sequence;
-
-class TaskGroupSeeder extends Seeder {
-
+class TaskGroupSeeder extends Seeder
+{
     const MIN_TASK_GROUPS = 2;
+
     const MAX_TASK_GROUPS = 5;
 
     /**
@@ -19,7 +17,8 @@ class TaskGroupSeeder extends Seeder {
      *
      * @return void
      */
-    public function run() {
+    public function run()
+    {
 
         $faker = fake();
 

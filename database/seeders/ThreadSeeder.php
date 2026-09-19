@@ -2,25 +2,25 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Project;
+use App\Models\Thread;
 use Illuminate\Database\Seeder;
 
-use App\Models\Thread;
-use App\Models\Project;
-
-class ThreadSeeder extends Seeder {
-
+class ThreadSeeder extends Seeder
+{
     const MIN_THREADS_PER_PROJECT = 10;
+
     const MAX_THREADS_PER_PROJECT = 20;
 
-    CONST AUTHOR_PERCENTAGE = 0.4;
+    const AUTHOR_PERCENTAGE = 0.4;
 
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run() {
+    public function run()
+    {
 
         $faker = fake();
 

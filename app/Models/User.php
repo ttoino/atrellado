@@ -8,19 +8,20 @@ use App\Events\UserUpdated;
 use App\Listeners\CreateDefaultProfilePic;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable implements MustVerifyEmail {
-    use Notifiable, HasFactory;
+class User extends Authenticatable implements MustVerifyEmail
+{
+    use HasFactory, Notifiable;
 
     const DELETED_USER = [
         'id' => 0,
         'name' => 'Deleted user',
         'email' => 'Deleted user',
-        'profile_picture_path' => 'public/logo.svg'
+        'profile_picture_path' => 'public/logo.svg',
     ];
 
     // Don't add create and update timestamps in database.
@@ -37,7 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail {
         'password',
         'blocked',
         'is_admin',
-        'profile_picture_path'
+        'profile_picture_path',
     ];
 
     /**
@@ -47,10 +48,11 @@ class User extends Authenticatable implements MustVerifyEmail {
      */
     protected $hidden = [
         'password',
-        'remember_token'
+        'remember_token',
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'is_admin' => 'boolean',
         ];
@@ -59,41 +61,49 @@ class User extends Authenticatable implements MustVerifyEmail {
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
         'updated' => UserUpdated::class,
-        'deleted' => UserDeleted::class
+        'deleted' => UserDeleted::class,
     ];
 
-    public function projects() {
+    public function projects()
+    {
         return $this->belongsToMany(
-                Project::class,
+            Project::class,
             'project_member',
             'user_profile_id',
             'project_id'
         )->withPivot('is_favorite')->orderByPivot('is_favorite', 'desc');
     }
 
-    public function reports() {
+    public function reports()
+    {
         return $this->hasMany(Report::class, 'user_profile_id');
     }
-    
-    public function oAuthProfiles() {
+
+    public function oAuthProfiles()
+    {
         return $this->hasMany(OAuthUser::class, 'user_id');
     }
-    
-    public function notifications() {
+
+    public function notifications()
+    {
         return $this->hasMany(Notification::class, 'notifiable_id')->orderByDesc('creation_date');
     }
 
-    protected function profilePic(): Attribute {
+    protected function profilePic(): Attribute
+    {
         return Attribute::make(get: function ($_, $attributes) {
 
-            if ($attributes['profile_picture_path'] !== null)
+            if ($attributes['profile_picture_path'] !== null) {
                 return $attributes['profile_picture_path'];
+            }
 
-            if (Storage::exists("public/users/{$attributes['id']}.webp"))
+            if (Storage::exists("public/users/{$attributes['id']}.webp")) {
                 return Storage::url("public/users/{$attributes['id']}.webp");
+            }
 
-            if (!Storage::exists("public/users/default_{$attributes['id']}.svg"))
-                (new CreateDefaultProfilePic())->handle(new UserUpdated($this));
+            if (! Storage::exists("public/users/default_{$attributes['id']}.svg")) {
+                (new CreateDefaultProfilePic)->handle(new UserUpdated($this));
+            }
 
             return Storage::url("public/users/default_{$attributes['id']}.svg");
         });

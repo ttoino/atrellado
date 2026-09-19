@@ -2,26 +2,27 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-
 use App\Models\Project;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
-class ProjectSeeder extends Seeder {
-
+class ProjectSeeder extends Seeder
+{
     const NORMAL_COUNT = 30;
+
     const ARCHIVED_COUNT = 5;
 
     const COORDINATOR_COUNT = 10;
 
-    const PROJECT_MEMBER_RATIO = 2/5;
+    const PROJECT_MEMBER_RATIO = 2 / 5;
 
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run() {
+    public function run()
+    {
         $coordinators = User::factory()
             ->sequence(
                 fn ($sequence) => ['email' => "coordinator$sequence->index@example.com"]

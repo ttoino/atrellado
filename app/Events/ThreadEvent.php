@@ -7,7 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class ThreadEvent {
+abstract class ThreadEvent
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Thread $thread;
@@ -17,7 +18,8 @@ abstract class ThreadEvent {
      *
      * @return void
      */
-    public function __construct(Thread $thread) {
+    public function __construct(Thread $thread)
+    {
         $this->thread = $thread;
     }
 }

@@ -3,12 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\Thread;
-use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ThreadNew extends Notification {
+class ThreadNew extends Notification
+{
     public Thread $thread;
 
     /**
@@ -16,7 +14,8 @@ class ThreadNew extends Notification {
      *
      * @return void
      */
-    public function __construct(Thread $thread) {
+    public function __construct(Thread $thread)
+    {
         $this->thread = $thread;
     }
 
@@ -26,9 +25,10 @@ class ThreadNew extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -36,13 +36,14 @@ class ThreadNew extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line($this->thread->author->name . "has opened a thread in project " . $this->thread->project->name . ".")
-                    ->action('View the thread', route('project.thread', ['project' => $this->thread->project, 'thread' => $this->thread]))
-                    ->line('Thank you for using our application!');
+            ->line($this->thread->author->name.'has opened a thread in project '.$this->thread->project->name.'.')
+            ->action('View the thread', route('project.thread', ['project' => $this->thread->project, 'thread' => $this->thread]))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -51,9 +52,10 @@ class ThreadNew extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
-            'thread' => $this->thread
+            'thread' => $this->thread,
         ];
     }
 }

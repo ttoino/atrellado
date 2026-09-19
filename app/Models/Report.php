@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Casts\Datetime;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Report extends Model {
+class Report extends Model
+{
     public $timestamps = false;
 
     /**
@@ -15,7 +15,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = [
-        'reason'
+        'reason',
     ];
 
     /**
@@ -25,21 +25,25 @@ class Report extends Model {
      */
     protected $hidden = [];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
-            'creation_date' => Datetime::class
+            'creation_date' => Datetime::class,
         ];
     }
 
-    public function project() {
+    public function project()
+    {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'user_profile_id');
     }
 
-    public function creator() {
+    public function creator()
+    {
         return $this->belongsTo(User::class, 'creator_id')->withDefault(User::DELETED_USER);
     }
 

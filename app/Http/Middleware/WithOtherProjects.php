@@ -4,18 +4,21 @@ namespace App\Http\Middleware;
 
 use App\Models\Project;
 use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\View;
 
-class WithOtherProjects {
+class WithOtherProjects
+{
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @param  Closure(Request): (Response|RedirectResponse)  $next
+     * @return Response|RedirectResponse
      */
-    public function handle(Request $request, Closure $next) {
+    public function handle(Request $request, Closure $next)
+    {
 
         // we had an issue where rendering views directly was causing errors to be thrown because of Laravel's implicit binding system
         // this should now be 'useless' but keep it as a fail-safe

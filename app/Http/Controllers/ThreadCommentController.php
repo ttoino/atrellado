@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ThreadComment;
 use App\Models\Thread;
+use App\Models\ThreadComment;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
-class ThreadCommentController extends Controller {
+class ThreadCommentController extends Controller
+{
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index(Request $request) {
-        
+    public function index(Request $request)
+    {
+
         $threadId = $request->query('thread_id');
 
         $thread = Thread::findOrFail($threadId);
@@ -29,9 +32,10 @@ class ThreadCommentController extends Controller {
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $this->threadCommentCreationValidator($request)->validate();
 
         $thread = Thread::findOrFail($request->input('thread_id'));
@@ -44,16 +48,18 @@ class ThreadCommentController extends Controller {
         return response()->json($threadComment);
     }
 
-    public function threadCommentCreationValidator(Request $request) {
+    public function threadCommentCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'content' => 'required|string|min:0|max:512',
             'thread_id' => 'required|integer',
         ]);
     }
 
-    public function createThreadComment(Request $request, Thread $thread) {
+    public function createThreadComment(Request $request, Thread $thread)
+    {
 
-        $threadComment = new ThreadComment();
+        $threadComment = new ThreadComment;
 
         $data = $request->only(['content']);
 
@@ -69,10 +75,10 @@ class ThreadCommentController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\ThreadComment  $threadComment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show(Request $request, ThreadComment $threadComment) {
+    public function show(Request $request, ThreadComment $threadComment)
+    {
         $this->authorize('view', [$threadComment]);
 
         return response()->json($threadComment);
@@ -81,11 +87,10 @@ class ThreadCommentController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\ThreadComment  $threadComment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function update(Request $request, ThreadComment $threadComment) {
+    public function update(Request $request, ThreadComment $threadComment)
+    {
 
         $this->threadCommentEditionValidator($request)->validate();
 
@@ -100,18 +105,21 @@ class ThreadCommentController extends Controller {
 
     }
 
-    public function threadCommentEditionValidator(Request $request) {
+    public function threadCommentEditionValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'content' => 'string|min:0|max:512',
         ]);
     }
 
-    public function updateThreadComment(ThreadComment $threadComment, Request $request) {
+    public function updateThreadComment(ThreadComment $threadComment, Request $request)
+    {
 
         $data = $request->all(['content']);
 
-        if (($data['content'] ??= null) !== null)
+        if (($data['content'] ??= null) !== null) {
             $threadComment->content = $data['content'];
+        }
 
         $threadComment->save();
 
@@ -121,10 +129,10 @@ class ThreadCommentController extends Controller {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\ThreadComment  $threadComment
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function destroy(ThreadComment $threadComment) {
+    public function destroy(ThreadComment $threadComment)
+    {
 
         $this->authorize('edit', $threadComment->thread->project);
         $this->authorize('delete', $threadComment);

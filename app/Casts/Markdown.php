@@ -3,35 +3,35 @@
 namespace App\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 
-class Markdown implements CastsAttributes {
+class Markdown implements CastsAttributes
+{
     /**
      * Cast the given value.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $key
+     * @param  Model  $model
      * @param  mixed  $value
-     * @param  array  $attributes
      * @return mixed
      */
-    public function get($model, string $key, $value, array $attributes) {
+    public function get($model, string $key, $value, array $attributes)
+    {
         return [
             'raw' => $value ?? '',
-            'formatted' => app(MarkdownRenderer::class)->toHtml($value ?? '')
+            'formatted' => app(MarkdownRenderer::class)->toHtml($value ?? ''),
         ];
     }
 
     /**
      * Prepare the given value for storage.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string  $key
+     * @param  Model  $model
      * @param  mixed  $value
-     * @param  array  $attributes
      * @return mixed
      */
-    public function set($model, string $key, $value, array $attributes) {
-        return is_array($value) ? $value['raw'] : $value ;
+    public function set($model, string $key, $value, array $attributes)
+    {
+        return is_array($value) ? $value['raw'] : $value;
     }
 }

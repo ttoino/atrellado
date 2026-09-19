@@ -2,15 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use App\Models\Tag;
-
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tag>
+ * @extends Factory<Tag>
  */
-class TagFactory extends Factory {
-
+class TagFactory extends Factory
+{
     const TAG_WITH_DESCRIPTION_PERCENTAGE = 0.4;
 
     /**
@@ -18,11 +17,12 @@ class TagFactory extends Factory {
      *
      * @return array<string, mixed>
      */
-    public function definition() {
+    public function definition()
+    {
         return [
             'title' => $this->faker->title,
             'description' => $this->faker->optional(TagFactory::TAG_WITH_DESCRIPTION_PERCENTAGE)->sentence,
-            'color' => hexdec($this->faker->hexColor)
+            'color' => hexdec($this->faker->hexColor),
         ];
     }
 

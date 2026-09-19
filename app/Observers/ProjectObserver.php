@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\DB;
 
 // Port of the coordinator-membership PL/pgSQL triggers. insertOrIgnore
 // keeps a coordinator who is already an explicit member untouched.
-class ProjectObserver {
-
-    public function created(Project $project): void {
+class ProjectObserver
+{
+    public function created(Project $project): void
+    {
         DB::table('project_member')->insertOrIgnore([
             'user_profile_id' => $project->coordinator_id,
             'project_id' => $project->id,
@@ -17,8 +18,9 @@ class ProjectObserver {
         ]);
     }
 
-    public function updating(Project $project): void {
-        if (!$project->isDirty('coordinator_id')) {
+    public function updating(Project $project): void
+    {
+        if (! $project->isDirty('coordinator_id')) {
             return;
         }
         DB::table('project_member')

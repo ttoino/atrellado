@@ -168,7 +168,7 @@ return [
     |
     */
 
-    # use this to force HTTPS on production servers
+    // use this to force HTTPS on production servers
     'secure' => env('APP_ENV') === 'production' ? true : env('SESSION_SECURE_COOKIE'),
 
     /*

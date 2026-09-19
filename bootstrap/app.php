@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\WithOtherProjects;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Middleware\TrustHosts;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Session\Middleware\AuthenticateSession;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -16,13 +25,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // Old Http\Kernel stack, framework classes only. TrustHosts keeps
         // its default (all subdomains of the app URL).
         $middleware->use([
-            \Illuminate\Http\Middleware\TrustHosts::class,
-            \Illuminate\Http\Middleware\TrustProxies::class,
-            \Illuminate\Http\Middleware\HandleCors::class,
-            \Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class,
-            \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-            \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
-            \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+            TrustHosts::class,
+            TrustProxies::class,
+            HandleCors::class,
+            PreventRequestsDuringMaintenance::class,
+            ValidatePostSize::class,
+            TrimStrings::class,
+            ConvertEmptyStringsToNull::class,
         ]);
 
         $middleware->trustProxies(at: '*');
@@ -38,8 +47,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'isAdmin' => \App\Http\Middleware\IsAdmin::class,
-            'withOtherProjects' => \App\Http\Middleware\WithOtherProjects::class,
+            'isAdmin' => IsAdmin::class,
+            'withOtherProjects' => WithOtherProjects::class,
         ]);
 
         $middleware->redirectGuestsTo('/login');

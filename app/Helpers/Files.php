@@ -5,19 +5,23 @@ namespace App\Helpers;
 use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 
-class Files {
-    public static function convertToWebp(File|UploadedFile $file, int $size, float|int $aspect_ratio = 0): bool {
+class Files
+{
+    public static function convertToWebp(File|UploadedFile $file, int $size, float|int $aspect_ratio = 0): bool
+    {
         $image = imagecreatefromstring($file->getContent());
 
-        if ($image === false)
+        if ($image === false) {
             return false;
+        }
 
         $original_width = imagesx($image); // width of the original image
         $original_height = imagesy($image); // height of the original image
         $original_aspect_ratio = $original_width / $original_height;
 
-        if ($aspect_ratio <= 0)
+        if ($aspect_ratio <= 0) {
             $aspect_ratio = $original_aspect_ratio;
+        }
 
         if ($aspect_ratio > 1) {
             $dest_width = min($size, $original_width);

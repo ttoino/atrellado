@@ -2,15 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Database\Seeder;
 
-class UserSeeder extends Seeder {
-
+class UserSeeder extends Seeder
+{
     const ADMIN_COUNT = 5;
+
     const BLOCKED_COUNT = 25;
+
     const NORMAL_COUNT = 600;
 
     /**
@@ -18,17 +19,18 @@ class UserSeeder extends Seeder {
      *
      * @return void
      */
-    public function run() {
+    public function run()
+    {
         User::factory()->admin()->verified()->state(new Sequence(
-            fn ($sequence) => [ 'email' => "admin$sequence->index@example.com" ]
+            fn ($sequence) => ['email' => "admin$sequence->index@example.com"]
         ))->count(UserSeeder::ADMIN_COUNT)->create();
-        
+
         User::factory()->verified()->state(new Sequence(
-            fn ($sequence) => [ 'email' => "user$sequence->index@example.com" ]
+            fn ($sequence) => ['email' => "user$sequence->index@example.com"]
         ))->count(UserSeeder::NORMAL_COUNT)->create();
 
         User::factory()->blocked()->verified()->state(new Sequence(
-            fn ($sequence) => [ 'email' => "blocked$sequence->index@example.com" ]
+            fn ($sequence) => ['email' => "blocked$sequence->index@example.com"]
         ))->count(UserSeeder::BLOCKED_COUNT)->create();
     }
 }

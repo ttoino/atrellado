@@ -2,5 +2,4 @@
 
 namespace App\Events;
 
-class ThreadCommentCreated extends ThreadCommentEvent {
-}
+class ThreadCommentCreated extends ThreadCommentEvent {}

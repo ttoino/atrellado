@@ -7,7 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class ProjectEvent {
+abstract class ProjectEvent
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Project $project;
@@ -17,7 +18,8 @@ abstract class ProjectEvent {
      *
      * @return void
      */
-    public function __construct(Project $project) {
+    public function __construct(Project $project)
+    {
         $this->project = $project;
     }
 }

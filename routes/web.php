@@ -12,8 +12,13 @@
 */
 // Home
 
-use Illuminate\Support\Facades\Route;
+use App\Enums\ProviderType;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OAuthController;
+use App\Http\Controllers\Auth\PasswordRecoveryController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
@@ -25,12 +30,7 @@ use App\Http\Controllers\TaskGroupController;
 use App\Http\Controllers\ThreadCommentController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\EmailVerificationController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\OAuthController;
-use App\Http\Controllers\Auth\PasswordRecoveryController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Enums\ProviderType;
+use Illuminate\Support\Facades\Route;
 
 Route::get('', [HomeController::class, 'show'])->name('home');
 
@@ -57,7 +57,7 @@ Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->control
 
 Route::get('/notifications', [UserController::class, 'showNotifications'])->middleware(['auth', 'verified'])->name('notifications');
 
-// Project 
+// Project
 Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->controller(ProjectController::class)->group(function () {
     Route::get('', 'index')->name('.list');
 
@@ -74,7 +74,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
             Route::post('', 'report')->name('.report-action');
         });
 
-        Route::redirect('', "/project/{project}/board")->name('');
+        Route::redirect('', '/project/{project}/board')->name('');
 
         Route::get('/info', 'showProjectInfo')->name('.info');
         Route::get('/members', 'getProjectMembers')->name('.members');
@@ -86,7 +86,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 
         // This breaks the HTTP standard since a GET request is changing server state (a project's members). However this should only be changed if this application scales
         Route::get('/join', 'joinProject')->name('.join')->middleware('signed');
-        
+
         Route::post('/delete', 'destroy')->name('.delete');
 
         Route::prefix('/task')->name('.task')->controller(TaskController::class)->group(function () {
@@ -106,16 +106,16 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 // Admin
 Route::prefix('/admin')->middleware(['auth', 'isAdmin', 'verified'])->name('admin')->controller(AdminController::class)->group(function () {
     Route::redirect('', '/admin/users')->name('');
-    
+
     Route::get('/users', 'listUsers')->name('.users');
-        
+
     Route::get('/projects', 'listProjects')->name('.projects');
-    
+
     Route::prefix('/create')->name('.create')->group(function () {
         Route::get('/user', 'showCreateUser')->name('.user');
         Route::post('/user', 'createUser')->name('.user-action');
     });
-    
+
     Route::prefix('/reports')->name('.reports')->group(function () {
         Route::get('/user/{user}', 'showUserReports')->name('.user');
         Route::get('/project/{project}', 'showProjectReports')->name('.project');
@@ -194,8 +194,8 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
     });
 
     Route::prefix('/user')->name('.user')->middleware('verified')->controller(UserController::class)->group(function () {
-        
-        Route::post('', 'store')->name('.new');      
+
+        Route::post('', 'store')->name('.new');
 
         Route::prefix('/{user}')->where(['user', '[0-9]+'])->group(function () {
             Route::delete('', 'destroy')->name('.delete');
@@ -231,7 +231,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
-        
+
         Route::prefix('/{taskComment}')->where(['taskComment', '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
@@ -241,9 +241,9 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
     });
 
     Route::prefix('/task-group')->name('.task-group')->middleware('verified')->controller(TaskGroupController::class)->group(function () {
-        
+
         Route::post('/new', 'store')->name('.new');
-        
+
         Route::prefix('/{taskGroup}')->where(['taskGroup', '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
@@ -257,7 +257,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
     Route::prefix('/thread')->name('.thread')->middleware('verified')->controller(ThreadController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
-        
+
         Route::prefix('/{thread}')->where(['thread', '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
@@ -270,7 +270,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
 
         Route::post('/new', 'store')->name('.new');
         Route::get('', 'index')->name('list');
-        
+
         Route::prefix('/{threadComment}')->where(['threadComment', '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');
@@ -282,7 +282,7 @@ Route::prefix('/api')->name('api')->middleware('throttle')->group(function () {
     Route::prefix('/tag')->name('.tag')->middleware('verified')->controller(TagController::class)->group(function () {
 
         Route::post('/new', 'store')->name('.new');
-        
+
         Route::prefix('/{tag}')->where(['tag', '[0-9]+'])->group(function () {
 
             Route::get('', 'show')->name('');

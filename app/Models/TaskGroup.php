@@ -3,18 +3,20 @@
 namespace App\Models;
 
 use App\Casts\Datetime;
-use Illuminate\Database\Eloquent\Model;
+use App\Observers\TaskGroupObserver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class TaskGroup extends Model {
-
+class TaskGroup extends Model
+{
     use HasFactory;
 
     public $timestamps = false;
 
     // Sibling-position bookkeeping ported from the PL/pgSQL triggers.
-    protected static function booted(): void {
-        static::observe(\App\Observers\TaskGroupObserver::class);
+    protected static function booted(): void
+    {
+        static::observe(TaskGroupObserver::class);
     }
 
     /**
@@ -25,7 +27,7 @@ class TaskGroup extends Model {
     protected $fillable = [
         'name',
         'description',
-        'position'
+        'position',
     ];
 
     /**
@@ -36,14 +38,16 @@ class TaskGroup extends Model {
     protected $hidden = [];
 
     protected $casts = [
-        'creation_date' => Datetime::class
+        'creation_date' => Datetime::class,
     ];
 
-    public function project() {
+    public function project()
+    {
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function tasks() {
+    public function tasks()
+    {
         return $this->hasMany(
             Task::class,
             'task_group_id'

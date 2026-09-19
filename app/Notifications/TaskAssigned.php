@@ -4,12 +4,12 @@ namespace App\Notifications;
 
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class TaskAssigned extends Notification {
+class TaskAssigned extends Notification
+{
     public Task $task;
+
     public User $assigner;
 
     /**
@@ -17,7 +17,8 @@ class TaskAssigned extends Notification {
      *
      * @return void
      */
-    public function __construct(Task $task, User $assigner) {
+    public function __construct(Task $task, User $assigner)
+    {
         $this->task = $task;
         $this->assigner = $assigner;
     }
@@ -28,9 +29,10 @@ class TaskAssigned extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -38,13 +40,14 @@ class TaskAssigned extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line("You've been assigned to a task in " . $this->task->project()->name . " by " . $this->assigner->name .  ".")
-                    ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
-                    ->line('Thank you for using our application!');
+            ->line("You've been assigned to a task in ".$this->task->project()->name.' by '.$this->assigner->name.'.')
+            ->action('View the task', route('project.task.info', ['project' => $this->task->project, 'task' => $this->task]))
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -53,7 +56,8 @@ class TaskAssigned extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
             'task' => $this->task,
             'assigner' => $this->assigner,

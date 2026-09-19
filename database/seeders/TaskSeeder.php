@@ -2,20 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-
 use App\Models\Project;
 use App\Models\Task;
+use Illuminate\Database\Seeder;
 
-class TaskSeeder extends Seeder {
-
+class TaskSeeder extends Seeder
+{
     const MIN_TASKS_PER_GROUP = 1;
+
     const MAX_TASKS_PER_GROUP = 5;
 
     const MIN_ASSIGNEES_PER_TASK = 0;
+
     const MAX_ASSIGNEES_PER_TASK = 2;
 
     const MIN_TAGS_PER_TASK = 0;
+
     const MAX_TAGS_PER_TASK = 3;
 
     /**
@@ -23,8 +25,9 @@ class TaskSeeder extends Seeder {
      *
      * @return void
      */
-    public function run() {
-        
+    public function run()
+    {
+
         $faker = fake();
 
         $projects = Project::all();
@@ -36,12 +39,12 @@ class TaskSeeder extends Seeder {
             $projectTags = $project->tags;
 
             $assigneeGenerator = fn () => $projectMembers->random($faker->numberBetween(
-                TaskSeeder::MIN_ASSIGNEES_PER_TASK, 
+                TaskSeeder::MIN_ASSIGNEES_PER_TASK,
                 min(TaskSeeder::MAX_ASSIGNEES_PER_TASK, $projectMembers->count())
             ));
 
             $tagGenerator = fn () => $projectTags->random($faker->numberBetween(
-                TaskSeeder::MIN_TAGS_PER_TASK, 
+                TaskSeeder::MIN_TAGS_PER_TASK,
                 min(TaskSeeder::MAX_TAGS_PER_TASK, $projectTags->count())
             ));
 

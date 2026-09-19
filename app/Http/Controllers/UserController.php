@@ -4,25 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Files;
 use App\Models\Report;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\Rules\File;
-use Illuminate\Validation\Rule;
-
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Password;
 
-class UserController extends Controller {
-
+class UserController extends Controller
+{
     /**
      * Shows the user profile of the user identified by the argument id.
-     * 
-     * @param int $id the id of the user to show
+     *
+     * @param  int  $id  the id of the user to show
      */
-    public function show(Request $request, User $user) {
+    public function show(Request $request, User $user)
+    {
         $this->authorize('view', $user);
 
         return $request->wantsJson()
@@ -30,7 +28,8 @@ class UserController extends Controller {
             : response()->view('pages.profile', ['user' => $user]);
     }
 
-    public function showNotifications(Request $request) {
+    public function showNotifications(Request $request)
+    {
 
         $user = $request->user();
 
@@ -43,11 +42,12 @@ class UserController extends Controller {
 
     /**
      * Register a new user.
-     * This endpoint is API only. 
+     * This endpoint is API only.
      *
      * @return User The user registered.
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $this->userCreationValidator($request)->validate();
 
@@ -56,23 +56,25 @@ class UserController extends Controller {
         return response()->json($user->toArray(), 201);
     }
 
-    public function storeUser(Request $request) {
-        
+    public function storeUser(Request $request)
+    {
+
         $data = $request->all();
-        
-        $user = new User();
+
+        $user = new User;
 
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->password = $data['password'];
-        $user->is_blocked = $data['is_blocked'] ?? FALSE;
-        $user->is_admin = $data['is_admin'] ?? FALSE;
+        $user->is_blocked = $data['is_blocked'] ?? false;
+        $user->is_admin = $data['is_admin'] ?? false;
         $user->save();
 
         return $user;
     }
 
-    public function userCreationValidator(Request $request) {
+    public function userCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'name' => 'required|string|min:6|max:255',
             'email' => 'required|string|email|unique:user_profile',
@@ -80,14 +82,15 @@ class UserController extends Controller {
                 'required',
                 'confirmed',
                 Password::min(8)
-                    ->letters()
+                    ->letters(),
             ],
             'is_blocked' => 'boolean',
-            'is_admin' => 'boolean'
+            'is_admin' => 'boolean',
         ]);
     }
 
-    public function update(Request $request, User $user) {
+    public function update(Request $request, User $user)
+    {
 
         $this->userEditionValidator($request)->validate();
 
@@ -100,36 +103,41 @@ class UserController extends Controller {
             : redirect()->route('user.profile', ['user' => $user]);
     }
 
-    public function updateUser(User $user, Request $request) {
+    public function updateUser(User $user, Request $request)
+    {
 
         $data = $request->all();
 
-        if (($data['name'] ??= null) !== null)
+        if (($data['name'] ??= null) !== null) {
             $user->name = $data['name'];
+        }
 
         if (isset($data['profile_picture'])) {
             Files::convertToWebp($data['profile_picture'], 512, 1);
 
             // TODO: change this to use accessor
-            $path = Storage::putFileAs("public/users/", $data['profile_picture'], "$user->id.webp");
+            $path = Storage::putFileAs('public/users/', $data['profile_picture'], "$user->id.webp");
 
             if ($path === false) {
                 // TODO: handle file upload err
             }
         }
 
-        if (($data['is_admin'] ??= null) !== null)
+        if (($data['is_admin'] ??= null) !== null) {
             $user->is_admin = $data['is_admin'];
+        }
 
-        if (($data['is_blocked'] ??= null) !== null)
+        if (($data['is_blocked'] ??= null) !== null) {
             $user->is_blocked = $data['is_blocked'];
+        }
 
         $user->save();
 
         return $user;
     }
 
-    protected function userEditionValidator(Request $request) {
+    protected function userEditionValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'name' => 'string|min:6|max:255',
             'profile_picture' => [
@@ -137,20 +145,22 @@ class UserController extends Controller {
                     ->max(5 * 1024)
                     // Compressed size says nothing about the decoded
                     // bitmap; cap dimensions so GD decodes stay bounded.
-                    ->dimensions(Rule::dimensions()->maxWidth(4000)->maxHeight(4000))
+                    ->dimensions(Rule::dimensions()->maxWidth(4000)->maxHeight(4000)),
             ],
             'is_blocked' => 'boolean',
-            'is_admin' => 'boolean'
+            'is_admin' => 'boolean',
         ]);
     }
 
-    public function edit(User $user) {
+    public function edit(User $user)
+    {
         $this->authorize('showProfileEditPage', $user);
 
         return response()->view('pages.profile.edit', ['user' => $user]);
     }
 
-    public function block(Request $request, User $user) {
+    public function block(Request $request, User $user)
+    {
         $this->authorize('block', $user);
 
         $user->blocked = true;
@@ -161,7 +171,8 @@ class UserController extends Controller {
             : redirect()->route('home');
     }
 
-    public function unblock(Request $request, User $user) {
+    public function unblock(Request $request, User $user)
+    {
         $this->authorize('unblock', $user);
 
         $user->blocked = false;
@@ -172,18 +183,20 @@ class UserController extends Controller {
             : redirect()->route('home');
     }
 
-    public function showReportForm(User $user) {
+    public function showReportForm(User $user)
+    {
         $this->authorize('report', $user);
 
         return view('pages.reportuser', ['user' => $user]);
     }
 
-    public function report(Request $request, User $user) {
+    public function report(Request $request, User $user)
+    {
         $this->reportValidator($request);
 
         $this->authorize('report', $user);
 
-        $report = new Report();
+        $report = new Report;
 
         $report->reason = $request->input('reason');
         $report->user_profile_id = $user->id;
@@ -193,13 +206,15 @@ class UserController extends Controller {
         return redirect()->route('user.profile', ['user' => $user]);
     }
 
-    protected function reportValidator(Request $request) {
+    protected function reportValidator(Request $request)
+    {
         return Validator::make($request->all(), [
-            'reason' => 'string|min:6|max:512'
+            'reason' => 'string|min:6|max:512',
         ]);
     }
 
-    public function destroy(Request $request, User $user) {
+    public function destroy(Request $request, User $user)
+    {
         $this->authorize('delete', $user);
 
         $user->delete();

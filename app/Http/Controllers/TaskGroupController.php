@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\TaskGroup;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
-class TaskGroupController extends Controller {
-
-    public function show(Request $request, TaskGroup $taskGroup) {
+class TaskGroupController extends Controller
+{
+    public function show(Request $request, TaskGroup $taskGroup)
+    {
 
         $this->authorize('view', $taskGroup);
 
@@ -19,9 +21,10 @@ class TaskGroupController extends Controller {
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $this->taskGroupCreationValidator($request)->validate();
 
         $project = Project::findOrFail($request->input('project_id'));
@@ -36,9 +39,10 @@ class TaskGroupController extends Controller {
             : redirect()->route('project', ['project' => $project]);
     }
 
-    public function createTaskGroup(Request $request, Project $project) {
+    public function createTaskGroup(Request $request, Project $project)
+    {
 
-        $taskGroup = new TaskGroup();
+        $taskGroup = new TaskGroup;
         $data = $request->only(['name']);
 
         $taskGroup->name = $data['name'];
@@ -55,15 +59,17 @@ class TaskGroupController extends Controller {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function taskGroupCreationValidator(Request $request) {
+    protected function taskGroupCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'name' => 'required|string|min:4|max:255',
             'description' => 'string|min:6|max:512',
-            'project_id' => 'required|integer'
+            'project_id' => 'required|integer',
         ]);
     }
 
-    public function update(Request $request, TaskGroup $taskGroup) {
+    public function update(Request $request, TaskGroup $taskGroup)
+    {
 
         $this->taskGroupUpdateValidator($request)->validate();
 
@@ -75,7 +81,8 @@ class TaskGroupController extends Controller {
         return response()->json($taskGroup);
     }
 
-    protected function taskGroupUpdateValidator(Request $request) {
+    protected function taskGroupUpdateValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'position' => 'integer|min:0',
             'name' => 'string|min:4|max:255',
@@ -83,24 +90,30 @@ class TaskGroupController extends Controller {
         ]);
     }
 
-    public function updateTaskGroup(TaskGroup $taskGroup, Request $request) {
+    public function updateTaskGroup(TaskGroup $taskGroup, Request $request)
+    {
 
         $data = $request->all();
 
-        if (($data['position'] ??= null) !== null)
+        if (($data['position'] ??= null) !== null) {
             $taskGroup->position = $data['position'];
-        
-        if (($data['name'] ??= null) !== null)
+        }
+
+        if (($data['name'] ??= null) !== null) {
             $taskGroup->name = $data['name'];
-        
-        if (($data['description'] ??= null) !== null)
+        }
+
+        if (($data['description'] ??= null) !== null) {
             $taskGroup->description = $data['description'];
+        }
 
         $taskGroup->save();
+
         return $taskGroup;
     }
 
-    public function destroy(Request $request, TaskGroup $taskGroup) {
+    public function destroy(Request $request, TaskGroup $taskGroup)
+    {
 
         $this->authorize('delete', $taskGroup);
         $taskGroup->delete();

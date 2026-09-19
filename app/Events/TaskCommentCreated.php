@@ -2,5 +2,4 @@
 
 namespace App\Events;
 
-class TaskCommentCreated extends TaskCommentEvent {
-}
+class TaskCommentCreated extends TaskCommentEvent {}

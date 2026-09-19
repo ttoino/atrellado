@@ -2,28 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Thread;
 use App\Models\Project;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Thread;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
-class ThreadController extends Controller {
+class ThreadController extends Controller
+{
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index() {
+    public function index()
+    {
         //
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function create(Request $request, Project $project) {
+    public function create(Request $request, Project $project)
+    {
         $this->authorize('viewCreationForm', [Thread::class, $project]);
 
         return response()->view('pages.project.forum.new', ['project' => $project]);
@@ -32,10 +35,10 @@ class ThreadController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $this->threadCreationValidator($request)->validate();
 
         $project = Project::findOrFail($request->input('project_id'));
@@ -50,9 +53,10 @@ class ThreadController extends Controller {
             : redirect()->route('project.thread', ['project' => $project, 'thread' => $thread]);
     }
 
-    public function createThread(Request $request, Project $project) {
+    public function createThread(Request $request, Project $project)
+    {
 
-        $thread = new Thread();
+        $thread = new Thread;
         $data = $request->only(['title', 'content']);
 
         $thread->title = $data['title'];
@@ -64,7 +68,8 @@ class ThreadController extends Controller {
         return $thread->fresh();
     }
 
-    public function threadCreationValidator(Request $request) {
+    public function threadCreationValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'title' => 'required|string|min:6|max:50',
             'content' => 'required|string|min:6|max:512',
@@ -74,10 +79,10 @@ class ThreadController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show(Request $request, Project $project, Thread $thread) {
+    public function show(Request $request, Project $project, Thread $thread)
+    {
 
         $this->authorize('view', $thread);
 
@@ -91,11 +96,10 @@ class ThreadController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function update(Request $request, Thread $thread) {
+    public function update(Request $request, Thread $thread)
+    {
 
         $this->threadEditionValidator($request)->validate();
 
@@ -107,22 +111,26 @@ class ThreadController extends Controller {
         return response()->json($thread);
     }
 
-    public function threadEditionValidator(Request $request) {
+    public function threadEditionValidator(Request $request)
+    {
         return Validator::make($request->all(), [
             'title' => 'string|min:6|max:50',
             'content' => 'string|min:6|max:512',
         ]);
     }
 
-    public function editThread(Thread $thread, Request $request) {
+    public function editThread(Thread $thread, Request $request)
+    {
 
         $data = $request->only(['title', 'content']);
 
-        if (($data['title'] ??= null) !== null)
+        if (($data['title'] ??= null) !== null) {
             $thread->title = $data['title'];
+        }
 
-        if (($data['content'] ??= null) !== null)
+        if (($data['content'] ??= null) !== null) {
             $thread->content = $data['content'];
+        }
 
         $thread->save();
 
@@ -132,10 +140,10 @@ class ThreadController extends Controller {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function destroy(Request $request, Thread $thread) {
+    public function destroy(Request $request, Thread $thread)
+    {
 
         $this->authorize('edit', $thread->project);
         $this->authorize('delete', $thread);

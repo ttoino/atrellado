@@ -7,7 +7,8 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-abstract class UserEvent {
+abstract class UserEvent
+{
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public User $user;
@@ -17,7 +18,8 @@ abstract class UserEvent {
      *
      * @return void
      */
-    public function __construct(User $user) {
+    public function __construct(User $user)
+    {
         $this->user = $user;
     }
 }

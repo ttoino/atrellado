@@ -3,11 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\Project;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class ProjectRemoved extends Notification {
+class ProjectRemoved extends Notification
+{
     public Project $project;
 
     /**
@@ -15,19 +14,22 @@ class ProjectRemoved extends Notification {
      *
      * @return void
      */
-    public function __construct(Project $project) {
+    public function __construct(Project $project)
+    {
         $this->project = $project;
     }
+
     /**
      * Get the notification's delivery channels.
      *
      * @param  mixed  $notifiable
      * @return array
      */
-    public function via($notifiable) {
+    public function via($notifiable)
+    {
         return [
             // 'mail',
-            CustomDatabaseChannel::class
+            CustomDatabaseChannel::class,
         ];
     }
 
@@ -35,12 +37,13 @@ class ProjectRemoved extends Notification {
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
-    public function toMail($notifiable) {
+    public function toMail($notifiable)
+    {
         return (new MailMessage)
-                    ->line("You've been removed from project - " . $this->project->name . ".")
-                    ->line('Thank you for using our application!');
+            ->line("You've been removed from project - ".$this->project->name.'.')
+            ->line('Thank you for using our application!');
     }
 
     /**
@@ -49,9 +52,10 @@ class ProjectRemoved extends Notification {
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toArray($notifiable) {
+    public function toArray($notifiable)
+    {
         return [
-            'project' => $this->project
+            'project' => $this->project,
         ];
     }
 }

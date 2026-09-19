@@ -5,21 +5,24 @@ namespace App\Models;
 use App\Casts\Datetime;
 use App\Casts\Markdown;
 use App\Events\ThreadCreated;
+use App\Observers\ThreadObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Spatie\LaravelMarkdown\MarkdownRenderer;
 
-class Thread extends Model {
+class Thread extends Model
+{
     use HasFactory;
 
     // Author-membership validation ported from the PL/pgSQL triggers.
-    protected static function booted(): void {
-        static::observe(\App\Observers\ThreadObserver::class);
+    protected static function booted(): void
+    {
+        static::observe(ThreadObserver::class);
     }
 
     const CREATED_AT = 'creation_date';
+
     const UPDATED_AT = 'edit_date';
 
     /**
@@ -29,7 +32,7 @@ class Thread extends Model {
      */
     protected $fillable = [
         'title',
-        'content'
+        'content',
     ];
 
     /**
@@ -44,35 +47,39 @@ class Thread extends Model {
     protected $casts = [
         'creation_date' => Datetime::class,
         'edit_date' => Datetime::class,
-        'content' => Markdown::class
+        'content' => Markdown::class,
     ];
 
     protected $dispatchesEvents = [
-        'created' => ThreadCreated::class
+        'created' => ThreadCreated::class,
     ];
 
     protected $appends = ['editable'];
 
-    public function project() {
+    public function project()
+    {
         return $this->belongsTo(
-                Project::class,
+            Project::class,
             'project_id'
         );
     }
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(
-                ThreadComment::class,
+            ThreadComment::class,
             'thread_id'
         );
     }
 
-    public function author() {
+    public function author()
+    {
         return $this->belongsTo(User::class, 'author_id')->withDefault(User::DELETED_USER);
     }
 
-    protected function editable(): Attribute {
-        return Attribute::make(get: fn() => Auth::user()?->can('update', $this));
+    protected function editable(): Attribute
+    {
+        return Attribute::make(get: fn () => Auth::user()?->can('update', $this));
     }
 
     protected $table = 'thread';
