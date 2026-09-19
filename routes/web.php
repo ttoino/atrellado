@@ -22,7 +22,6 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\StaticController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
@@ -36,8 +35,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('', [HomeController::class, 'show'])->name('home');
 
 // Static
-Route::get('{name}', [StaticController::class, 'show'])
-    ->whereIn('name', StaticController::STATIC_PAGES)->name('static');
+Route::view('/about', 'static.about')->name('static.about');
+Route::view('/contacts', 'static.contacts')->name('static.contacts');
+Route::view('/faq', 'static.faq')->name('static.faq');
+Route::view('/services', 'static.services')->name('static.services');
 
 // User
 Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->controller(UserController::class)->group(function () {
