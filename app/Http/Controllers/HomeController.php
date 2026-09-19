@@ -16,9 +16,8 @@ class HomeController extends Controller
         } elseif ($user->is_admin) {
             return redirect()->route('admin');
         } elseif ($user->is_blocked) {
-            dd('bahhh');
-        } // TODO: implement this
-        else {
+            abort(403);
+        } else {
             return redirect()->route('project.list');
         }
     }
