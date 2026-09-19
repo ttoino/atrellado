@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'email_verified_at' => null,
-            'password' => '$2a$12$HXIQ3hqLzAE/t6Z4.aL1Ne75CR26WL7JESGTuaKmiUF78ZPA13d9e', // password123
+            'password' => 'password123', // hashed by the model cast
             'is_admin' => false,
             'blocked' => false,
             'remember_token' => Str::random(10),
