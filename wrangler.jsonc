@@ -1,0 +1,55 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "atrellado",
+	"account_id": "e024e5a1e487a3d3a07815b431986107",
+	"main": "worker.ts",
+	"compatibility_date": "2026-09-15",
+	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"enabled": true,
+		"logs": { "enabled": true },
+		"traces": { "enabled": true }
+	},
+	"upload_source_maps": true,
+	"containers": [
+		{
+			"class_name": "AtrelladoContainer",
+			"image": "./Dockerfile",
+			"max_instances": 2,
+			"instance_type": "basic"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "CONTAINER",
+				"class_name": "AtrelladoContainer"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["AtrelladoContainer"]
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "atrellado",
+			"database_id": "a4e9158a-a9f2-4a74-afb2-04c13a2df151"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "FILES",
+			"bucket_name": "atrellado"
+		}
+	],
+	"send_email": [
+		{
+			"name": "EMAIL",
+			"allowed_sender_addresses": ["noreply@atrellado.toino.pt"]
+		}
+	]
+}
