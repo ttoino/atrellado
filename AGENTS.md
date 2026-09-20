@@ -28,6 +28,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 - **API resources**: `app/Http/Resources/` serializes the comment/thread models for JSON, adding the request-dependent `editable` flag (the models themselves carry no auth-dependent appends).
 - **Uploads**: profile pictures are bounded at 4000×4000 px by the form request and processed through the `Image` facade (orient → cover 512×512 → webp) in `UserController`.
 - **Observability**: Pulse (admin-gated) in production; Telescope is local-only (`APP_ENV=local` via `AppServiceProvider`).
+- **Livewire migration** (branch `livewire`): interactive pages are being ported one-by-one from the hand-rolled TS stack to class-based Livewire 4 components in `app/Livewire/` (views in `resources/views/livewire/`; class-based so phpstan sees them). Full-page components render through the default `layouts::app` layout — `layouts/app.blade.php` carries a `{{ $slot ?? '' }}` hybrid so it serves both `@extends` pages and Livewire. As each page migrates, its TS module, `/api` endpoints, controller methods and blade partials die with it. Pagination stays on plain cursor links (full reloads); Livewire ships only a Tailwind pagination theme.
 
 ## Code Style
 
@@ -38,6 +39,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 ## Important Files
 
 - `app/Observers/`: Eloquent observers (business triggers)
+- `app/Livewire/`, `resources/views/livewire/`: Livewire components (notifications page migrated; rest pending)
 - `app/Http/Resources/`: JSON serialization (incl. `editable` flag)
 - `database/migrations/`: Schema (driver-agnostic Laravel migrations)
 - `Dockerfile`: Production image (single FrankenPHP artifact, one process per container; `etc/entrypoint.sh` caches config from runtime env then drops to www-data; the service with `RUN_MIGRATIONS=true` migrates on boot)

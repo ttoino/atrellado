@@ -16,7 +16,6 @@ use App\Enums\ProviderType;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskCommentController;
@@ -25,6 +24,7 @@ use App\Http\Controllers\TaskGroupController;
 use App\Http\Controllers\ThreadCommentController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
+use App\Livewire\NotificationsPage;
 use App\Models\Project;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -60,7 +60,7 @@ Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->control
     });
 });
 
-Route::get('/notifications', [UserController::class, 'showNotifications'])->middleware(['auth', 'verified'])->name('notifications');
+Route::livewire('/notifications', NotificationsPage::class)->middleware(['auth', 'verified'])->name('notifications');
 
 // Project
 Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->controller(ProjectController::class)->group(function () {
@@ -214,8 +214,4 @@ Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle']
 
     Route::apiResource('tag', TagController::class)->only(['store', 'show', 'update', 'destroy']);
 
-    Route::prefix('/notifications/{notification}')->controller(NotificationController::class)->group(function () {
-        Route::get('', 'show')->name('notification.show');
-        Route::put('/read', 'markAsRead')->name('notification.mark-read');
-    });
 });

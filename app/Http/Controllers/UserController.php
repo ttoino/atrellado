@@ -25,18 +25,6 @@ class UserController extends Controller
             : response()->view('pages.profile', ['user' => $user]);
     }
 
-    public function showNotifications(Request $request)
-    {
-
-        $user = $request->user();
-
-        $notifications = $user->unreadNotifications()->cursorPaginate(10);
-
-        return $request->wantsJson()
-            ? response()->json($notifications)
-            : response()->view('pages.notifications', ['notifications' => $notifications]);
-    }
-
     /**
      * Register a new user.
      * This endpoint is API only.
