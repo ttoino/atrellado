@@ -8,10 +8,15 @@ if [ -z "$APP_KEY" ]; then
     exit 1
 fi
 
-# Runtime env becomes the cached config; migrations run before traffic.
+# Runtime env becomes the cached config. Only the service with
+# RUN_MIGRATIONS=true (web) migrates; role services just boot.
 php artisan storage:link || true
-php artisan migrate --force
+if [ "$RUN_MIGRATIONS" = "true" ]; then
+    php artisan migrate --force
+fi
 php artisan config:cache
 php artisan event:cache
 
-exec supervisord -c /etc/supervisor/conf.d/atrellado.conf
+# Housekeeping above runs as root (storage:link writes to public/); the
+# service itself runs as www-data, which owns storage/ and bootstrap/cache.
+exec setpriv --reuid=www-data --regid=www-data --init-groups "$@"

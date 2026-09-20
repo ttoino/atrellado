@@ -1,0 +1,53 @@
+# Production stack: one image, one process per container (the dev compose
+# mirrors this shape). Environment (APP_KEY, DB_*, REVERB_*, ...) comes from
+# the platform; the .env file referenced below is for local verification.
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: atrellado:latest
+    env_file: .env
+    environment:
+      RUN_MIGRATIONS: "true"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  reverb:
+    image: atrellado:latest
+    env_file: .env
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080"]
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # Reverb docs: every connection is an open file; raise the container
+    # limit (the container-native equivalent of supervisor's minfds).
+    ulimits:
+      nofile:
+        soft: 10000
+        hard: 10000
+
+  queue:
+    image: atrellado:latest
+    env_file: .env
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3", "--timeout=120"]
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+
+  schedule:
+    image: atrellado:latest
+    env_file: .env
+    command: ["php", "artisan", "schedule:work"]
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
