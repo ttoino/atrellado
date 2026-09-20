@@ -12,6 +12,7 @@
     <div class="d-flex flex-fill overflow-auto">
         @include('partials.project.drawer')
 
+        {{ $slot ?? '' }}
         @yield('project-content')
     </div>
 @endsection

@@ -17,7 +17,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\TagController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskGroupController;
@@ -25,6 +24,10 @@ use App\Http\Controllers\ThreadCommentController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
 use App\Livewire\NotificationsPage;
+use App\Livewire\ProjectInfoPage;
+use App\Livewire\ProjectListPage;
+use App\Livewire\ProjectMembersPage;
+use App\Livewire\ProjectTagsPage;
 use App\Models\Project;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -64,7 +67,7 @@ Route::livewire('/notifications', NotificationsPage::class)->middleware(['auth',
 
 // Project
 Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->controller(ProjectController::class)->group(function () {
-    Route::get('', 'index')->name('.list');
+    Route::livewire('', ProjectListPage::class)->name('.list');
 
     Route::prefix('/new')->group(function () {
         Route::get('', 'create')->name('.new');
@@ -81,9 +84,9 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 
         Route::any('', fn (Project $project) => redirect()->route('project.board', $project))->name('');
 
-        Route::get('/info', 'showProjectInfo')->name('.info');
-        Route::get('/members', 'getProjectMembers')->name('.members');
-        Route::get('/tags', 'getProjectTags')->name('.tags');
+        Route::livewire('/info', ProjectInfoPage::class)->name('.info');
+        Route::livewire('/members', ProjectMembersPage::class)->name('.members');
+        Route::livewire('/tags', ProjectTagsPage::class)->name('.tags');
         Route::get('/board', 'showProjectBoard')->name('.board');
         Route::get('/tasks', 'getProjectTasks')->name('.tasks');
         Route::get('/timeline', 'showProjectTimeline')->name('.timeline');
@@ -159,24 +162,12 @@ Route::middleware('guest')->group(function () {
 
 Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle'])->group(function () {
 
-    Route::apiResource('project', ProjectController::class)->only(['store', 'show', 'update', 'destroy']);
+    Route::apiResource('project', ProjectController::class)->only(['destroy']);
 
     Route::prefix('/project/{project}')->whereNumber('project')->controller(ProjectController::class)->group(function () {
-        Route::put('/archive', 'archive')->name('project.archive');
-        Route::delete('/archive', 'unarchive')->name('project.unarchive');
-
-        Route::post('/leave', 'leaveProject')->name('project.leave');
-
-        Route::get('/members', 'getProjectMembers')->name('project.members');
-        Route::delete('/members/{user}', 'removeUser')->name('project.members.remove');
-
         Route::get('/tags', 'getProjectTags')->name('project.tags');
 
         Route::post('/favorite/toggle', 'toggleFavorite')->name('project.favorite.toggle');
-
-        Route::post('/invite', 'inviteUser')->name('project.invite-user');
-
-        Route::put('/coordinator', 'setCoordinator')->name('project.coordinator');
     });
 
     Route::apiResource('user', UserController::class)->only(['store', 'show', 'update', 'destroy']);
@@ -211,7 +202,5 @@ Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle']
     Route::apiResource('thread-comment', ThreadCommentController::class)
         ->only(['index', 'store', 'show', 'update', 'destroy'])
         ->parameters(['thread-comment' => 'threadComment']);
-
-    Route::apiResource('tag', TagController::class)->only(['store', 'show', 'update', 'destroy']);
 
 });

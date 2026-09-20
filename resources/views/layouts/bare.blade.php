@@ -11,6 +11,8 @@
 
     @hasSection('title')
         <title>@yield('title') - {{ config('app.name', 'Laravel') }}</title>
+    @elseif (isset($title))
+        <title>{{ $title }} - {{ config('app.name', 'Laravel') }}</title>
     @else
         <title>{{ config('app.name', 'Laravel') }}</title>
     @endif

@@ -1,14 +1,6 @@
 import { tryRequest } from "../api";
-import {
-    inviteUser,
-    removeProjectMember,
-    setCoordinator,
-} from "../api/project";
 import { blockUser, deleteUser, unblockUser } from "../api/user";
 import { registerEnhancement } from "../enhancements";
-import { ajaxForm } from "../forms";
-import { projectId } from "../pages/project";
-import { renderToast } from "../toast";
 
 registerEnhancement<HTMLElement>({
     onattach: (el) => {
@@ -16,37 +8,6 @@ registerEnhancement<HTMLElement>({
         const userId = el.dataset.userId;
 
         if (!userId) return;
-
-        const removeUserButton =
-            el.querySelector<HTMLButtonElement>("button.remove-user");
-        removeUserButton?.addEventListener("click", async () => {
-            const result = await tryRequest(
-                removeProjectMember,
-                undefined,
-                projectId,
-                userId,
-            );
-
-            if (result) {
-                el.remove();
-            }
-        });
-
-        const setCoordinatorButton = el.querySelector<HTMLButtonElement>(
-            "button.set-coordinator",
-        );
-        setCoordinatorButton?.addEventListener("click", async () => {
-            const result = await tryRequest(
-                setCoordinator,
-                undefined,
-                projectId,
-                userId,
-            );
-
-            if (result) {
-                window.location.reload();
-            }
-        });
 
         const deleteUserButton =
             el.querySelector<HTMLButtonElement>("button.delete-user");
@@ -81,20 +42,6 @@ registerEnhancement<HTMLElement>({
         });
     },
     selector: "[data-user-id]",
-});
-
-registerEnhancement<HTMLFormElement>({
-    onattach: (el) =>
-        ajaxForm(
-            inviteUser,
-            el,
-            { projectId: projectId },
-            () => {
-                renderToast?.({ text: "Invited user" });
-            },
-            () => {},
-        ),
-    selector: "form.invite-user-form",
 });
 
 // TODO: Move this to user page script
