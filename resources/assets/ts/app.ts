@@ -6,10 +6,6 @@
 
 import "bootstrap";
 
-if (window.location.pathname.match(/project\/\d+\/(board|task\/\d+)/))
-    import("./pages/board");
-
-
 // Enhancements
 import "./enhancements/autoresize";
 import "./enhancements/form";
@@ -19,11 +15,18 @@ import "./enhancements/singleline";
 import "./enhancements/tooltip";
 // Echo + Reverb: boots the websocket client used by the pages' live updates.
 import "./echo";
+// Board drag-and-drop bridge (guards on [data-board] presence).
+import "./board-dnd";
 import { renderToast } from "./toast";
 
 declare global {
     interface Window {
         Livewire?: {
+            dispatch: (event: string, params?: Record<string, unknown>) => void;
+            hook: (
+                name: string,
+                cb: (payload: { el: unknown }) => void,
+            ) => void;
             on: (event: string, cb: (event: unknown) => void) => void;
         };
     }

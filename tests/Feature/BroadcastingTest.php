@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\ProjectForumPage;
+use App\Livewire\TaskOverlay;
 use App\Livewire\ThreadOverlay;
 use App\Models\Thread;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
@@ -112,18 +113,17 @@ it('broadcasts task comment creation on the project channel', function () {
 
     $broadcaster = fakeBroadcaster();
 
-    $response = $this->actingAs($coordinator)->postJson('/api/task-comment', [
-        'content' => 'A live task comment',
-        'task_id' => $task->id,
-    ]);
+    $response = Livewire::actingAs($coordinator)
+        ->test(TaskOverlay::class, ['task' => $task])
+        ->set('newComment', 'A live task comment')
+        ->call('addComment');
 
-    $response->assertCreated();
+    $response->assertHasNoErrors();
 
     expect($broadcaster->broadcasts)->toHaveCount(1)
         ->and($broadcaster->broadcasts[0]['channels'])->toBe(['private-project.'.$project->id])
         ->and($broadcaster->broadcasts[0]['event'])->toBe('task-comment.created')
         ->and($broadcaster->broadcasts[0]['payload'])->toMatchArray([
-            'id' => $response->json('id'),
             'project_id' => $project->id,
             'task_id' => $task->id,
         ]);

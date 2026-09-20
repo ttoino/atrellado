@@ -11,16 +11,6 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    public function showProjectBoard(Request $request, Project $project)
-    {
-
-        $this->authorize('view', $project);
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : response()->view('pages.project.board', ['project' => $project]);
-    }
-
     public function showProjectTimeline(Request $request, Project $project)
     {
         $this->authorize('view', $project);
@@ -90,23 +80,6 @@ class ProjectController extends Controller
         return $project;
     }
 
-    public function toggleFavorite(Request $request, Project $project)
-    {
-
-        $this->authorize('toggleFavorite', $project);
-
-        $member = $project->users()->get()->first(fn (User $user) => $user->id === $request->user()->id);
-
-        // Pivot columns are runtime-magic on the related model; fetch the
-        // loaded pivot relation directly to keep static analysis happy.
-        $pivot = $member->getRelation('pivot');
-
-        $pivot->is_favorite = ! $pivot->is_favorite;
-        $pivot->save();
-
-        return response()->json(['isFavorite' => $pivot->is_favorite]);
-    }
-
     public function destroy(Request $request, Project $project)
     {
 
@@ -151,19 +124,6 @@ class ProjectController extends Controller
         }
 
         return $projectTasks->cursorPaginate(10);
-    }
-
-    public function getProjectTags(Request $request, Project $project)
-    {
-        $this->authorize('getProjectTags', $project);
-
-        $searchTerm = $request->query('q') ?? '';
-
-        $tags = $this->searchTags($project, $searchTerm)->withQueryString();
-
-        return $request->wantsJson()
-            ? response()->json($tags)
-            : response()->view('pages.project.tags', ['tags' => $tags]);
     }
 
     public function searchTags(Project $project, string $search)

@@ -17,15 +17,13 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\OAuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\TaskCommentController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\TaskGroupController;
 use App\Http\Controllers\UserController;
 use App\Livewire\AdminProjectsPage;
 use App\Livewire\AdminUsersPage;
 use App\Livewire\NotificationsPage;
 use App\Livewire\ProfileEditPage;
 use App\Livewire\ProfilePage;
+use App\Livewire\ProjectBoardPage;
 use App\Livewire\ProjectForumPage;
 use App\Livewire\ProjectInfoPage;
 use App\Livewire\ProjectListPage;
@@ -87,7 +85,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
         Route::livewire('/info', ProjectInfoPage::class)->name('.info');
         Route::livewire('/members', ProjectMembersPage::class)->name('.members');
         Route::livewire('/tags', ProjectTagsPage::class)->name('.tags');
-        Route::get('/board', 'showProjectBoard')->name('.board');
+        Route::livewire('/board', ProjectBoardPage::class)->name('.board');
         Route::get('/tasks', 'getProjectTasks')->name('.tasks');
         Route::get('/timeline', 'showProjectTimeline')->name('.timeline');
         Route::livewire('/forum', ProjectForumPage::class)->name('.forum');
@@ -97,11 +95,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 
         Route::post('/delete', 'destroy')->name('.delete');
 
-        Route::prefix('/task')->name('.task')->controller(TaskController::class)->group(function () {
-            Route::prefix('/{task}')->where(['task' => '[0-9]+'])->scopeBindings()->group(function () {
-                Route::get('', 'show')->name('.info');
-            });
-        });
+        Route::livewire('/task/{task}', ProjectBoardPage::class)->scopeBindings()->name('.task.info');
 
         Route::livewire('/thread/{thread}', ProjectForumPage::class)->scopeBindings()->name('.thread');
     });
@@ -154,36 +148,4 @@ Route::middleware('guest')->group(function () {
         Route::get('/verify/{id}/{hash}', VerifyEmailController::class)->middleware('signed')->name('.verify');
         Route::post('/verification-notice', [EmailVerificationNotificationController::class, 'store'])->middleware('throttle:6,1')->name('.send');
     });
-});
-
-Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle'])->group(function () {
-
-    Route::apiResource('project', ProjectController::class)->only(['destroy']);
-
-    Route::prefix('/project/{project}')->whereNumber('project')->controller(ProjectController::class)->group(function () {
-        Route::get('/tags', 'getProjectTags')->name('project.tags');
-
-        Route::post('/favorite/toggle', 'toggleFavorite')->name('project.favorite.toggle');
-    });
-
-    Route::apiResource('task', TaskController::class)->only(['store', 'show', 'update', 'destroy']);
-
-    Route::prefix('/task/{task}')->whereNumber('task')->controller(TaskController::class)->group(function () {
-        Route::put('/complete', 'complete')->name('task.complete');
-        Route::delete('/complete', 'incomplete')->name('task.incomplete');
-        Route::post('/reposition', 'update')->name('task.reposition');
-    });
-
-    Route::apiResource('task-comment', TaskCommentController::class)
-        ->only(['index', 'store', 'show', 'update', 'destroy'])
-        ->parameters(['task-comment' => 'taskComment']);
-
-    Route::apiResource('task-group', TaskGroupController::class)
-        ->only(['store', 'show', 'update', 'destroy'])
-        ->parameters(['task-group' => 'taskGroup']);
-
-    Route::prefix('/task-group/{taskGroup}')->whereNumber('taskGroup')->group(function () {
-        Route::post('/reposition', [TaskGroupController::class, 'update'])->name('task-group.reposition');
-    });
-
 });
