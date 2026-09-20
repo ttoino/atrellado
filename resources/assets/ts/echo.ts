@@ -4,6 +4,14 @@ import Pusher from "pusher-js";
 declare global {
     interface Window {
         Pusher: typeof Pusher;
+        // Injected per-request by layouts/bare from the cached runtime
+        // config; takes precedence over the build-time VITE_REVERB_* vars.
+        reverbConfig?: {
+            host?: string;
+            key?: string;
+            port?: number | string;
+            scheme?: string;
+        };
     }
 }
 
@@ -33,19 +41,27 @@ export interface ThreadCreatedPayload {
 // without a websocket server.
 let echo: Echo<"reverb"> | null = null;
 
-const key: string | undefined = import.meta.env.VITE_REVERB_APP_KEY;
+const runtime = window.reverbConfig;
+
+const key: string | undefined =
+    runtime?.key ?? import.meta.env.VITE_REVERB_APP_KEY;
+const host: string | undefined =
+    runtime?.host ?? import.meta.env.VITE_REVERB_HOST;
+const port: number | undefined =
+    Number(runtime?.port ?? import.meta.env.VITE_REVERB_PORT) || undefined;
+const scheme: string =
+    runtime?.scheme ?? import.meta.env.VITE_REVERB_SCHEME ?? "https";
 
 if (key) {
     try {
         echo = new Echo<"reverb">({
             broadcaster: "reverb",
             enabledTransports: ["ws", "wss"],
-            forceTLS:
-                (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
+            forceTLS: scheme === "https",
             key,
-            wsHost: import.meta.env.VITE_REVERB_HOST,
-            wsPort: Number(import.meta.env.VITE_REVERB_PORT ?? 80),
-            wssPort: Number(import.meta.env.VITE_REVERB_PORT ?? 443),
+            wsHost: host,
+            wsPort: port,
+            wssPort: port,
         });
     } catch (error) {
         console.error("Failed to start Echo:", error);

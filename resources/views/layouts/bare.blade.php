@@ -28,6 +28,15 @@
         // Fix for Firefox autofocus CSS bug
         // See: http://stackoverflow.com/questions/18943276/html-5-autofocus-messes-up-css-loading/18945951#18945951
     </script>
+
+    {{-- Echo config from the cached runtime config; the image needs no build args. Never the secret. --}}
+    @if (config('broadcasting.default') === 'reverb' && config('broadcasting.connections.reverb.key'))
+        @php($reverbConfig = ['key' => config('broadcasting.connections.reverb.key'), 'host' => config('broadcasting.connections.reverb.options.host'), 'port' => config('broadcasting.connections.reverb.options.port'), 'scheme' => config('broadcasting.connections.reverb.options.scheme')])
+        <script>
+            window.reverbConfig = @json($reverbConfig);
+        </script>
+    @endif
+
     @vite(['resources/assets/sass/app.scss', 'resources/assets/ts/app.ts'])
 
     @stack('templates')
