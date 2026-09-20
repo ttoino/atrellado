@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\TaskComment;
-use App\Models\Thread;
-use App\Models\ThreadComment;
 use Illuminate\Support\Facades\Hash;
 
 it('marks a task comment as editable for its author but not for another member', function () {
@@ -27,37 +25,6 @@ it('marks a task comment as editable for its author but not for another member',
         ->getJson("/api/task-comment/{$response->json('id')}")
         ->assertOk()
         ->assertJsonPath('editable', false);
-});
-
-it('embeds comments under comments.data in the thread json', function () {
-    $author = makeUser();
-    $project = makeProject($author);
-    $thread = Thread::factory()->create([
-        'project_id' => $project->id,
-        'author_id' => $author->id,
-    ]);
-
-    ThreadComment::factory()->count(3)->create([
-        'thread_id' => $thread->id,
-        'author_id' => $author->id,
-    ]);
-
-    $this->actingAs($author)->getJson("/api/thread/{$thread->id}")
-        ->assertOk()
-        ->assertJsonPath('editable', true)
-        ->assertJsonCount(3, 'comments.data')
-        ->assertJsonPath('comments.data.0.editable', true)
-        ->assertJsonStructure([
-            'id',
-            'title',
-            'content',
-            'editable',
-            'comments' => [
-                'data',
-                'links' => ['first', 'last', 'prev', 'next'],
-                'meta' => ['path', 'per_page', 'next_cursor', 'prev_cursor'],
-            ],
-        ]);
 });
 
 it('wraps comment listings in the resource pagination envelope', function () {

@@ -9,8 +9,6 @@ import "bootstrap";
 if (window.location.pathname.match(/project\/\d+\/(board|task\/\d+)/))
     import("./pages/board");
 
-if (window.location.pathname.match(/project\/\d+\/(forum|thread)/))
-    import("./pages/forum");
 
 // Enhancements
 import "./enhancements/autoresize";

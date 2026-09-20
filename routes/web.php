@@ -20,14 +20,13 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskGroupController;
-use App\Http\Controllers\ThreadCommentController;
-use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
 use App\Livewire\AdminProjectsPage;
 use App\Livewire\AdminUsersPage;
 use App\Livewire\NotificationsPage;
 use App\Livewire\ProfileEditPage;
 use App\Livewire\ProfilePage;
+use App\Livewire\ProjectForumPage;
 use App\Livewire\ProjectInfoPage;
 use App\Livewire\ProjectListPage;
 use App\Livewire\ProjectMembersPage;
@@ -91,7 +90,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
         Route::get('/board', 'showProjectBoard')->name('.board');
         Route::get('/tasks', 'getProjectTasks')->name('.tasks');
         Route::get('/timeline', 'showProjectTimeline')->name('.timeline');
-        Route::get('/forum', 'showProjectForum')->name('.forum');
+        Route::livewire('/forum', ProjectForumPage::class)->name('.forum');
 
         // This breaks the HTTP standard since a GET request is changing server state (a project's members). However this should only be changed if this application scales
         Route::get('/join', 'joinProject')->name('.join')->middleware('signed');
@@ -104,11 +103,7 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
             });
         });
 
-        Route::prefix('/thread')->name('.thread')->controller(ThreadController::class)->group(function () {
-            Route::prefix('/{thread}')->where(['thread' => '[0-9]+'])->scopeBindings()->group(function () {
-                Route::get('', 'show')->name('');
-            });
-        });
+        Route::livewire('/thread/{thread}', ProjectForumPage::class)->scopeBindings()->name('.thread');
     });
 });
 
@@ -190,11 +185,5 @@ Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle']
     Route::prefix('/task-group/{taskGroup}')->whereNumber('taskGroup')->group(function () {
         Route::post('/reposition', [TaskGroupController::class, 'update'])->name('task-group.reposition');
     });
-
-    Route::apiResource('thread', ThreadController::class)->only(['store', 'show', 'update', 'destroy']);
-
-    Route::apiResource('thread-comment', ThreadCommentController::class)
-        ->only(['index', 'store', 'show', 'update', 'destroy'])
-        ->parameters(['thread-comment' => 'threadComment']);
 
 });
