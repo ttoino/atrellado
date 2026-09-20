@@ -1,22 +1,37 @@
 <div class="vstack gap-1 align-self-center">
-    <ul class="tags" data-render-list="tags,#tag-template">
-        @each('partials.project.board.task-tag', $task->tags, 'tag')
+    <ul class="tags">
+        @foreach ($task->tags as $tag)
+            <li style="--tag-color: {{ $tag->rgb_color }}">
+                <a href="{{ route('project.tasks', ['project' => $project, 'q' => $tag->title]) }}">
+                    {{ $tag->title }}
+                </a>
+            </li>
+        @endforeach
     </ul>
 
-    <a class="stretched-link" data-render-text="name"
+    <a class="stretched-link"
         href="{{ route('project.task.info', ['project' => $project, 'task' => $task->id ?? 0]) }}">
         {{ $task->name }}
     </a>
 
     <div class="bottom-row">
-        <ul class="assignees" data-render-list="assignees,#assignee-template" data-render-attr="assignees.length,length"
+        <ul class="assignees"
             data-length="{{ $task->assignees->count() }}">
-            @each('partials.project.board.task-assignee', $task->assignees, 'assignee')</ul>
-        <span class="comments" data-render-attr="comments.length,comment-count"
+            @foreach ($task->assignees as $assignee)
+                <li>
+                    <a href="{{ route('user.profile', ['user' => $assignee]) }}" data-bs-toggle="tooltip"
+                        data-bs-title="{{ $assignee->name }}" data-bs-placement="bottom">
+                        <img src="{{ asset($assignee->profile_pic) }}" alt="{{ $assignee->name }}" width="24"
+                            height="24" class="rounded-circle">
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+        <span class="comments"
             data-comment-count="{{ $task->comments->count() }}">
             <i class="bi bi-reply"></i>
         </span>
     </div>
 </div>
 
-<i data-render-class-condition="completed,d-none,false" @class(['completed-check', 'd-none' => !$task->completed])></i>
+<i @class(['completed-check', 'd-none' => !$task->completed])></i>
