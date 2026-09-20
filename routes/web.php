@@ -23,7 +23,11 @@ use App\Http\Controllers\TaskGroupController;
 use App\Http\Controllers\ThreadCommentController;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\UserController;
+use App\Livewire\AdminProjectsPage;
+use App\Livewire\AdminUsersPage;
 use App\Livewire\NotificationsPage;
+use App\Livewire\ProfileEditPage;
+use App\Livewire\ProfilePage;
 use App\Livewire\ProjectInfoPage;
 use App\Livewire\ProjectListPage;
 use App\Livewire\ProjectMembersPage;
@@ -49,12 +53,9 @@ Route::view('/services', 'static.services')->name('static.services');
 // User
 Route::prefix('/user')->middleware(['auth', 'verified'])->name('user.')->controller(UserController::class)->group(function () {
     Route::prefix('/{user}')->where(['user' => '[0-9]+'])->group(function () {
-        Route::get('', 'show')->name('profile');
+        Route::livewire('', ProfilePage::class)->name('profile');
 
-        Route::prefix('/edit')->group(function () {
-            Route::get('', 'edit')->name('edit');
-            Route::post('', 'update')->name('edit-action');
-        });
+        Route::livewire('/edit', ProfileEditPage::class)->name('edit');
 
         Route::prefix('/report')->group(function () {
             Route::get('', 'showReportForm')->name('report');
@@ -115,9 +116,9 @@ Route::prefix('/project')->middleware(['auth', 'verified'])->name('project')->co
 Route::prefix('/admin')->middleware(['auth', 'verified'])->name('admin')->controller(AdminController::class)->group(function () {
     Route::redirect('', '/admin/users')->name('');
 
-    Route::get('/users', 'listUsers')->name('.users');
+    Route::livewire('/users', AdminUsersPage::class)->middleware('can:admin-action')->name('.users');
 
-    Route::get('/projects', 'listProjects')->name('.projects');
+    Route::livewire('/projects', AdminProjectsPage::class)->middleware('can:admin-action')->name('.projects');
 
     Route::prefix('/create')->name('.create')->group(function () {
         Route::get('/user', 'showCreateUser')->name('.user');
@@ -168,13 +169,6 @@ Route::prefix('/api')->name('api.')->middleware(['auth', 'verified', 'throttle']
         Route::get('/tags', 'getProjectTags')->name('project.tags');
 
         Route::post('/favorite/toggle', 'toggleFavorite')->name('project.favorite.toggle');
-    });
-
-    Route::apiResource('user', UserController::class)->only(['store', 'show', 'update', 'destroy']);
-
-    Route::prefix('/user/{user}')->whereNumber('user')->controller(UserController::class)->group(function () {
-        Route::post('/block', 'block')->name('user.block');
-        Route::post('/unblock', 'unblock')->name('user.unblock');
     });
 
     Route::apiResource('task', TaskController::class)->only(['store', 'show', 'update', 'destroy']);

@@ -12,23 +12,22 @@ if (window.location.pathname.match(/project\/\d+\/(board|task\/\d+)/))
 if (window.location.pathname.match(/project\/\d+\/(forum|thread)/))
     import("./pages/forum");
 
-
 // Enhancements
 import "./enhancements/autoresize";
 import "./enhancements/form";
 import "./enhancements/imageinput";
 import "./enhancements/passwordinput";
 import "./enhancements/singleline";
-import "./enhancements/project";
 import "./enhancements/tooltip";
-import "./enhancements/user";
 // Echo + Reverb: boots the websocket client used by the pages' live updates.
 import "./echo";
 import { renderToast } from "./toast";
 
 declare global {
     interface Window {
-        Livewire?: { on: (event: string, cb: (event: unknown) => void) => void };
+        Livewire?: {
+            on: (event: string, cb: (event: unknown) => void) => void;
+        };
     }
 }
 

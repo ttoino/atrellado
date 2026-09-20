@@ -1,10 +1,4 @@
-@extends('layouts.app')
-
-@section('title', $user->name)
-
-@push('main-classes', 'flex-column align-items-center justify-content-center p-2 gap-3')
-
-@section('content')
+<div class="flex-column align-items-center justify-content-center p-2 gap-3 d-flex">
     <img src="{{ asset($user->profile_pic) }}" width=240 height=240 alt="Profile Picture" class="rounded-circle">
 
     <h2 class="m-0">{{ $user->name }}</h2>
@@ -24,8 +18,8 @@
     @endcan
 
     @can('delete', $user)
-        <x-button class="delete-user" outline color="danger" icon="trash">
+        <x-button wire:click="deleteUser" wire:confirm="Delete this account?" outline color="danger" icon="trash">
             Delete account
         </x-button>
     @endcan
-@endsection
+</div>
