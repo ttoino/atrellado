@@ -35,6 +35,16 @@ return [
 
     'connections' => [
 
+        // PDO handle over a D1 HTTP query endpoint, with SQLite grammar;
+        // see WorkersPhp\Laravel\D1ServiceProvider.
+        'd1' => [
+            'driver' => 'd1',
+            'endpoint' => env('DB_D1_ENDPOINT'),
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DATABASE_URL'),

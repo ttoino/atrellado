@@ -24,3 +24,5 @@ yarn-error.log
 frankenphp
 frankenphp-worker.php
 /tests/Browser/Screenshots
+.dev.vars
+etc/certs/

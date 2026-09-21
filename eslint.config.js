@@ -12,7 +12,13 @@ export default ts.config(
     includeIgnoreFile(gitignorePath),
 
     {
-        ignores: ["artifacts/", "public/", "storage/", "vendor/"],
+        ignores: [
+            "artifacts/",
+            "public/",
+            "storage/",
+            "vendor/",
+            "worker-configuration.d.ts",
+        ],
     },
 
     js.configs.recommended,

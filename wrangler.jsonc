@@ -1,0 +1,87 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "atrellado",
+    "account_id": "e024e5a1e487a3d3a07815b431986107",
+    "main": "worker.ts",
+    "compatibility_date": "2026-09-15",
+    "compatibility_flags": ["nodejs_compat"],
+    "observability": {
+        "enabled": true,
+        "issue_detection": { "enabled": true },
+        "logs": { "enabled": true },
+        "traces": { "enabled": true },
+    },
+    "upload_source_maps": true,
+    "workers_dev": true,
+    "routes": [{ "custom_domain": true, "pattern": "atrellado.toino.pt" }],
+    "containers": [
+        {
+            "name": "atrellado",
+            "class_name": "AtrelladoContainer",
+            "image": "./Dockerfile.containers",
+            "max_instances": 2,
+            "instance_type": "basic",
+        },
+        {
+            "name": "atrellado-reverb",
+            "class_name": "ReverbContainer",
+            "image": "./Dockerfile.containers",
+            "max_instances": 1,
+            "instance_type": "lite",
+        },
+    ],
+    "durable_objects": {
+        "bindings": [
+            {
+                "name": "CONTAINER",
+                "class_name": "AtrelladoContainer",
+            },
+            {
+                "name": "REVERB_CONTAINER",
+                "class_name": "ReverbContainer",
+            },
+        ],
+    },
+    "migrations": [
+        {
+            "tag": "v1",
+            "new_sqlite_classes": ["AtrelladoContainer"],
+        },
+        {
+            "tag": "v2",
+            "new_sqlite_classes": ["ReverbContainer"],
+        },
+    ],
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "atrellado",
+            "database_id": "a4e9158a-a9f2-4a74-afb2-04c13a2df151",
+        },
+    ],
+    "r2_buckets": [
+        {
+            "binding": "FILES",
+            "bucket_name": "atrellado",
+        },
+    ],
+    "kv_namespaces": [
+        {
+            "binding": "KV",
+            "id": "600a1bfb94b240af9a3e8e094e103fe7",
+        },
+    ],
+    "queues": {
+        "producers": [{ "binding": "QUEUE", "queue": "atrellado" }],
+        "consumers": [
+            { "queue": "atrellado", "max_batch_size": 5, "max_retries": 3 },
+        ],
+    },
+    "triggers": { "crons": ["0 0 * * *"] },
+    "send_email": [
+        {
+            "name": "EMAIL",
+            "allowed_sender_addresses": ["noreply@atrellado.toino.pt"],
+        },
+    ],
+}

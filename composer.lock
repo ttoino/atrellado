@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4746327b6f6ab826c30e0b571e737eb8",
+    "content-hash": "90aa3501d78d75c503d7774671de2b6e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -9550,6 +9550,65 @@
                 "source": "https://github.com/webmozarts/assert/tree/2.4.1"
             },
             "time": "2026-06-15T15:31:57+00:00"
+        },
+        {
+            "name": "workers-php/workers-php",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ttoino/workers-php.git",
+                "reference": "84bf76128389801c160a6cf230a5dbd8b47e58d9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ttoino/workers-php/zipball/84bf76128389801c160a6cf230a5dbd8b47e58d9",
+                "reference": "84bf76128389801c160a6cf230a5dbd8b47e58d9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.12",
+                "laravel/framework": "^13.32",
+                "laravel/pint": "^1.13",
+                "orchestra/testbench": "^11.2",
+                "phpstan/extension-installer": "*",
+                "phpstan/phpstan": "^2.2",
+                "phpunit/phpunit": "^11.5",
+                "symfony/mailer": "^8.1"
+            },
+            "suggest": {
+                "laravel/framework": "Enables the service providers, D1 connection, R2 filesystem and mailer integrations.",
+                "symfony/mailer": "Enables the WorkersPhp\\Symfony mail transport."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "WorkersPhp\\Laravel\\CloudflareServiceProvider",
+                        "WorkersPhp\\Laravel\\D1ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WorkersPhp\\": "php/base/",
+                    "WorkersPhp\\Laravel\\": "php/laravel/",
+                    "WorkersPhp\\Symfony\\": "php/symfony/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "PHP runtime for workers-php: D1, R2 and Mail HTTP clients plus Laravel and Symfony integrations.",
+            "support": {
+                "issues": "https://github.com/ttoino/workers-php/issues",
+                "source": "https://github.com/ttoino/workers-php/tree/v1.4.0"
+            },
+            "time": "2026-09-21T00:44:55+00:00"
         }
     ],
     "packages-dev": [

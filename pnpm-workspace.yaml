@@ -1,2 +1,10 @@
 allowBuilds:
   "@parcel/watcher": false
+  core-js-pure: true
+  esbuild: true
+  workerd: true
+
+# Ours; published moments ago, so the 1-day release-age policy would
+# otherwise block installs.
+minimumReleaseAgeExclude:
+  - workers-php

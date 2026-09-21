@@ -34,6 +34,13 @@ return [
     */
 
     'mailers' => [
+        // Structured messages over the worker's email endpoint; see
+        // WorkersPhp\Symfony\Mailer\HttpMailTransport.
+        'http-mail' => [
+            'transport' => 'http-mail',
+            'endpoint' => env('MAIL_ENDPOINT'),
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
