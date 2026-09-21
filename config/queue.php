@@ -42,6 +42,13 @@ return [
             'after_commit' => false,
         ],
 
+        'cfqueue' => [
+            'driver' => 'cfqueue',
+            'endpoint' => env('QUEUE_ENDPOINT', 'http://example.com/QUEUE'),
+            'max_tries' => 3,
+            'retry_after' => 30,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',

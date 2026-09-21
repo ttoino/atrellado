@@ -12,6 +12,7 @@ use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Session\Middleware\AuthenticateSession;
+use WorkersPhp\Laravel\Middleware\WaitForBoot;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,9 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Old Http\Kernel stack, framework classes only. TrustHosts keeps
-        // its default (all subdomains of the app URL).
+        // Old Http\Kernel stack. WaitForBoot holds traffic while the
+        // container boots; it only exists in the container (WORKERS_PHP),
+        // tests and local dev skip it. The rest are framework classes.
         $middleware->use([
+            ...(getenv('WORKERS_PHP') ? [WaitForBoot::class] : []),
             TrustHosts::class,
             TrustProxies::class,
             HandleCors::class,
@@ -34,6 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->trustProxies(at: '*');
+
+        // Local container dev arrives with a localhost Host; production
+        // keeps the default (the app URL host and its subdomains).
+        $middleware->trustHosts(at: ['atrellado.toino.workers.dev', 'atrellado.toino.pt', '127.0.0.1', 'localhost'], subdomains: false);
 
         // The old web group ran AuthenticateSession; the framework default
         // does not.

@@ -30,6 +30,15 @@ return [
 
     'disks' => [
 
+        // Objects over the worker's R2 endpoint; see
+        // WorkersPhp\Laravel\Filesystem\R2Adapter.
+        'r2' => [
+            'driver' => 'r2',
+            'endpoint' => env('R2_ENDPOINT'),
+            'url_prefix' => env('R2_URL_PREFIX', '/storage'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),

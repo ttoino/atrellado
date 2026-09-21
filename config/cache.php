@@ -49,6 +49,11 @@ return [
             'lock_connection' => null,
         ],
 
+        'kv' => [
+            'driver' => 'kv',
+            'endpoint' => env('KV_ENDPOINT', 'http://example.com/KV'),
+        ],
+
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
