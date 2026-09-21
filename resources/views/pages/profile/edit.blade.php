@@ -2,6 +2,9 @@
 
 @section('title', $user->name)
 
+{{-- The file input needs multipart; every other form posts urlencoded. --}}
+@section('enctype', 'multipart/form-data')
+
 @section('form')
     <label class="image-input align-self-center">
         <img src="{{ asset($user->profile_pic) }}" width=240 height=240 alt="{{ $user->name }}'s profile picture"

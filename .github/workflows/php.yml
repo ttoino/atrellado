@@ -67,3 +67,43 @@ jobs:
 
       - name: Run tests
         run: php artisan test
+
+  browser:
+    name: Browser
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5"
+          extensions: gd, pdo_sqlite, sockets, pcntl
+
+      - name: Install composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install node dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Browser tests load the real built assets; without a manifest the
+      # pages render without JS and the assertions are meaningless.
+      - name: Build assets
+        run: pnpm run build
+
+      - name: Install playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run browser tests
+        run: ./vendor/bin/pest --ci --parallel tests/Browser

@@ -4,3 +4,4 @@ storage
 vendor
 artifacts
 *.blade.php
+pnpm-lock.yaml

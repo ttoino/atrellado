@@ -12,6 +12,19 @@ pest()->extend(TestCase::class)
     ->beforeEach(fn () => $this->withoutVite())
     ->in('Feature');
 
+// Browser tests drive a real chromium against the in-process server; vite
+// must NOT be stubbed here — pages load the built assets from public/build.
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        // public/storage is gitignored; the in-process server serves real
+        // files, so avatars need the symlink the dev image normally bakes.
+        if (! file_exists(public_path('storage'))) {
+            symlink(storage_path('app/public'), public_path('storage'));
+        }
+    })
+    ->in('Browser');
+
 // Small factories for the graph every feature test needs: a user, a project
 // (its observer auto-enrolls the coordinator as member), a task group and a
 // task, all with explicit sequential positions.

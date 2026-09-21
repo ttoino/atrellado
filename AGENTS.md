@@ -14,6 +14,7 @@ A Laravel 13 project-management app (kanban boards, task groups, tags, threads, 
 - `pnpm run check` / `lint` / `format` (+`:fix`): tsc, eslint, prettier
 - `php artisan migrate`: Run migrations
 - `./vendor/bin/pest`: Pest suite (sqlite in-memory)
+- `./vendor/bin/pest tests/Browser`: Browser tests (Pest 4 + playwright chromium against an in-process server; needs `pnpm run build` first; not in `php artisan test`'s suites)
 - `./vendor/bin/phpstan analyse --memory-limit=1G`: Larastan, level 5
 - `./vendor/bin/pint`: Code style fixer
 

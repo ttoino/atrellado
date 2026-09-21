@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgd-dev libwebp-dev libjpeg-dev libfreetype6-dev \
         libpq-dev libsqlite3-dev libzip-dev libicu-dev \
     && docker-php-ext-configure gd --with-webp --with-jpeg --with-freetype \
-    && docker-php-ext-install gd pdo_pgsql pdo_sqlite zip intl \
+    && docker-php-ext-install gd pdo_pgsql pdo_sqlite zip intl sockets pcntl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
@@ -34,6 +34,16 @@ RUN composer install --no-autoloader
 
 COPY --chown=www-data package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
+
+# Pest browser tests drive a real chromium via playwright.
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+USER root
+# TLS-intercepting networks (e.g. WARP) can pass their CA via
+# `docker build --secret id=warp_ca,src=<ca.pem>`; untouched otherwise.
+RUN --mount=type=secret,id=warp_ca,target=/run/warp_ca.pem,required=false \
+    if [ -f /run/warp_ca.pem ]; then export NODE_EXTRA_CA_CERTS=/run/warp_ca.pem; fi; \
+    pnpm exec playwright install --with-deps chromium && chmod -R a+rX /opt/ms-playwright
+USER www-data
 
 COPY --chown=www-data . .
 
