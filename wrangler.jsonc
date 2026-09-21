@@ -7,7 +7,6 @@
     "compatibility_flags": ["nodejs_compat"],
     "observability": {
         "enabled": true,
-        "issue_detection": { "enabled": true },
         "logs": { "enabled": true },
         "traces": { "enabled": true },
     },
