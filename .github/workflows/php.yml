@@ -105,5 +105,22 @@ jobs:
       - name: Install playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
+      # The live-update test needs a real Reverb server; the same config
+      # serves both the app's server-side publish and the browser's ws.
+      - name: Start reverb
+        run: php artisan reverb:start &
+        env:
+          REVERB_APP_ID: atrellado-test
+          REVERB_APP_KEY: local-key
+          REVERB_APP_SECRET: local-secret
+
       - name: Run browser tests
         run: ./vendor/bin/pest --ci --parallel tests/Browser
+        env:
+          BROADCAST_CONNECTION: reverb
+          REVERB_APP_ID: atrellado-test
+          REVERB_APP_KEY: local-key
+          REVERB_APP_SECRET: local-secret
+          REVERB_HOST: 127.0.0.1
+          REVERB_PORT: 8080
+          REVERB_SCHEME: http
