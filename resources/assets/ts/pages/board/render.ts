@@ -31,8 +31,6 @@ const newTaskGroupForm = board?.querySelector<HTMLElement>(
 export const appendTaskGroup = (group: TaskGroup) => {
     const newGroup = renderTaskGroup?.(group);
 
-    console.log(newGroup, board, newTaskGroupForm);
-
     if (newGroup && newTaskGroupForm)
         board?.insertBefore(newGroup, newTaskGroupForm);
 };

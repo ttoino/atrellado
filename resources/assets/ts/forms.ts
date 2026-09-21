@@ -22,8 +22,6 @@ export const ajaxForm = <K, P>(
                 : formData.get(key);
         }
 
-        console.log(new FormData(form), data);
-
         try {
             const payload =
                 constantData instanceof Object

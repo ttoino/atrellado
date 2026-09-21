@@ -29,14 +29,6 @@ registerEnhancement({
 
                 const newPosition = ((e.newIndex ?? 0) + 1).toString();
 
-                console.log(
-                    "task group",
-                    taskGroupId,
-                    "position",
-                    newPosition,
-                    e,
-                );
-
                 const result = await tryRequest(
                     repositionTaskGroup,
                     undefined,
@@ -59,15 +51,6 @@ const onTaskMove = async (e: SortableEvent) => {
     if (!taskGroup) return;
 
     const newPosition = ((e.newIndex ?? 0) + 1).toString();
-
-    console.log(
-        "task",
-        taskId,
-        "task-group",
-        taskGroup,
-        "position",
-        newPosition,
-    );
 
     const result = await tryRequest(
         repositionTask,

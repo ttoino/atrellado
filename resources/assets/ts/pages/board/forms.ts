@@ -99,7 +99,6 @@ registerEnhancement<HTMLElement>({
         if (!el.dataset.taskGroupId) return;
 
         const taskGroupId = parseInt(el.dataset.taskGroupId);
-        console.log(taskGroupId);
 
         const appendTask = appendTaskCard(
             `.task-group[data-task-group-id="${taskGroupId}"] > ul`,

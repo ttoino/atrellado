@@ -122,8 +122,6 @@ export const appendListItems = <T extends object>(
 
     const renderItem = renderTemplate(templateSelector);
 
-    console.log(list, renderItem);
-
     return (
         list &&
         renderItem &&

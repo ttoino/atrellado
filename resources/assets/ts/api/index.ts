@@ -28,12 +28,6 @@ export const apiFetch = <T>(
     body?: unknown,
     options?: RequestInit,
 ): Promise<EnhancedResponse<T>> => {
-    console.log(
-        `Making ${method} request to ${url} with options ${options} and body ${JSON.stringify(
-            body,
-        )}`,
-    );
-
     if (method === "GET") {
         url += "?" + new URLSearchParams(body as Record<string, string>);
         body = undefined;

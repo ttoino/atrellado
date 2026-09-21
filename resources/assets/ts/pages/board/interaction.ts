@@ -12,7 +12,6 @@ registerEnhancement<HTMLElement>({
         if (!el.dataset.taskGroupId) return;
 
         const taskGroupId = parseInt(el.dataset.taskGroupId);
-        console.log(taskGroupId);
 
         const deleteGroupButton = el.querySelector<HTMLButtonElement>(
             "button.delete-task-group",
@@ -31,7 +30,6 @@ registerEnhancement<HTMLElement>({
         const taskList = el.querySelector(":scope > ul");
         if (taskList)
             new MutationObserver(() => {
-                console.log(taskList.children.length);
                 deleteGroupButton?.classList.toggle(
                     "d-none",
                     taskList?.children.length !== 0,

@@ -23,7 +23,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'id' => 0,
         'name' => 'Deleted user',
         'email' => 'Deleted user',
-        'profile_picture_path' => 'public/logo.svg',
+        // Rendered via asset(), so this is a public path, not a storage path.
+        'profile_picture_path' => 'logo.svg',
     ];
 
     // Don't add create and update timestamps in database.
