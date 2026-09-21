@@ -40,6 +40,11 @@
 			"database_id": "7192fb5e-aaa0-4926-8aea-639a3bf4656b"
 		}
 	],
+	"migrations": [
+		{ "tag": "v1", "new_sqlite_classes": ["AtrelladoContainer"] },
+		{ "tag": "v2", "deleted_classes": ["AtrelladoContainer"] }
+	],
+	"workers_dev": true,
 	"vars": {
 		"APP_ENV": "production"
 	},
