@@ -18,6 +18,7 @@ function initBoardDnd() {
     destroyAll();
 
     const board = document.querySelector<HTMLElement>("[data-board]");
+
     if (!board) return;
 
     sortables.push(
@@ -66,6 +67,8 @@ function initBoardDnd() {
             }),
         );
     });
+
+    board.dataset.enhanced = "true";
 }
 
 document.addEventListener("livewire:init", () => {

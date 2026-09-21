@@ -9,9 +9,10 @@ function boardLogin(object $t): mixed
         ->fill('password', 'password123')
         ->submit()
         ->navigate("/project/{$t->project->id}/board")
-        // Elements are clickable before their handlers attach; the retried
-        // assertion waits for the board's enhancement pass to mark them.
-        ->assertScript("document.querySelector('.task-group[data-task-group-id][data-enhanced]') !== null");
+        // Elements are clickable before livewire boots and sortable
+        // attaches; the retried assertions wait for both.
+        ->assertScript("window.Livewire !== undefined")
+        ->assertScript("document.querySelector('[data-board][data-enhanced]') !== null");
 }
 
 beforeEach(function () {
@@ -22,13 +23,14 @@ beforeEach(function () {
     $this->task = makeTask($this->todo, 1, ['name' => 'Drag Me']);
 });
 
-// Group names render inside editable textareas; their values are invisible
-// to text assertions, so visibility is checked via script.
+// Group names render inside editable textareas (no name attributes on
+// livewire); their values are invisible to text assertions, so visibility
+// is checked via script.
 it('creates a task group', function () {
     boardLogin($this)
-        ->fill('#new-task-group-form [name=name]', 'Browser Group')
+        ->fill('#new-task-group-form textarea', 'Browser Group')
         ->press('#new-task-group-form [type=submit]')
-        ->assertScript("Array.from(document.querySelectorAll('.task-group textarea[name=name]')).some(t => t.value === 'Browser Group')");
+        ->assertScript("Array.from(document.querySelectorAll('.task-group .edit-task-group-form textarea')).some(t => t.value === 'Browser Group')");
 
     $this->assertDatabaseHas('task_group', [
         'project_id' => $this->project->id,
@@ -38,19 +40,19 @@ it('creates a task group', function () {
 
 it('creates and edits a task', function () {
     $page = boardLogin($this)
-        ->fill(".task-group[data-task-group-id=\"{$this->todo->id}\"] .new-task-form [name=name]", 'Fresh Task')
+        ->fill(".task-group[data-task-group-id=\"{$this->todo->id}\"] .new-task-form textarea", 'Fresh Task')
         ->press(".task-group[data-task-group-id=\"{$this->todo->id}\"] .new-task-form [type=submit]")
         ->waitForText('Fresh Task');
 
     $this->assertDatabaseHas('task', ['name' => 'Fresh Task']);
 
-    // Clicking the card navigates to the task page (offcanvas in read mode);
-    // the edit form is display:none until #edit-task-button toggles it.
+    // The card deep-links to the task overlay page; its read mode swaps to
+    // the edit form via the Edit button.
     $page
         ->click('Fresh Task')
-        ->click('#edit-task-button')
-        ->fill('#edit-task-form [name=name]', 'Renamed Task')
-        ->press('#edit-task-form [type=submit]')
+        ->click('Edit')
+        ->fill('#task-name', 'Renamed Task')
+        ->press('Save changes')
         ->waitForText('Renamed Task');
 
     $this->assertDatabaseHas('task', ['name' => 'Renamed Task']);
@@ -65,18 +67,26 @@ it('moves a task between groups via drag and drop', function () {
         ".task-group[data-task-group-id=\"{$this->done->id}\"] > ul",
     );
 
-    // The reposition PUT is fire-and-forget; a fresh render proves the
-    // persisted state (and exercises the read path).
+    // The task-moved request is queued behind livewire's commit pipeline, so
+    // navigating immediately would tear it down; wait for it to land, then
+    // let a fresh render prove the persisted state.
+    waitForPhp($page, fn () => DB::table('task')->find($this->task->id)?->task_group_id === $this->done->id);
+
     $page
         ->navigate("/project/{$this->project->id}/board")
         ->assertScript("document.querySelector('.task[data-task-id=\"{$this->task->id}\"]')?.closest('.task-group')?.dataset.taskGroupId === \"{$this->done->id}\"");
 });
 
 it('deletes an empty task group', function () {
-    boardLogin($this)
+    $page = boardLogin($this);
+
+    // wire:confirm guards the delete behind window.confirm, which playwright
+    // auto-dismisses; force-accept it first.
+    $page->script('window.confirm = () => true');
+
+    $page
         ->click(".task-group[data-task-group-id=\"{$this->done->id}\"] .delete-task-group")
-        // Deletion is optimistic: the element is removed before the DELETE
-        // roundtrip lands, so persistence is checked on a fresh render.
-        ->navigate("/project/{$this->project->id}/board")
-        ->assertScript("Array.from(document.querySelectorAll('.task-group textarea[name=name]')).some(t => t.value === 'Done')", false);
+        ->assertScript("Array.from(document.querySelectorAll('.task-group .edit-task-group-form textarea')).some(t => t.value === 'Done')", false);
+
+    $this->assertDatabaseMissing('task_group', ['id' => $this->done->id]);
 });

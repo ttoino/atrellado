@@ -65,3 +65,18 @@ function groupPositions(Project $project): array
 {
     return $project->taskGroups()->orderBy('position')->pluck('position', 'id')->all();
 }
+
+// Polls a PHP-side condition, yielding between attempts so the in-process
+// server keeps serving the browser request the condition depends on.
+function waitForPhp(mixed $page, callable $condition, float $timeoutSeconds = 5): void
+{
+    $deadline = microtime(true) + $timeoutSeconds;
+
+    while (! $condition()) {
+        if (microtime(true) > $deadline) {
+            throw new PHPUnit\Framework\ExpectationFailedException('Timed out waiting for PHP condition.');
+        }
+
+        $page->wait(0.1);
+    }
+}

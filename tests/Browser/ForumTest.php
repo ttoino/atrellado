@@ -3,16 +3,16 @@
 use App\Models\Thread;
 
 // See BoardTest for why visit() lives in a helper rather than beforeEach.
-function forumLogin(object $t, string $path, string $interactive): mixed
+function forumLogin(object $t, string $path): mixed
 {
     return visit('/login')
         ->fill('email', $t->user->email)
         ->fill('password', 'password123')
         ->submit()
         ->navigate($path)
-        // Elements are clickable before their handlers attach; the retried
-        // assertion waits for the page's enhancement pass to mark them.
-        ->assertScript("document.querySelector('{$interactive}[data-enhanced]') !== null");
+        // Elements are clickable before livewire boots; the retried
+        // assertion waits for it.
+        ->assertScript("window.Livewire !== undefined");
 }
 
 beforeEach(function () {
@@ -26,8 +26,9 @@ beforeEach(function () {
 });
 
 it('creates a thread', function () {
-    forumLogin($this, "/project/{$this->project->id}/forum", '#new-thread-offcanvas > form')
-        ->click('#new-thread-button')
+    forumLogin($this, "/project/{$this->project->id}/forum")
+        // The create offcanvas renders after a livewire roundtrip.
+        ->click('New Thread')
         ->fill('#new-thread-title', 'Browser Thread')
         ->fill('#new-thread-content', 'Opening post from a browser')
         ->press('Create thread')
@@ -40,17 +41,17 @@ it('creates a thread', function () {
     ]);
 });
 
-it('opens the thread page from the list', function () {
-    forumLogin($this, "/project/{$this->project->id}/forum", '#new-thread-offcanvas > form')
+it('opens the thread overlay from the list', function () {
+    forumLogin($this, "/project/{$this->project->id}/forum")
         ->click('Existing Thread')
         ->assertPathIs("/project/{$this->project->id}/thread/{$this->thread->id}")
         ->assertSee('Existing Thread');
 });
 
 it('posts a comment and renders its markdown', function () {
-    forumLogin($this, "/project/{$this->project->id}/thread/{$this->thread->id}", 'form#new-comment-form')
-        ->fill('#new-comment-form [name=content]', 'A **bold** statement')
-        ->press('#new-comment-form [type=submit]')
+    forumLogin($this, "/project/{$this->project->id}/thread/{$this->thread->id}")
+        ->fill('#thread-comment-new', 'A **bold** statement')
+        ->press('#thread-comment-new ~ [type=submit]')
         ->assertScript("Array.from(document.querySelectorAll('.thread-comment strong')).some(s => s.textContent === 'bold')");
 
     $this->assertDatabaseHas('thread_comment', ['content' => 'A **bold** statement']);
