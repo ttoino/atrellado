@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\WithOtherProjects;
+use App\Http\Middleware\WorkersRequestContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -23,10 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Old Http\Kernel stack. WaitForBoot holds traffic while the
-        // container boots; it only exists in the container (WORKERS_PHP),
-        // tests and local dev skip it. The rest are framework classes.
+        // container boots, WorkersRequestContext derives URL config from
+        // the request host; both only exist in the container (WORKERS_PHP),
+        // tests and local dev skip them. The rest are framework classes.
         $middleware->use([
-            ...(getenv('WORKERS_PHP') ? [WaitForBoot::class] : []),
+            ...(getenv('WORKERS_PHP') ? [WaitForBoot::class, WorkersRequestContext::class] : []),
             TrustHosts::class,
             TrustProxies::class,
             HandleCors::class,

@@ -13,6 +13,7 @@
     },
     "secrets": { "required": ["APP_KEY", "REVERB_APP_SECRET"] },
     "upload_source_maps": true,
+    "vars": { "APP_CACHE_DRIVER": "kv", "APP_QUEUE_CONNECTION": "cfqueue" },
     "workers_dev": true,
     "routes": [{ "custom_domain": true, "pattern": "atrellado.toino.pt" }],
     "containers": [
@@ -85,5 +86,70 @@
             "allowed_sender_addresses": ["noreply@atrellado.toino.pt"],
         },
     ],
-
+    // Previews inherit nothing from production: bindings must be
+    // redeclared here (containers too) and point at the atrellado-previews
+    // resources. Queue consumers and Cron Triggers target production only,
+    // so previews run the queue synchronously and cache on local disk.
+    "previews": {
+        "vars": {
+            "APP_CACHE_DRIVER": "file",
+            "APP_QUEUE_CONNECTION": "sync",
+        },
+        "containers": [
+            {
+                "class_name": "AtrelladoContainer",
+                "image": "./Dockerfile.containers",
+                "max_instances": 2,
+                "instance_type": "basic",
+            },
+            {
+                "class_name": "ReverbContainer",
+                "image": "./Dockerfile.containers",
+                "max_instances": 1,
+                "instance_type": "lite",
+            },
+        ],
+        "durable_objects": {
+            "bindings": [
+                {
+                    "name": "CONTAINER",
+                    "class_name": "AtrelladoContainer",
+                },
+                {
+                    "name": "REVERB_CONTAINER",
+                    "class_name": "ReverbContainer",
+                },
+            ],
+        },
+        "d1_databases": [
+            {
+                "binding": "DB",
+                "database_name": "atrellado-previews",
+                "database_id": "85119855-47ba-497d-a9f3-e72cd8ecb1be",
+            },
+        ],
+        "kv_namespaces": [
+            {
+                "binding": "KV",
+                "id": "a4b28e2c59c84c3ea94d3b1e94f57262",
+            },
+        ],
+        "r2_buckets": [
+            {
+                "binding": "FILES",
+                "bucket_name": "atrellado-previews",
+            },
+        ],
+        "queues": {
+            "producers": [
+                { "binding": "QUEUE", "queue": "atrellado-previews" },
+            ],
+        },
+        "send_email": [
+            {
+                "name": "EMAIL",
+                "allowed_sender_addresses": ["noreply@atrellado.toino.pt"],
+            },
+        ],
+    },
 }
