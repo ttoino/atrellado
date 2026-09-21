@@ -11,7 +11,7 @@ function boardLogin(object $t): mixed
         ->navigate("/project/{$t->project->id}/board")
         // Elements are clickable before livewire boots and sortable
         // attaches; the retried assertions wait for both.
-        ->assertScript("window.Livewire !== undefined")
+        ->assertScript('window.Livewire !== undefined')
         ->assertScript("document.querySelector('[data-board][data-enhanced]') !== null");
 }
 

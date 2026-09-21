@@ -5,6 +5,7 @@ use App\Models\Task;
 use App\Models\TaskGroup;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\ExpectationFailedException;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)
@@ -74,7 +75,7 @@ function waitForPhp(mixed $page, callable $condition, float $timeoutSeconds = 5)
 
     while (! $condition()) {
         if (microtime(true) > $deadline) {
-            throw new PHPUnit\Framework\ExpectationFailedException('Timed out waiting for PHP condition.');
+            throw new ExpectationFailedException('Timed out waiting for PHP condition.');
         }
 
         $page->wait(0.1);

@@ -12,7 +12,7 @@ function forumLogin(object $t, string $path): mixed
         ->navigate($path)
         // Elements are clickable before livewire boots; the retried
         // assertion waits for it.
-        ->assertScript("window.Livewire !== undefined");
+        ->assertScript('window.Livewire !== undefined');
 }
 
 beforeEach(function () {
