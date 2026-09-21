@@ -1,8 +1,12 @@
 <?php
 
+use App\Livewire\ProjectForumPage;
+use App\Livewire\TaskOverlay;
+use App\Livewire\ThreadOverlay;
 use App\Models\Thread;
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 use Illuminate\Support\Facades\Broadcast;
+use Livewire\Livewire;
 
 // Laravel 13 removed Broadcast::fake(); this driver records what the sync
 // queue hands to the broadcaster so tests can assert channels and payloads.
@@ -61,19 +65,19 @@ it('broadcasts thread creation on the project channel', function () {
 
     $broadcaster = fakeBroadcaster();
 
-    $response = $this->actingAs($coordinator)->postJson('/api/thread', [
-        'title' => 'Broadcast test thread',
-        'content' => 'Thread content',
-        'project_id' => $project->id,
-    ]);
+    Livewire::actingAs($coordinator)
+        ->test(ProjectForumPage::class, ['project' => $project])
+        ->set('title', 'Broadcast test thread')
+        ->set('content', 'Thread content')
+        ->call('createThread');
 
-    $response->assertCreated();
+    $thread = $project->threads()->sole();
 
     expect($broadcaster->broadcasts)->toHaveCount(1)
         ->and($broadcaster->broadcasts[0]['channels'])->toBe(['private-project.'.$project->id])
         ->and($broadcaster->broadcasts[0]['event'])->toBe('thread.created')
         ->and($broadcaster->broadcasts[0]['payload'])->toMatchArray([
-            'id' => $response->json('id'),
+            'id' => $thread->id,
             'project_id' => $project->id,
         ]);
 });
@@ -88,18 +92,15 @@ it('broadcasts thread comment creation on the project channel', function () {
 
     $broadcaster = fakeBroadcaster();
 
-    $response = $this->actingAs($coordinator)->postJson('/api/thread-comment', [
-        'content' => 'A live comment',
-        'thread_id' => $thread->id,
-    ]);
-
-    $response->assertOk();
+    Livewire::actingAs($coordinator)
+        ->test(ThreadOverlay::class, ['thread' => $thread])
+        ->set('newComment', 'A live comment')
+        ->call('addComment');
 
     expect($broadcaster->broadcasts)->toHaveCount(1)
         ->and($broadcaster->broadcasts[0]['channels'])->toBe(['private-project.'.$project->id])
         ->and($broadcaster->broadcasts[0]['event'])->toBe('thread-comment.created')
         ->and($broadcaster->broadcasts[0]['payload'])->toMatchArray([
-            'id' => $response->json('id'),
             'project_id' => $project->id,
             'thread_id' => $thread->id,
         ]);
@@ -112,18 +113,17 @@ it('broadcasts task comment creation on the project channel', function () {
 
     $broadcaster = fakeBroadcaster();
 
-    $response = $this->actingAs($coordinator)->postJson('/api/task-comment', [
-        'content' => 'A live task comment',
-        'task_id' => $task->id,
-    ]);
+    $response = Livewire::actingAs($coordinator)
+        ->test(TaskOverlay::class, ['task' => $task])
+        ->set('newComment', 'A live task comment')
+        ->call('addComment');
 
-    $response->assertCreated();
+    $response->assertHasNoErrors();
 
     expect($broadcaster->broadcasts)->toHaveCount(1)
         ->and($broadcaster->broadcasts[0]['channels'])->toBe(['private-project.'.$project->id])
         ->and($broadcaster->broadcasts[0]['event'])->toBe('task-comment.created')
         ->and($broadcaster->broadcasts[0]['payload'])->toMatchArray([
-            'id' => $response->json('id'),
             'project_id' => $project->id,
             'task_id' => $task->id,
         ]);

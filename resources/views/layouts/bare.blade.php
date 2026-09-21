@@ -11,6 +11,8 @@
 
     @hasSection('title')
         <title>@yield('title') - {{ config('app.name', 'Laravel') }}</title>
+    @elseif (isset($title))
+        <title>{{ $title }} - {{ config('app.name', 'Laravel') }}</title>
     @else
         <title>{{ config('app.name', 'Laravel') }}</title>
     @endif
@@ -39,13 +41,6 @@
 
     @vite(['resources/assets/sass/app.scss', 'resources/assets/ts/app.ts'])
 
-    @stack('templates')
-    <template id="toast-template">
-        <div class="toast d-flex align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body" data-render-text="text"></div>
-            <button type="button" class="btn-close m-3" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </template>
 </head>
 
 <body class="h-100 d-flex flex-column @stack('body-classes')">

@@ -6,27 +6,38 @@
 
 import "bootstrap";
 
-if (window.location.pathname.match(/project\/\d+\/(board|task\/\d+)/))
-    import("./pages/board");
-
-if (window.location.pathname.match(/project\/\d+\/(forum|thread)/))
-    import("./pages/forum");
-
-if (window.location.pathname.match(/project\/\d+\/info/))
-    import("./pages/info");
-
-if (window.location.pathname.match(/notifications/))
-    import("./pages/notifications");
-
 // Enhancements
 import "./enhancements/autoresize";
 import "./enhancements/form";
-import "./enhancements/imageinput";
 import "./enhancements/passwordinput";
 import "./enhancements/singleline";
-import "./enhancements/project";
-import "./enhancements/tag";
 import "./enhancements/tooltip";
-import "./enhancements/user";
 // Echo + Reverb: boots the websocket client used by the pages' live updates.
 import "./echo";
+// Board drag-and-drop bridge (guards on [data-board] presence).
+import "./board-dnd";
+import { renderToast } from "./toast";
+
+declare global {
+    interface Window {
+        Livewire?: {
+            dispatch: (event: string, params?: Record<string, unknown>) => void;
+            hook: (
+                name: string,
+                cb: (payload: { el: unknown }) => void,
+            ) => void;
+            on: (event: string, cb: (event: unknown) => void) => void;
+        };
+    }
+}
+
+// Livewire components surface action feedback as toasts.
+document.addEventListener("livewire:init", () => {
+    window.Livewire?.on("toast", (event) => {
+        const text =
+            typeof event === "string"
+                ? event
+                : ((event as { text?: string }).text ?? "");
+        renderToast?.({ text });
+    });
+});

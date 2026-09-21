@@ -50,6 +50,7 @@
     </header>
 
     <main class="d-flex flex-fill @stack('main-classes')">
+        {{ $slot ?? '' }}
         @yield('content')
     </main>
 @endsection

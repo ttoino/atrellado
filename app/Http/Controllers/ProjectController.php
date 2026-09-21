@@ -4,45 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\StoreReportRequest;
-use App\Http\Requests\UpdateProjectRequest;
 use App\Models\Project;
 use App\Models\Report;
 use App\Models\User;
-use App\Notifications\ProjectArchived;
-use App\Notifications\ProjectInvite;
-use App\Notifications\ProjectRemoved;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\URL;
 
 class ProjectController extends Controller
 {
-    public function show(Project $project)
-    {
-        $this->authorize('view', $project);
-
-        return response()->json($project->toArray());
-    }
-
-    public function showProjectBoard(Request $request, Project $project)
-    {
-
-        $this->authorize('view', $project);
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : response()->view('pages.project.board', ['project' => $project]);
-    }
-
-    public function showProjectInfo(Request $request, Project $project)
-    {
-        $this->authorize('view', $project);
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : response()->view('pages.project.info', ['project' => $project]);
-    }
-
     public function showProjectTimeline(Request $request, Project $project)
     {
         $this->authorize('view', $project);
@@ -61,19 +29,6 @@ class ProjectController extends Controller
             : response()->view('pages.project.forum', ['project' => $project]);
     }
 
-    public function leaveProject(Request $request, Project $project)
-    {
-        $user = $request->user();
-
-        $this->authorize('leaveProject', $project);
-
-        $project->users()->detach($user);
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project.list');
-    }
-
     public function joinProject(Request $request, Project $project)
     {
 
@@ -84,49 +39,6 @@ class ProjectController extends Controller
         $project->users()->save($user);
 
         return redirect()->route('project', ['project' => $project]);
-    }
-
-    public function removeUser(Request $request, Project $project, User $user)
-    {
-
-        $this->authorize('removeUser', [$project, $user]);
-
-        $project->users()->detach($user);
-
-        $user->notify(new ProjectRemoved($project));
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project.list');
-    }
-
-    public function setCoordinator(Request $request, Project $project)
-    {
-        $requestData = $request->all();
-
-        $user = User::findOrFail($requestData['user']);
-
-        $this->authorize('setCoordinator', [$project, $user]);
-
-        $project->coordinator_id = $user->id;
-        $project->save();
-        $project = $project->fresh();
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project.members', ['project' => $project]);
-    }
-
-    public function searchProjects(Request $request, string $searchTerm)
-    {
-
-        $userProjects = $request->user()->projects();
-
-        if (! empty($searchTerm)) {
-            $userProjects = $userProjects->searchText($searchTerm);
-        }
-
-        return $userProjects->paginate(10);
     }
 
     public function create()
@@ -168,135 +80,6 @@ class ProjectController extends Controller
         return $project;
     }
 
-    public function update(UpdateProjectRequest $request, Project $project)
-    {
-        // this is different than 'edit' in that only the project's coordinator can update the project's attributes
-        $this->authorize('update', $project);
-
-        $project = $this->updateProject($project, $request);
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project', ['project' => $project]);
-    }
-
-    /**
-     * Creates a new project.
-     *
-     * @return Project The project created.
-     */
-    public function updateProject(Project $project, Request $request)
-    {
-
-        $data = $request->all();
-
-        if (($data['name'] ??= null) !== null) {
-            $project->name = $data['name'];
-        }
-
-        if (($data['archived'] ??= null) !== null) {
-            $project->archived = $data['archived'];
-        }
-
-        if (($data['description'] ??= null) !== null) {
-            $project->description = $data['description'];
-        }
-
-        if (($data['coordinator_id'] ??= null) !== null) {
-            $project->coordinator_id = $data['coordinator_id'];
-        }
-
-        $project->save();
-
-        return $project;
-    }
-
-    /**
-     * Shows user's projects.
-     *
-     * @return Response
-     */
-    public function index(Request $request)
-    {
-
-        $this->authorize('viewAny', [Project::class]);
-
-        $searchTerm = $request->query('q') ?? '';
-
-        $projects = $this->searchProjects($request, $searchTerm)->withQueryString();
-
-        return response()->view('pages.project.list', ['projects' => $projects]);
-    }
-
-    public function showInviteUserPage(Project $project)
-    {
-
-        $this->authorize('showAddUserPage', $project);
-
-        return response()->view('pages.project.add', ['project' => $project]);
-    }
-
-    public function inviteUser(Request $request, Project $project)
-    {
-
-        $user = User::where('email', $request->input('email'))->first();
-
-        $this->authorize('addUser', [$project, $user]);
-
-        $url = URL::signedRoute('project.join', ['project' => $project, 'user' => $user]);
-
-        $user->notify(new ProjectInvite($url, $project));
-
-        return request()->wantsJson()
-            ? response()->json()
-            : redirect()->route('project', ['project' => $project]);
-    }
-
-    public function toggleFavorite(Request $request, Project $project)
-    {
-
-        $this->authorize('toggleFavorite', $project);
-
-        $member = $project->users()->get()->first(fn (User $user) => $user->id === $request->user()->id);
-
-        // Pivot columns are runtime-magic on the related model; fetch the
-        // loaded pivot relation directly to keep static analysis happy.
-        $pivot = $member->getRelation('pivot');
-
-        $pivot->is_favorite = ! $pivot->is_favorite;
-        $pivot->save();
-
-        return response()->json(['isFavorite' => $pivot->is_favorite]);
-    }
-
-    public function archive(Request $request, Project $project)
-    {
-        $this->authorize('archive', $project);
-
-        $project->archived = true;
-        $project->save();
-
-        foreach ($project->users as $user) {
-            $user->notify(new ProjectArchived($project));
-        }
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project.info', ['project' => $project]);
-    }
-
-    public function unarchive(Request $request, Project $project)
-    {
-        $this->authorize('unarchive', $project);
-
-        $project->archived = false;
-        $project->save();
-
-        return $request->wantsJson()
-            ? response()->json($project)
-            : redirect()->route('project.info', ['project' => $project]);
-    }
-
     public function destroy(Request $request, Project $project)
     {
 
@@ -306,31 +89,6 @@ class ProjectController extends Controller
         return $request->wantsJson()
             ? response()->json($project)
             : redirect()->route('project.list');
-    }
-
-    public function getProjectMembers(Request $request, Project $project)
-    {
-
-        $this->authorize('getProjectMembers', $project);
-
-        $searchTerm = $request->query('q') ?? '';
-
-        $members = $this->searchMembers($project, $searchTerm)->withQueryString();
-
-        return $request->wantsJson()
-            ? response()->json($members)
-            : response()->view('pages.project.members', ['project' => $project, 'members' => $members]);
-    }
-
-    public function searchMembers(Project $project, string $search)
-    {
-        $members = $project->users();
-
-        if (! empty($search)) {
-            $members = $members->where('name', 'like', '%'.ProjectController::escape_like($search).'%');
-        }
-
-        return $members->cursorPaginate(10);
     }
 
     protected function escape_like(string $value, string $char = '\\')
@@ -366,19 +124,6 @@ class ProjectController extends Controller
         }
 
         return $projectTasks->cursorPaginate(10);
-    }
-
-    public function getProjectTags(Request $request, Project $project)
-    {
-        $this->authorize('getProjectTags', $project);
-
-        $searchTerm = $request->query('q') ?? '';
-
-        $tags = $this->searchTags($project, $searchTerm)->withQueryString();
-
-        return $request->wantsJson()
-            ? response()->json($tags)
-            : response()->view('pages.project.tags', ['tags' => $tags]);
     }
 
     public function searchTags(Project $project, string $search)

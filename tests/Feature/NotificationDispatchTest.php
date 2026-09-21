@@ -1,9 +1,12 @@
 <?php
 
+use App\Livewire\ProjectBoardPage;
+use App\Livewire\TaskOverlay;
 use App\Models\Notification;
 use App\Models\TaskComment;
 use App\Notifications\TaskAssigned;
 use App\Notifications\TaskCommented;
+use Livewire\Livewire;
 
 it('notifies task assignees with a denormalized payload when a task is commented', function () {
     $coordinator = makeUser();
@@ -43,18 +46,24 @@ it('notifies newly attached assignees when a task is created or updated', functi
     $project->users()->save($second);
     $group = makeGroup($project, 0);
 
-    $response = $this->actingAs($coordinator)->postJson('/api/task', [
-        'name' => 'Test task',
-        'task_group_id' => $group->id,
-        'assignees' => [$first->id],
-    ]);
-    $response->assertCreated();
+    Livewire::actingAs($coordinator)
+        ->test(ProjectBoardPage::class, ['project' => $project])
+        ->set('name', 'Test task')
+        ->set('taskGroupId', $group->id)
+        ->set('assignees', [$first->id])
+        ->call('createFullTask')
+        ->assertHasNoErrors();
+
+    $task = $group->tasks()->sole();
 
     expect(Notification::where('notifiable_id', $first->id)->where('type', TaskAssigned::class)->count())->toBe(1);
 
-    $this->actingAs($coordinator)->putJson('/api/task/'.$response->json('id'), [
-        'assignees' => [$first->id, $second->id],
-    ])->assertOk();
+    Livewire::actingAs($coordinator)
+        ->test(TaskOverlay::class, ['task' => $task])
+        ->call('edit')
+        ->set('editAssignees', [$first->id, $second->id])
+        ->call('save')
+        ->assertHasNoErrors();
 
     // The already-assigned user is not notified again.
     expect(Notification::where('notifiable_id', $first->id)->where('type', TaskAssigned::class)->count())->toBe(1)
@@ -63,11 +72,11 @@ it('notifies newly attached assignees when a task is created or updated', functi
     $notification = Notification::where('notifiable_id', $second->id)->sole();
 
     expect($notification->data)->toMatchArray([
-        'task_id' => $response->json('id'),
+        'task_id' => $task->id,
         'task_name' => 'Test task',
         'project_id' => $project->id,
         'project_name' => $project->name,
-        'url' => route('project.task.info', ['project' => $project, 'task' => $response->json('id')]),
+        'url' => route('project.task.info', ['project' => $project, 'task' => $task->id]),
     ])
         ->and($notification->getRawOriginal('data'))->not->toContain('model:');
 });
