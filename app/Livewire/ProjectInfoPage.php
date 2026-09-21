@@ -90,7 +90,8 @@ class ProjectInfoPage extends Component
     public function render(): View
     {
         return view('livewire.project-info-page')
-            ->layout('layouts.project', ['project' => $this->project])
+            ->extends('layouts.project', ['project' => $this->project])
+            ->section('project-content')
             ->title($this->project->name);
     }
 }

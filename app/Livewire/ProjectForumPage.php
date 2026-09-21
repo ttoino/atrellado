@@ -58,7 +58,8 @@ class ProjectForumPage extends Component
     {
         return view('livewire.project-forum-page', [
             'threads' => $this->project->threads()->with('author')->withCount('comments')->get(),
-        ])->layout('layouts.project', ['project' => $this->project])
+        ])->extends('layouts.project', ['project' => $this->project])
+            ->section('project-content')
             ->title($this->thread === null ? $this->project->name : $this->thread->title);
     }
 }

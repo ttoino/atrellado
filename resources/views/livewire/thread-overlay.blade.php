@@ -1,5 +1,5 @@
 <div>
-    <article id="thread" class="editable">
+    <article id="thread" @class(['editable', 'editing' => $editing])>
         <header class="offcanvas-header">
             <h2 class="offcanvas-title">
                 {{ $thread->title }}
@@ -81,7 +81,7 @@
 
     <ul id="thread-comments">
         @foreach ($comments as $comment)
-            <li wire:key="thread-comment-{{ $comment->id }}" class="thread-comment editable">
+            <li wire:key="thread-comment-{{ $comment->id }}" @class(['thread-comment', 'editable', 'editing' => $editingCommentId === $comment->id])>
                 <a href="{{ route('user.profile', ['user' => $comment->author]) }}" role="button" style="z-index: 100"
                     class="hstack gap-2">
                     <img width="40" height="40" alt="Profile picture"

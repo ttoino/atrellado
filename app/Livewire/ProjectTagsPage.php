@@ -97,7 +97,8 @@ class ProjectTagsPage extends Component
 
         return view('livewire.project-tags-page', [
             'tags' => $tags->cursorPaginate(10)->withQueryString(),
-        ])->layout('layouts.project', ['project' => $this->project])
+        ])->extends('layouts.project', ['project' => $this->project])
+            ->section('project-content')
             ->title($this->project->name);
     }
 }

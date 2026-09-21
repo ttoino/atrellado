@@ -187,7 +187,8 @@ class ProjectBoardPage extends Component
 
         return view('livewire.project-board-page', [
             'groups' => $groups,
-        ])->layout('layouts.project', ['project' => $this->project])
+        ])->extends('layouts.project', ['project' => $this->project])
+            ->section('project-content')
             ->title($this->task === null ? $this->project->name : $this->task->name);
     }
 
