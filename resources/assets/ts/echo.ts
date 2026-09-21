@@ -3,8 +3,8 @@ import Pusher from "pusher-js";
 
 declare global {
     interface Window {
-        Pusher: typeof Pusher;
         Echo?: Echo<"reverb"> | null;
+        Pusher: typeof Pusher;
         // Injected per-request by layouts/bare from the cached runtime
         // config; takes precedence over the build-time VITE_REVERB_* vars.
         reverbConfig?: {

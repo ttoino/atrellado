@@ -21,7 +21,7 @@ it('appends new threads live', function () {
         ->navigate("/project/{$project->id}/forum")
         ->waitForText('Existing Thread')
         // The broadcast fires once; gate it on the channel being subscribed.
-        ->assertScript("Object.values(window.Echo?.connector?.channels ?? {}).some(c => c.subscription?.subscribed === true)");
+        ->assertScript('Object.values(window.Echo?.connector?.channels ?? {}).some(c => c.subscription?.subscribed === true)');
 
     // The model's created event broadcasts ThreadCreated; the open page
     // should append the card without a reload.
