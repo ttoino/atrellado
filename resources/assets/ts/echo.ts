@@ -4,6 +4,7 @@ import Pusher from "pusher-js";
 declare global {
     interface Window {
         Pusher: typeof Pusher;
+        Echo?: Echo<"reverb"> | null;
         // Injected per-request by layouts/bare from the cached runtime
         // config; takes precedence over the build-time VITE_REVERB_* vars.
         reverbConfig?: {
@@ -63,6 +64,8 @@ if (key) {
             wsPort: port,
             wssPort: port,
         });
+
+        window.Echo = echo;
     } catch (error) {
         console.error("Failed to start Echo:", error);
     }

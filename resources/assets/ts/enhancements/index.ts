@@ -19,6 +19,8 @@ const addEnhancement =
 
         e.enhancements.add(enhancement);
 
+        e.dataset.enhanced = "true";
+
         enhancement.onattach?.(e);
     };
 

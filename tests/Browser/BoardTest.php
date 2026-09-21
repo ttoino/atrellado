@@ -9,9 +9,9 @@ function boardLogin(object $t): mixed
         ->fill('password', 'password123')
         ->submit()
         ->navigate("/project/{$t->project->id}/board")
-        // The enhancement registry attaches click handlers via a
-        // MutationObserver; give it a beat before interacting.
-        ->wait(1);
+        // Elements are clickable before their handlers attach; the retried
+        // assertion waits for the board's enhancement pass to mark them.
+        ->assertScript("document.querySelector('.task-group[data-task-group-id][data-enhanced]') !== null");
 }
 
 beforeEach(function () {
@@ -58,27 +58,25 @@ it('creates and edits a task', function () {
 
 it('moves a task between groups via drag and drop', function () {
     // Sortable is configured with handle: ".grip" — drags must start there.
-    boardLogin($this)
-        ->drag(
-            ".task[data-task-id=\"{$this->task->id}\"] .grip",
-            ".task-group[data-task-group-id=\"{$this->done->id}\"] > ul",
-        )
-        // The reposition is a fire-and-forget PUT; let the roundtrip land
-        // before asserting on the database.
-        ->wait(1);
+    $page = boardLogin($this);
 
-    $this->assertDatabaseHas('task', [
-        'id' => $this->task->id,
-        'task_group_id' => $this->done->id,
-    ]);
+    $page->drag(
+        ".task[data-task-id=\"{$this->task->id}\"] .grip",
+        ".task-group[data-task-group-id=\"{$this->done->id}\"] > ul",
+    );
+
+    // The reposition PUT is fire-and-forget; a fresh render proves the
+    // persisted state (and exercises the read path).
+    $page
+        ->navigate("/project/{$this->project->id}/board")
+        ->assertScript("document.querySelector('.task[data-task-id=\"{$this->task->id}\"]')?.closest('.task-group')?.dataset.taskGroupId === \"{$this->done->id}\"");
 });
 
 it('deletes an empty task group', function () {
     boardLogin($this)
         ->click(".task-group[data-task-group-id=\"{$this->done->id}\"] .delete-task-group")
-        // Deletion is an API roundtrip before the DOM catches up.
-        ->wait(1)
+        // Deletion is optimistic: the element is removed before the DELETE
+        // roundtrip lands, so persistence is checked on a fresh render.
+        ->navigate("/project/{$this->project->id}/board")
         ->assertScript("Array.from(document.querySelectorAll('.task-group textarea[name=name]')).some(t => t.value === 'Done')", false);
-
-    $this->assertDatabaseMissing('task_group', ['id' => $this->done->id]);
 });
