@@ -11,6 +11,7 @@
         "logs": { "enabled": true },
         "traces": { "enabled": true },
     },
+    "secrets": { "required": ["APP_KEY", "REVERB_APP_SECRET"] },
     "upload_source_maps": true,
     "workers_dev": true,
     "routes": [{ "custom_domain": true, "pattern": "atrellado.toino.pt" }],
@@ -84,4 +85,5 @@
             "allowed_sender_addresses": ["noreply@atrellado.toino.pt"],
         },
     ],
+
 }

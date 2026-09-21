@@ -21,7 +21,6 @@ const reverbApp = {
 
 export class AtrelladoContainer extends PhpContainer {
     envVars = {
-        APP_DEBUG: workerEnv.APP_DEBUG,
         APP_ENV: "production",
         APP_KEY: workerEnv.APP_KEY,
         APP_URL: "https://atrellado.toino.pt",
