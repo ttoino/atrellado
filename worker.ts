@@ -1,12 +1,11 @@
-import { Container, getContainer } from "@cloudflare/containers";
 import { env as workerEnv } from "cloudflare:workers";
 import {
-    ContainerProxy,
     d1,
     kv,
     log,
     mail,
     PhpContainer,
+    PhpOutbound,
     phpOutbound,
     phpWorker,
     queue,
@@ -19,7 +18,7 @@ const reverbApp = {
     REVERB_APP_SECRET: workerEnv.REVERB_APP_SECRET,
 };
 
-export class AtrelladoContainer extends PhpContainer {
+export class AppContainer extends PhpContainer {
     envVars = {
         APP_ENV: "production",
         APP_KEY: workerEnv.APP_KEY,
@@ -47,11 +46,13 @@ export class AtrelladoContainer extends PhpContainer {
         SESSION_SECURE_COOKIE: "true",
         WORKERS_PHP: "true",
     };
-    pingEndpoint = "/ping.php";
-    sleepAfter = "1h";
+    image = "atrellado";
+    inactivityTimeoutMs = 3_600_000;
+
+    instance: ContainerStartupOptions["instance"] = "standard-1";
 }
 
-AtrelladoContainer.outboundByHost = phpOutbound(
+AppContainer.outboundByHost = phpOutbound(
     d1("DB"),
     r2("FILES"),
     kv("KV"),
@@ -60,8 +61,7 @@ AtrelladoContainer.outboundByHost = phpOutbound(
     log(),
 );
 
-export class ReverbContainer extends Container {
-    defaultPort = 8080;
+export class ReverbServer extends PhpContainer {
     entrypoint = [
         "php",
         "artisan",
@@ -73,10 +73,14 @@ export class ReverbContainer extends Container {
         APP_KEY: workerEnv.APP_KEY,
         ...reverbApp,
     };
-    sleepAfter = "1h";
+    image = "atrellado-reverb";
+
+    inactivityTimeoutMs = 3_600_000;
+
+    instance: ContainerStartupOptions["instance"] = "lite";
 }
 
-export { ContainerProxy };
+export { PhpOutbound };
 
 const handler = phpWorker({
     consume: true,
@@ -95,7 +99,9 @@ export default {
             (path.startsWith("/app/") &&
                 request.headers.get("upgrade") === "websocket")
         ) {
-            return getContainer(env.REVERB_CONTAINER, "reverb").fetch(request);
+            return env.REVERB_CONTAINER.get(
+                env.REVERB_CONTAINER.idFromName("reverb"),
+            ).fetch(request);
         }
         return (
             handler.fetch?.(request, env, ctx) ??

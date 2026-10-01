@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90aa3501d78d75c503d7774671de2b6e",
+    "content-hash": "1308f23998ba19ee5d2c583ffb7c6c36",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -9553,16 +9553,16 @@
         },
         {
             "name": "workers-php/workers-php",
-            "version": "v1.4.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ttoino/workers-php.git",
-                "reference": "84bf76128389801c160a6cf230a5dbd8b47e58d9"
+                "reference": "a02184edd1c9d9862552af1076b83b6a63ffef74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ttoino/workers-php/zipball/84bf76128389801c160a6cf230a5dbd8b47e58d9",
-                "reference": "84bf76128389801c160a6cf230a5dbd8b47e58d9",
+                "url": "https://api.github.com/repos/ttoino/workers-php/zipball/a02184edd1c9d9862552af1076b83b6a63ffef74",
+                "reference": "a02184edd1c9d9862552af1076b83b6a63ffef74",
                 "shasum": ""
             },
             "require": {
@@ -9606,9 +9606,9 @@
             "description": "PHP runtime for workers-php: D1, R2 and Mail HTTP clients plus Laravel and Symfony integrations.",
             "support": {
                 "issues": "https://github.com/ttoino/workers-php/issues",
-                "source": "https://github.com/ttoino/workers-php/tree/v1.4.0"
+                "source": "https://github.com/ttoino/workers-php/tree/v2.0.0"
             },
-            "time": "2026-09-21T00:44:55+00:00"
+            "time": "2026-10-01T13:41:31+00:00"
         }
     ],
     "packages-dev": [

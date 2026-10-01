@@ -18,28 +18,30 @@
     "containers": [
         {
             "name": "atrellado",
-            "class_name": "AtrelladoContainer",
-            "image": "./Dockerfile.containers",
-            "max_instances": 2,
-            "instance_type": "basic",
+            "class_name": "AppContainer",
+            "scheduling_policy": "durable_object",
+            "images": {
+                "atrellado": { "dockerfile": "./Dockerfile.containers" },
+            },
         },
         {
             "name": "atrellado-reverb",
-            "class_name": "ReverbContainer",
-            "image": "./Dockerfile.containers",
-            "max_instances": 1,
-            "instance_type": "lite",
+            "class_name": "ReverbServer",
+            "scheduling_policy": "durable_object",
+            "images": {
+                "atrellado-reverb": { "dockerfile": "./Dockerfile.containers" },
+            },
         },
     ],
     "durable_objects": {
         "bindings": [
             {
                 "name": "CONTAINER",
-                "class_name": "AtrelladoContainer",
+                "class_name": "AppContainer",
             },
             {
                 "name": "REVERB_CONTAINER",
-                "class_name": "ReverbContainer",
+                "class_name": "ReverbServer",
             },
         ],
     },
@@ -51,6 +53,11 @@
         {
             "tag": "v2",
             "new_sqlite_classes": ["ReverbContainer"],
+        },
+        {
+            "tag": "v3",
+            "new_sqlite_classes": ["AppContainer", "ReverbServer"],
+            "deleted_classes": ["AtrelladoContainer", "ReverbContainer"],
         },
     ],
     "d1_databases": [
@@ -86,37 +93,25 @@
         },
     ],
     // Previews inherit nothing from production: bindings must be
-    // redeclared here (containers too) and point at the atrellado-previews
-    // resources. Queue consumers and Cron Triggers target production only,
-    // so previews run the queue synchronously and cache on local disk.
+    // redeclared here and point at the atrellado-previews resources.
+    // Containers are Durable Object-managed, so they live only in the
+    // top-level containers array. Queue consumers and Cron Triggers target
+    // production only, so previews run the queue synchronously and cache
+    // on local disk.
     "previews": {
         "vars": {
             "APP_CACHE_DRIVER": "file",
             "APP_QUEUE_CONNECTION": "sync",
         },
-        "containers": [
-            {
-                "class_name": "AtrelladoContainer",
-                "image": "./Dockerfile.containers",
-                "max_instances": 2,
-                "instance_type": "basic",
-            },
-            {
-                "class_name": "ReverbContainer",
-                "image": "./Dockerfile.containers",
-                "max_instances": 1,
-                "instance_type": "lite",
-            },
-        ],
         "durable_objects": {
             "bindings": [
                 {
                     "name": "CONTAINER",
-                    "class_name": "AtrelladoContainer",
+                    "class_name": "AppContainer",
                 },
                 {
                     "name": "REVERB_CONTAINER",
-                    "class_name": "ReverbContainer",
+                    "class_name": "ReverbServer",
                 },
             ],
         },

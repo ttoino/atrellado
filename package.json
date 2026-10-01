@@ -14,7 +14,7 @@
         "lint:fix": "eslint --fix ."
     },
     "devDependencies": {
-        "@cloudflare/workers-types": "^4.20260702.1",
+        "@cloudflare/workers-types": "^5.20260930.2",
         "@eslint/compat": "^2.1.0",
         "@eslint/js": "^10.0.1",
         "@types/bootstrap": "^5.2.11",
@@ -33,14 +33,13 @@
         "wrangler": "^4.135.0"
     },
     "dependencies": {
-        "@cloudflare/containers": "^0.3.7",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.8",
         "bootstrap-icons": "^1.13.1",
         "laravel-echo": "^2.5.0",
         "pusher-js": "^8.6.0",
         "sortablejs": "^1.15.7",
-        "workers-php": "^1.4.0"
+        "workers-php": "^2.0.0"
     },
     "packageManager": "pnpm@12.4.1"
 }
