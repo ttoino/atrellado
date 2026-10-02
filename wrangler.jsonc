@@ -17,7 +17,7 @@
     "routes": [{ "custom_domain": true, "pattern": "atrellado.toino.pt" }],
     "containers": [
         {
-            "name": "atrellado",
+            "name": "atrellado-app",
             "class_name": "AppContainer",
             "scheduling_policy": "durable_object",
             "images": {
@@ -25,11 +25,11 @@
             },
         },
         {
-            "name": "atrellado-reverb",
+            "name": "atrellado-reverb-server",
             "class_name": "ReverbServer",
             "scheduling_policy": "durable_object",
             "images": {
-                "atrellado-reverb": { "dockerfile": "./Dockerfile.containers" },
+                "atrellado-reverb": { "dockerfile": "./Dockerfile.reverb" },
             },
         },
     ],

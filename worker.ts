@@ -49,7 +49,7 @@ export class AppContainer extends PhpContainer {
     image = "atrellado";
     inactivityTimeoutMs = 3_600_000;
 
-    instance: ContainerStartupOptions["instance"] = "standard-1";
+    instance: ContainerStartupOptions["instance"] = "lite";
 }
 
 AppContainer.outboundByHost = phpOutbound(
@@ -61,14 +61,11 @@ AppContainer.outboundByHost = phpOutbound(
     log(),
 );
 
+export class AtrelladoContainer extends PhpContainer {}
+
+export class ReverbContainer extends PhpContainer {}
+
 export class ReverbServer extends PhpContainer {
-    entrypoint = [
-        "php",
-        "artisan",
-        "reverb:start",
-        "--host=0.0.0.0",
-        "--port=8080",
-    ];
     envVars = {
         APP_KEY: workerEnv.APP_KEY,
         ...reverbApp,
@@ -100,7 +97,7 @@ export default {
                 request.headers.get("upgrade") === "websocket")
         ) {
             return env.REVERB_CONTAINER.get(
-                env.REVERB_CONTAINER.idFromName("reverb"),
+                env.REVERB_CONTAINER.idFromName("reverb-3"),
             ).fetch(request);
         }
         return (
