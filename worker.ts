@@ -61,10 +61,6 @@ AppContainer.outboundByHost = phpOutbound(
     log(),
 );
 
-export class AtrelladoContainer extends PhpContainer {}
-
-export class ReverbContainer extends PhpContainer {}
-
 export class ReverbServer extends PhpContainer {
     envVars = {
         APP_KEY: workerEnv.APP_KEY,

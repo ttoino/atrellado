@@ -58,6 +58,10 @@
             "tag": "v3",
             "new_sqlite_classes": ["AppContainer", "ReverbServer"],
         },
+        {
+            "tag": "v4",
+            "deleted_classes": ["AtrelladoContainer", "ReverbContainer"],
+        },
     ],
     "d1_databases": [
         {
