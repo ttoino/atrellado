@@ -2,24 +2,40 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\ProviderType;
 use App\Http\Controllers\Controller;
 use App\Models\OAuthUser;
 use App\Models\User;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class OAuthController extends Controller
 {
-    public function redirectOAuth($provider)
+    public function redirectOAuth(string $provider)
     {
+        abort_unless(ProviderType::from($provider)->isConfigured(), 404);
+
         return Socialite::driver($provider)->redirect();
     }
 
-    public function handleOAuthCallback($provider)
+    public function handleOAuthCallback(string $provider)
     {
-        /** @var \Laravel\Socialite\Two\User $oAuthUser */
-        $oAuthUser = Socialite::driver($provider)->user();
+        $providerType = ProviderType::from($provider);
+        abort_unless($providerType->isConfigured(), 404);
+
+        try {
+            /** @var \Laravel\Socialite\Two\User $oAuthUser */
+            $oAuthUser = Socialite::driver($provider)->user();
+        } catch (InvalidStateException|GuzzleException) {
+            return redirect()->route('login')->with('error', "Sign-in with {$providerType->label()} failed. Please try again.");
+        }
+
+        if (! $oAuthUser->getEmail()) {
+            return redirect()->route('register')->with('error', "Your {$providerType->label()} account did not share an email address. Register manually instead.");
+        }
 
         // Primary lookup: the stable provider account id, immune to email
         // changes and token rotation.

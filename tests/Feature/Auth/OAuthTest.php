@@ -4,6 +4,7 @@ use App\Models\OAuthUser;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 it('signs up and links a new oauth identity, then reuses it on the next login', function () {
     $socialiteUser = new Laravel\Socialite\Two\User;
@@ -76,4 +77,75 @@ it('stamps the provider user id on legacy rows linked only by token', function (
     $this->assertAuthenticatedAs($user);
     expect($legacy->fresh()->provider_user_id)->toBe('github-77')
         ->and(OAuthUser::where('user_id', $user->id)->count())->toBe(1);
+});
+
+it('shows oauth buttons only for configured providers', function () {
+    config()->set('services.google.client_id', null);
+    config()->set('services.google.client_secret', null);
+
+    $this->get('/login')
+        ->assertOk()
+        ->assertSee('Sign in with Github')
+        ->assertDontSee('Sign in with Google');
+
+    $this->get('/register')
+        ->assertOk()
+        ->assertSee('Sign in with Github')
+        ->assertDontSee('Sign in with Google');
+});
+
+it('hides all oauth buttons when no provider is configured', function () {
+    config()->set('services.github.client_id', null);
+    config()->set('services.github.client_secret', null);
+    config()->set('services.google.client_id', null);
+    config()->set('services.google.client_secret', null);
+
+    $this->get('/login')
+        ->assertOk()
+        ->assertDontSee('Sign in with');
+});
+
+it('rejects oauth routes for unconfigured providers', function () {
+    config()->set('services.github.client_id', null);
+    config()->set('services.github.client_secret', null);
+
+    $this->get('/oauth/github/redirect')->assertNotFound();
+    $this->get('/oauth/github/callback')->assertNotFound();
+});
+
+it('redirects to login when the oauth callback fails', function () {
+    Socialite::shouldReceive('driver')->with('github')->andReturnSelf();
+    Socialite::shouldReceive('user')->andThrow(new InvalidStateException);
+
+    $response = $this->get('/oauth/github/callback');
+    $response->assertRedirect(route('login'))
+        ->assertSessionHas('error');
+
+    $this->followRedirects($response)->assertSee('Sign-in with GitHub failed');
+
+    $this->assertGuest();
+});
+
+it('redirects to register when the provider shares no email', function () {
+    $socialiteUser = new Laravel\Socialite\Two\User;
+    $socialiteUser->map([
+        'id' => 'github-9',
+        'name' => 'No Email',
+        'email' => null,
+        'avatar' => null,
+    ]);
+    $socialiteUser->token = 'oauth-token-no-email';
+    $socialiteUser->refresh_token = null;
+
+    Socialite::shouldReceive('driver')->with('github')->andReturnSelf();
+    Socialite::shouldReceive('user')->andReturn($socialiteUser);
+
+    $response = $this->get('/oauth/github/callback');
+    $response->assertRedirect(route('register'))
+        ->assertSessionHas('error');
+
+    $this->followRedirects($response)->assertSee('did not share an email address');
+
+    $this->assertGuest();
+    expect(User::count())->toBe(0);
 });
